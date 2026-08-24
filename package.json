@@ -1,0 +1,25 @@
+{
+  "name": "@bryanus/agent-skills",
+  "version": "1.0.0",
+  "description": "Modular, agent-agnostic skills and workflows for Claude Code, Antigravity, Codex, Cursor, and AI coding assistants.",
+  "type": "module",
+  "main": "catalog/catalog.json",
+  "scripts": {
+    "lint:skills": "node scripts/lint-skills.mjs",
+    "test": "node scripts/lint-skills.mjs"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "skills",
+    "antigravity",
+    "claude-code",
+    "codex",
+    "cursor",
+    "workflows",
+    "developer-tools"
+  ],
+  "author": "Brayan Sanjuan",
+  "license": "MIT",
+  "packageManager": "pnpm@10.33.2"
+}
