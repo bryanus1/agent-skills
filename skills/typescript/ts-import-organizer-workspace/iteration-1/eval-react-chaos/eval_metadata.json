@@ -1,0 +1,31 @@
+{
+  "eval_id": 1,
+  "eval_name": "eval-react-chaos",
+  "prompt": "Organiza los imports de este archivo Dashboard.tsx, tiene muchos mezclados, algunos repetidos y algunos que no uso. El archivo de input está en: /Users/brayansanjuan/Development/personal/agent-skills/skills/typescript/ts-import-organizer/evals/inputs/Dashboard.tsx",
+  "assertions": [
+    {
+      "text": "useState, useEffect, useCallback y useMemo están consolidados en una sola línea de import de 'react'",
+      "description": "Verifica consolidación de imports duplicados del mismo módulo"
+    },
+    {
+      "text": "Las rutas ../../../utils/formatters y ../../../types/dashboard están convertidas a @/utils/formatters y @/types/dashboard",
+      "description": "Verifica conversión de rutas relativas profundas a path aliases"
+    },
+    {
+      "text": "DashboardProps usa 'import type'",
+      "description": "Verifica uso correcto de import type para tipos TypeScript"
+    },
+    {
+      "text": "El import de Chart de chart.js ha sido eliminado (no se usa en el componente)",
+      "description": "Verifica eliminación de unused imports"
+    },
+    {
+      "text": "Hay una línea en blanco entre cada grupo de imports",
+      "description": "Verifica separación visual entre grupos"
+    },
+    {
+      "text": "Los side-effect imports (reflect-metadata, Dashboard.module.css) están al final, en el grupo 4",
+      "description": "Verifica que side-effects van al último grupo"
+    }
+  ]
+}

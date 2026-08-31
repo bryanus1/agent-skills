@@ -1,0 +1,23 @@
+{
+  "eval_id": 2,
+  "eval_name": "eval-new-service",
+  "prompt": "Escribe un servicio TypeScript llamado UserService.ts para gestionar usuarios vía API REST. Necesita: axios para HTTP, zod para validar respuestas, el tipo User de @/types/user, el tipo ApiResponse de @/types/api, el helper buildHeaders de @/utils/http, y la constante API_BASE_URL de @/config/constants. El servicio debe tener una función getUser(id: string) que llama a GET /users/:id.",
+  "assertions": [
+    {
+      "text": "User y ApiResponse se importan con 'import type'",
+      "description": "Verifica uso de import type para tipos en código nuevo"
+    },
+    {
+      "text": "axios y zod están en el grupo de dependencias externas, separados de los @/ aliases por una línea en blanco",
+      "description": "Verifica agrupación correcta externos vs aliases"
+    },
+    {
+      "text": "Todos los imports usan comillas simples",
+      "description": "Verifica estilo de comillas por defecto"
+    },
+    {
+      "text": "Dentro del grupo de @/ aliases, los imports están ordenados por longitud de línea (cortos primero)",
+      "description": "Verifica ordenamiento por longitud dentro del grupo"
+    }
+  ]
+}

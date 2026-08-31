@@ -1,0 +1,23 @@
+{
+  "skill_name": "ts-import-organizer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Organiza los imports de este archivo Dashboard.tsx, tiene muchos mezclados, algunos repetidos y algunos que no uso. El archivo de input está en: /Users/brayansanjuan/Development/personal/agent-skills/skills/typescript/ts-import-organizer/evals/inputs/Dashboard.tsx",
+      "expected_output": "El bloque de imports del archivo queda reorganizado en 4 grupos (builtins → externos → aliases/relativos → side-effects), separados por línea en blanco. Los imports duplicados de react están consolidados. Las rutas ../../../ están convertidas a @/. El tipo DashboardProps usa import type. Los imports unused son eliminados. El ordenamiento dentro de cada grupo es por longitud de línea ascendente.",
+      "files": ["evals/inputs/Dashboard.tsx"]
+    },
+    {
+      "id": 2,
+      "prompt": "Escribe un servicio TypeScript llamado UserService.ts para gestionar usuarios vía API REST. Necesita: axios para HTTP, zod para validar respuestas, el tipo User de @/types/user, el tipo ApiResponse de @/types/api, el helper buildHeaders de @/utils/http, y la constante API_BASE_URL de @/config/constants. El servicio debe tener una función getUser(id: string) que llama a GET /users/:id. Guarda el archivo en /Users/brayansanjuan/Development/personal/agent-skills/skills/typescript/ts-import-organizer-workspace/iteration-1/eval-new-service/with_skill/outputs/UserService.ts",
+      "expected_output": "El archivo generado tiene imports organizados en 2 grupos: externos (axios, zod) y path aliases (@/types, @/utils, @/config), separados por línea en blanco. Los tipos User y ApiResponse usan import type. Orden por longitud dentro del grupo. Comillas simples.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Tengo este archivo authService.ts con muchos imports usando rutas relativas profundas con ../../../, conviértelos todos a path aliases usando @/ y organiza los imports correctamente. El archivo está en: /Users/brayansanjuan/Development/personal/agent-skills/skills/typescript/ts-import-organizer/evals/inputs/authService.ts",
+      "expected_output": "Todas las rutas con 2+ niveles (../../..) están convertidas a @/. Las rutas ./ y ../ de un solo nivel se mantienen igual. Los imports quedan en los grupos correctos y ordenados por longitud.",
+      "files": ["evals/inputs/authService.ts"]
+    }
+  ]
+}

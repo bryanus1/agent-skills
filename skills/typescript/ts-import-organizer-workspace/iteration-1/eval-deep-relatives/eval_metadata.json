@@ -1,0 +1,27 @@
+{
+  "eval_id": 3,
+  "eval_name": "eval-deep-relatives",
+  "prompt": "Tengo este archivo authService.ts con muchos imports usando rutas relativas profundas con ../../../, conviértelos todos a path aliases usando @/ y organiza los imports correctamente.",
+  "assertions": [
+    {
+      "text": "No existe ninguna ruta con ../../ (dos o más niveles) en los imports resultantes",
+      "description": "Verifica conversión completa de rutas profundas"
+    },
+    {
+      "text": "./errors se mantiene como ruta relativa (es de un nivel, permitida)",
+      "description": "Verifica que ./ de un nivel no se convierte"
+    },
+    {
+      "text": "../helpers/crypto se mantiene como ruta relativa (es de un nivel, permitida)",
+      "description": "Verifica que ../ de un nivel no se convierte"
+    },
+    {
+      "text": "User está importado con 'import type'",
+      "description": "Verifica type import para tipos"
+    },
+    {
+      "text": "bcryptjs y jsonwebtoken están en el grupo de dependencias externas",
+      "description": "Verifica agrupación correcta de dependencias externas"
+    }
+  ]
+}
