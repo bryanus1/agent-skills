@@ -1,9 +1,8 @@
 ---
 name: glab-cli
-version: 1.0.0
+version: 1.1.0
 description: >-
-  Automatización y gestión de flujos de GitLab desde terminal usando glab CLI: Merge Requests, pipelines de CI/CD, issues, releases y variables.
-  Activar al interactuar con repositorios de GitLab, revisar pipelines o crear MRs.
+  Automatización de flujos de GitLab (MRs con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y releases) usando glab CLI y scripts.
 tags: [gitlab, glab, cli, devops, git, ci-cd, merge-requests]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
@@ -14,84 +13,93 @@ triggers:
   - gitlab ci
   - gitlab pipeline
   - gitlab issue
+  - crear mr gitlab
 requirements:
   tools: [run_command, view_file, replace_file_content]
-  bins: [glab, git]
+  bins: [glab, git, bash]
 ---
 
 # 🦊 GitLab CLI (`glab`) Workflow & Automation
 
 ## 🎯 Propósito
-Guiar al asistente y desarrollador en el uso eficiente y automatizado de la herramienta oficial **GitLab CLI (`glab`)** para gestionar repositorios, crear y revisar Merge Requests (MRs), monitorear y reintentar pipelines de CI/CD, gestionar issues y consultar la API de GitLab directamente desde la terminal.
+Guiar al asistente y desarrollador en la gestión y automatización de repositorios en **GitLab** utilizando `glab` CLI y scripts auxiliares. Estandariza la creación de **Merge Requests (MRs)** siguiendo las normas estrictas del equipo (Conventional Commits, mapeo de emojis, Scoped Labels y ausencia de scope cuando no hay issue), diagnóstico rápido de pipelines fallidos y gestión de releases.
 
 ## ⚡ Cuándo Activar esta Skill
 - Al trabajar en proyectos alojados en GitLab (`gitlab.com`, GitLab Self-Managed o Dedicated).
-- Al crear, revisar, aprobar o fusionar Merge Requests (`glab mr`).
-- Al monitorear el estado de pipelines, depurar logs de jobs fallidos o validar `.gitlab-ci.yml` (`glab ci`).
-- Al gestionar variables de entorno, releases o issues del proyecto.
+- Al crear, revisar, aprobar o gestionar Merge Requests (`glab mr` o `scripts/create_mr.sh`).
+- Al diagnosticar jobs fallidos de CI/CD o ver logs de pipelines (`scripts/diagnose_pipeline.sh` o `glab ci`).
+- Al validar entorno de autenticación, variables o releases de GitLab.
 
 ## 📋 Flujo de Trabajo Paso a Paso
 
 ```mermaid
 flowchart TD
-    A["Verificar Conexión / Auth\n(glab auth status)"] --> B{"Tarea Solicitada"}
-    B -->|"Merge Request"| C["Crear / Revisar MR\n(glab mr create / view)"]
-    B -->|"CI/CD Pipeline"| D["Monitorear / Logs\n(glab ci status / trace)"]
-    B -->|"Issues / Release"| E["Gestionar Work Items\n(glab issue / release)"]
+    A["Verificar Entorno\n(scripts/check_env.sh)"] --> B{"Tarea Requerida"}
+    B -->|"Crear Merge Request"| C["Ejecutar scripts/create_mr.sh\n(Validación de Emojis, Scope y Labels)"]
+    B -->|"Depurar CI/CD"| D["Ejecutar scripts/diagnose_pipeline.sh\n(glab ci trace <job>)"]
+    B -->|"Releases / Tags"| E["Ejecutar scripts/release_helper.sh\n(glab release list/create)"]
 ```
 
 1. **Paso 1: Verificación de Estado y Autenticación**:
-   - Comprobar que `glab` esté autenticado y reconozca el repositorio remoto:
+   - Ejecutar el script de comprobación previa:
      ```bash
-     glab auth status
+     ./skills/gitlab/glab-cli/scripts/check_env.sh
      ```
-   - Si no está autenticado, utilizar `GITLAB_TOKEN` o iniciar sesión con `glab auth login`.
 
-2. **Paso 2: Gestión de Merge Requests (MRs)**:
-   - Para crear un MR a partir de los cambios locales y la rama actual:
+2. **Paso 2: Creación Estandarizada de Merge Requests**:
+   - Usar el script asistente para generar el MR con el título, emojis, labels y formato exacto:
+     ```bash
+     # Con Issue ID detectado o explícito:
+     ./skills/gitlab/glab-cli/scripts/create_mr.sh --issue 42 --domain pets
+
+     # Sin Issue ID (genera título sin scope: <type>: <emoji> <desc>):
+     ./skills/gitlab/glab-cli/scripts/create_mr.sh --domain operations
+     ```
+   - O manualmente con `glab mr create`:
      ```bash
      glab mr create --fill --remove-source-branch --yes
      ```
-   - Para listar o inspeccionar un MR existente:
+
+3. **Paso 3: Diagnóstico y Monitoreo de Pipelines de CI/CD**:
+   - Inspeccionar el pipeline de la rama activa y jobs fallidos:
      ```bash
-     glab mr list
-     glab mr view <id>
+     ./skills/gitlab/glab-cli/scripts/diagnose_pipeline.sh
      ```
-   - Para revisar diff o aprobar:
+   - Ver logs del job específico (ej. `lint`, `test:unit`, `build:app`):
      ```bash
-     glab mr diff <id>
-     glab mr approve <id>
+     ./skills/gitlab/glab-cli/scripts/diagnose_pipeline.sh --job lint --lines 50
      ```
 
-3. **Paso 3: Diagnóstico y Monitoreo de CI/CD**:
-   - Comprobar el estado del pipeline en ejecución:
+4. **Paso 4: Gestión de Releases y Notas de Versión**:
+   - Listar o crear releases:
      ```bash
-     glab ci status
-     ```
-   - Si un job falla, inspeccionar la traza de logs para diagnosticar la causa raíz:
-     ```bash
-     glab ci trace <nombre-del-job>
-     ```
-   - Para reintentar jobs tras corregir incidencias:
-     ```bash
-     glab ci retry
-     ```
-   - Para validar la sintaxis del archivo de CI antes de hacer push:
-     ```bash
-     glab ci lint .gitlab-ci.yml
+     ./skills/gitlab/glab-cli/scripts/release_helper.sh list
+     ./skills/gitlab/glab-cli/scripts/release_helper.sh draft-notes
      ```
 
-4. **Paso 4: Automatización Avanzada y API**:
-   - Para operaciones personalizadas, consultar la API REST directamente con `glab api`:
-     ```bash
-     glab api "projects/:id/repository/commits"
-     ```
+## 🛠️ Scripts y Herramientas Auxiliares
+
+- [`scripts/check_env.sh`](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/gitlab/glab-cli/scripts/check_env.sh): Valida `git`, `glab` y sesión activa.
+- [`scripts/create_mr.sh`](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/gitlab/glab-cli/scripts/create_mr.sh): Creación automatizada de MR con validación de:
+  - Formato con issue: `<type>(#<issue-id>): <emoji> <description>`
+  - Formato sin issue: `<type>: <emoji> <description>` (sin scope)
+  - Scoped Labels obligatorios (`type::*`, `layer::*`, `domain::*`, `priority::*`).
+- [`scripts/diagnose_pipeline.sh`](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/gitlab/glab-cli/scripts/diagnose_pipeline.sh): Inspección de jobs y logs de CI.
+- [`scripts/release_helper.sh`](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/gitlab/glab-cli/scripts/release_helper.sh): Consulta y generación de releases.
 
 ## ⚠️ Reglas Críticas
-- **No interactividad en scripts**: Usar siempre flags como `--yes`, `--fill` o `-y` al ejecutar comandos en flujos automatizados para evitar que la CLI se quede esperando prompts interactivos.
-- **Instancias Self-Managed**: Asegurar que la variable `GITLAB_HOST` esté configurada adecuadamente si el repositorio no reside en `gitlab.com`.
-- **Seguridad**: Nunca exponer tokens personales (`glpat-*`) en logs públicos o commits.
 
-## 📚 Referencias
-* [CheatSheet Completo de Comandos](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/gitlab/glab-cli/references/commands_cheatsheet.md)
+1. **Regla de Título y Scope de MR**:
+   - Si **hay Issue ID**: `<type>(#<issue-id>): <emoji> <description>` (ej. `feat(#42): ✨ pet registration`).
+   - Si **NO hay Issue ID**: `<type>: <emoji> <description>` (ej. `chore: 🔧 upgrade dependencies`).
+   - **NUNCA usar carpetas ni paths como scope** (ej. `feat(web): ...` está PROHIBIDO).
+2. **Uso Exclusivo de Scoped Labels de Grupo**:
+   - Solo usar labels de grupo (`type::feature`, `layer::frontend`, `domain::pets`, etc.). Nunca crear labels locales de repo.
+3. **No interactividad en scripts**: Usar siempre `--yes` o flags no interactivas.
+
+## 📚 Referencias Adicionales
+
+* [Estándares de GitLab, Emojis y Scoped Labels](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/gitlab/glab-cli/references/gitlab_standards.md)
+* [CheatSheet Completo de Comandos glab](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/gitlab/glab-cli/references/commands_cheatsheet.md)
 * [Guía de CI/CD y Resolución de Problemas](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/gitlab/glab-cli/references/ci_and_troubleshooting.md)
+* [Ejemplos de Flujos de Trabajo](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/gitlab/glab-cli/examples/workflows.md)
