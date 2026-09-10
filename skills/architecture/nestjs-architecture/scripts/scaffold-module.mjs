@@ -154,7 +154,7 @@ export class Create${NounPascal}Dto {
   // 4. Update DTO
   files.push({
     path: path.join(moduleRoot, 'dto', `update-${nounKebab}.dto.ts`),
-    content: `import { PartialType, OmitType } from '@nestjs/swagger';
+    content: `import { OmitType, PartialType } from '@nestjs/swagger';
 import { Create${NounPascal}Dto } from './create-${nounKebab}.dto';
 
 export class Update${NounPascal}Dto extends PartialType(
@@ -474,31 +474,31 @@ describe('${NounPascal}Service', () => {
   files.push({
     path: path.join(moduleRoot, 'controllers', `${nounKebab}.controller.ts`),
     content: `import {
-  Controller,
   Get,
-  Post,
-  Patch,
-  Delete,
+  Req,
   Body,
+  Post,
   Param,
+  Patch,
   Query,
+  Delete,
   HttpCode,
   HttpStatus,
+  Controller,
   ParseUUIDPipe,
-  Req,
 } from '@nestjs/common';
 import {
+  ApiBody,
   ApiTags,
-  ApiBearerAuth,
+  ApiParam,
   ApiOperation,
+  ApiBearerAuth,
   ApiOkResponse,
   ApiCreatedResponse,
+  ApiNotFoundResponse,
+  ApiForbiddenResponse,
   ApiNoContentResponse,
   ApiUnauthorizedResponse,
-  ApiForbiddenResponse,
-  ApiNotFoundResponse,
-  ApiParam,
-  ApiBody,
 } from '@nestjs/swagger';
 import { ${NounPascal}Service } from '../services';
 import {

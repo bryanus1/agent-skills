@@ -60,7 +60,7 @@ export class CreateCustomerDto {
 Hereda de `CreateDto` haciendo todos los campos opcionales mediante `PartialType` de `@nestjs/swagger`, omitiendo campos inmutables:
 
 ```typescript
-import { PartialType, OmitType } from '@nestjs/swagger';
+import { OmitType, PartialType } from '@nestjs/swagger';
 import { CreateCustomerDto } from './create-customer.dto';
 
 // Omitir campos que no pueden modificarse tras la creación (ej. email)

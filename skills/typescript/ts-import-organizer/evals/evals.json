@@ -18,6 +18,12 @@
       "prompt": "Tengo este archivo authService.ts con muchos imports usando rutas relativas profundas con ../../../, conviértelos todos a path aliases usando @/ y organiza los imports correctamente. El archivo está en: /Users/brayansanjuan/Development/personal/agent-skills/skills/typescript/ts-import-organizer/evals/inputs/authService.ts",
       "expected_output": "Todas las rutas con 2+ niveles (../../..) están convertidas a @/. Las rutas ./ y ../ de un solo nivel se mantienen igual. Los imports quedan en los grupos correctos y ordenados por longitud.",
       "files": ["evals/inputs/authService.ts"]
+    },
+    {
+      "id": 4,
+      "prompt": "Formatea este archivo OrderProcessor.ts y organiza sus imports. Tiene código desalineado, imports sin usar, rutas relativas profundas y tipos sin 'import type'. El archivo está en: /Users/brayansanjuan/Development/personal/agent-skills/skills/typescript/ts-import-organizer/evals/inputs/OrderProcessor.ts",
+      "expected_output": "El agente formatea primero el código general del archivo y, como paso final posterior al formateo, aplica ts-import-organizer para consolidar duplicados, eliminar unused, convertir ../../../ a @/, asignar import type, agrupar en los 4 bloques estándar y ordenar por longitud ascendente sin permitir que formateadores posteriores desarmen el bloque.",
+      "files": ["evals/inputs/OrderProcessor.ts"]
     }
   ]
 }
