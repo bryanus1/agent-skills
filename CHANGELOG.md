@@ -1,3 +1,13 @@
+## [1.1.0](https://github.com/bryanus1/agent-skills/compare/v1.0.0...v1.1.0) (2026-09-10)
+
+### ✨ Features & Skills
+
+* **skills:** add nextjs and nestjs architecture skills ([e6f00b2](https://github.com/bryanus1/agent-skills/commit/e6f00b2fca5c9a439df2cbae93a73b222f352c82))
+
+### 📝 Documentation
+
+* update README with nextjs and nestjs architecture skills ([2db1d56](https://github.com/bryanus1/agent-skills/commit/2db1d5663cd9fced36329007d8ec2a4c53004aaa))
+
 ## 1.0.0 (2026-08-31)
 
 ### ✨ Features & Skills
