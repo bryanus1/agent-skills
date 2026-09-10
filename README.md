@@ -26,7 +26,7 @@ Diseñado bajo el principio de **Progressive Disclosure**:
 | **[`nextjs-architecture`](skills/architecture/nextjs-architecture/SKILL.md)** | `architecture` / `frontend` | Todos | Screaming Architecture (Feature-Driven / Domain-First) para Next.js App Router, leaf-folder barrel policy, FormDialog, Server Actions vs TanStack Query y generadores CLI. |
 | **[`nestjs-architecture`](skills/architecture/nestjs-architecture/SKILL.md)** | `architecture` / `backend` | Todos | Monolito Modular y Clean Architecture para NestJS, andamiaje de 18 archivos, persistencia agnóstica a ORM con contrato `I<Noun>Repository`, Swagger OpenAPI exhaustivo y doble barrera de seguridad (RBAC). |
 | **[`glab-cli`](skills/gitlab/glab-cli/SKILL.md)** | `gitlab` / `devops` | Todos | Automatización de GitLab con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y gestión de releases. |
-| **[`ts-import-organizer`](skills/typescript/ts-import-organizer/SKILL.md)** | `typescript` / `clean-code` | Todos | Organización de imports en TS/JS (4 grupos, path aliases `@/`, `import type`, consolidación de duplicados y orden por longitud). |
+| **[`ts-import-organizer`](skills/typescript/ts-import-organizer/SKILL.md)** | `typescript` / `clean-code` | Todos | Organización de imports en TS/JS post-formateo (4 grupos, multilíneas primero, miembros por longitud ascendente, aliases `@/` e `import type`). |
 
 ---
 
@@ -124,14 +124,15 @@ Una vez instalada una skill, tu asistente de IA la activará automáticamente cu
 
 ### 🟦 Ejemplo con `ts-import-organizer`:
 
-* **Limpiar y ordenar imports**:
+* **Limpiar y ordenar imports (Post-formateo)**:
   > *"Organiza los imports de este archivo `Dashboard.tsx`, elimina los que no use y cambia las rutas relativas `../../../` por `@/`"*
   > 
   > 🤖 **El agente aplicará**:
-  > 1. Agrupación en 4 bloques: `builtins` ➔ `externos` ➔ `@/ aliases` ➔ `side-effects`.
-  > 2. Conversión a `import type` para interfaces y tipos.
-  > 3. Consolidación de imports de React en una sola línea.
-  > 4. Ordenamiento por longitud de línea.
+  > 1. Formateo previo del código (sintaxis y cuerpo del archivo asegurados primero).
+  > 2. Depuración de imports: elimina unused, consolida duplicados y convierte rutas relativas a `@/`.
+  > 3. Conversión a `import type` para interfaces y tipos de TypeScript.
+  > 4. Agrupación en 4 bloques: `builtins` ➔ `externos` ➔ `@/ aliases / locales` ➔ `side-effects`.
+  > 5. Jerarquía dentro del grupo: imports multilínea primero y monolíneas después, con todos los miembros internos ordenados por longitud ascendente.
 
 ---
 
