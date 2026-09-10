@@ -23,8 +23,10 @@ Diseñado bajo el principio de **Progressive Disclosure**:
 
 | Skill | Categoría | Agentes | Descripción |
 | :--- | :--- | :--- | :--- |
+| **[`flutter-architecture`](skills/architecture/flutter-architecture/SKILL.md)** | `architecture` / `mobile` | Todos | Feature-First Clean Architecture para Flutter (`domain`, `data`, `presentation`), BLoC/Cubit, GetIt/Injectable, Result sealed class de Dart 3 y andamiaje CLI de 13 archivos. |
 | **[`nextjs-architecture`](skills/architecture/nextjs-architecture/SKILL.md)** | `architecture` / `frontend` | Todos | Screaming Architecture (Feature-Driven / Domain-First) para Next.js App Router, leaf-folder barrel policy, FormDialog, Server Actions vs TanStack Query y generadores CLI. |
 | **[`nestjs-architecture`](skills/architecture/nestjs-architecture/SKILL.md)** | `architecture` / `backend` | Todos | Monolito Modular y Clean Architecture para NestJS, andamiaje de 18 archivos, persistencia agnóstica a ORM con contrato `I<Noun>Repository`, Swagger OpenAPI exhaustivo y doble barrera de seguridad (RBAC). |
+| **[`dart-import-organizer`](skills/dart/dart-import-organizer/SKILL.md)** | `dart` / `clean-code` | Todos | Organización de directivas Dart post-formateo en 6 grupos jerárquicos (`dart:*` ➔ `flutter`/terceros ➔ `package:app` ➔ relativos ➔ `export` ➔ `part`), orden alfabético y script CLI. |
 | **[`glab-cli`](skills/gitlab/glab-cli/SKILL.md)** | `gitlab` / `devops` | Todos | Automatización de GitLab con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y gestión de releases. |
 | **[`ts-import-organizer`](skills/typescript/ts-import-organizer/SKILL.md)** | `typescript` / `clean-code` | Todos | Organización de imports en TS/JS post-formateo (4 grupos, multilíneas primero, miembros por longitud ascendente, aliases `@/` e `import type`). |
 
@@ -41,6 +43,8 @@ Puedes instalar estas skills directamente desde GitHub en cualquier proyecto o a
 npx skills add bryanus1/agent-skills --list
 
 # Instalar una skill específica en tu proyecto actual:
+npx skills add bryanus1/agent-skills --skill flutter-architecture
+npx skills add bryanus1/agent-skills --skill dart-import-organizer
 npx skills add bryanus1/agent-skills --skill nextjs-architecture
 npx skills add bryanus1/agent-skills --skill nestjs-architecture
 npx skills add bryanus1/agent-skills --skill glab-cli
@@ -50,7 +54,7 @@ npx skills add bryanus1/agent-skills --skill ts-import-organizer
 npx skills add bryanus1/agent-skills --all
 
 # Instalar globalmente en tu máquina (disponible para todos tus proyectos):
-npx skills add bryanus1/agent-skills --skill nextjs-architecture -g
+npx skills add bryanus1/agent-skills --skill flutter-architecture -g
 ```
 
 ### 2. Vía Enlace Simbólico (Symlink Local)
@@ -60,11 +64,15 @@ Si tienes este repositorio clonado en tu máquina y quieres reflejar los cambios
 ```bash
 # Para Google Antigravity:
 mkdir -p .agents/skills
+ln -s /ruta/a/agent-skills/skills/architecture/flutter-architecture .agents/skills/flutter-architecture
+ln -s /ruta/a/agent-skills/skills/dart/dart-import-organizer .agents/skills/dart-import-organizer
 ln -s /ruta/a/agent-skills/skills/architecture/nextjs-architecture .agents/skills/nextjs-architecture
 ln -s /ruta/a/agent-skills/skills/architecture/nestjs-architecture .agents/skills/nestjs-architecture
 
 # Para Claude Code:
 mkdir -p .claude/skills
+ln -s ../../.agents/skills/flutter-architecture .claude/skills/flutter-architecture
+ln -s ../../.agents/skills/dart-import-organizer .claude/skills/dart-import-organizer
 ln -s ../../.agents/skills/nextjs-architecture .claude/skills/nextjs-architecture
 ln -s ../../.agents/skills/nestjs-architecture .claude/skills/nestjs-architecture
 ```
@@ -74,6 +82,36 @@ ln -s ../../.agents/skills/nestjs-architecture .claude/skills/nestjs-architectur
 ## 💡 Ejemplos de Activación y Uso con Agentes de IA
 
 Una vez instalada una skill, tu asistente de IA la activará automáticamente cuando uses lenguaje natural:
+
+### 📱 Ejemplo con `flutter-architecture`:
+
+* **Andamiar una feature completa con BLoC**:
+  > *"Estructura la feature de facturación (billing) con Clean Architecture y el modelo invoice en Flutter"*
+  > 
+  > 🤖 **El agente ejecutará**: `node skills/architecture/flutter-architecture/scripts/scaffold-feature.mjs billing --model invoice`  
+  > ➔ Genera las 3 capas (`domain`, `data`, `presentation`), contratos de repositorio con Result, BLoC con estados inmutables y tests unitarios con `mocktail`.
+
+* **Andamiar con Cubit**:
+  > *"Crea la feature del carrito de compras (cart) usando Cubit"*
+  > 
+  > 🤖 **El agente ejecutará**: `node skills/architecture/flutter-architecture/scripts/scaffold-feature.mjs cart --model cart_item --cubit`  
+  > ➔ Genera la feature con `CartItemCubit`, estados sellados y suite de pruebas en `test/features/cart/`.
+
+---
+
+### 🎯 Ejemplo con `dart-import-organizer`:
+
+* **Organizar imports de un archivo o directorio**:
+  > *"Reorganiza y limpia los imports de este archivo `login_screen.dart` después de darle formato"*
+  > 
+  > 🤖 **El agente aplicará**:
+  > 1. Formato sintáctico asegurado con `dart format`.
+  > 2. Reorganización en los 6 bloques canónicos: `dart:*` ➔ terceros y `package:flutter/*` ➔ paquete de la app ➔ relativos locales ➔ `export` ➔ `part`.
+  > 3. Ordenamiento alfabético por URI y de miembros en cláusulas `show`/`hide`.
+  > 
+  > O ejecutará: `node skills/dart/dart-import-organizer/scripts/organize-dart-imports.mjs lib/features/auth --write`
+
+---
 
 ### ⚡ Ejemplo con `nextjs-architecture`:
 
@@ -147,9 +185,12 @@ agent-skills/
 │   ├── basic-skill/             # Plantilla para flujos basados en Markdown puro
 │   └── tool-assisted-skill/     # Plantilla con scripts ejecutables y referencias
 ├── skills/                      # Catálogo organizado por categorías
-│   ├── architecture/            # Arquitectura empresarial frontend y backend
+│   ├── architecture/            # Arquitectura empresarial frontend, mobile y backend
+│   │   ├── flutter-architecture/# Clean Architecture Feature-First, BLoC y Result en Flutter
 │   │   ├── nestjs-architecture/ # Modular Monolith, contratos DIP y Swagger en NestJS
 │   │   └── nextjs-architecture/ # Screaming Architecture y App Router en Next.js
+│   ├── dart/
+│   │   └── dart-import-organizer/# Organización canónica de directivas Dart en 6 grupos
 │   ├── gitlab/
 │   │   └── glab-cli/            # Flujos y scripts para GitLab CLI
 │   └── typescript/
