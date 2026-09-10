@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/bryanus1/agent-skills/compare/v1.1.0...v1.2.0) (2026-09-10)
+
+### ✨ Features & Skills
+
+* **ts-import-organizer:** enforce post-formatting execution and multiline-first import hierarchy ([6941a79](https://github.com/bryanus1/agent-skills/commit/6941a79102efd4896307c7d460c5ccbd095888b8))
+
 ## [1.1.0](https://github.com/bryanus1/agent-skills/compare/v1.0.0...v1.1.0) (2026-09-10)
 
 ### ✨ Features & Skills
