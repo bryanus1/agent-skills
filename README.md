@@ -23,6 +23,8 @@ Diseñado bajo el principio de **Progressive Disclosure**:
 
 | Skill | Categoría | Agentes | Descripción |
 | :--- | :--- | :--- | :--- |
+| **[`nextjs-architecture`](skills/architecture/nextjs-architecture/SKILL.md)** | `architecture` / `frontend` | Todos | Screaming Architecture (Feature-Driven / Domain-First) para Next.js App Router, leaf-folder barrel policy, FormDialog, Server Actions vs TanStack Query y generadores CLI. |
+| **[`nestjs-architecture`](skills/architecture/nestjs-architecture/SKILL.md)** | `architecture` / `backend` | Todos | Monolito Modular y Clean Architecture para NestJS, andamiaje de 18 archivos, persistencia agnóstica a ORM con contrato `I<Noun>Repository`, Swagger OpenAPI exhaustivo y doble barrera de seguridad (RBAC). |
 | **[`glab-cli`](skills/gitlab/glab-cli/SKILL.md)** | `gitlab` / `devops` | Todos | Automatización de GitLab con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y gestión de releases. |
 | **[`ts-import-organizer`](skills/typescript/ts-import-organizer/SKILL.md)** | `typescript` / `clean-code` | Todos | Organización de imports en TS/JS (4 grupos, path aliases `@/`, `import type`, consolidación de duplicados y orden por longitud). |
 
@@ -39,6 +41,8 @@ Puedes instalar estas skills directamente desde GitHub en cualquier proyecto o a
 npx skills add bryanus1/agent-skills --list
 
 # Instalar una skill específica en tu proyecto actual:
+npx skills add bryanus1/agent-skills --skill nextjs-architecture
+npx skills add bryanus1/agent-skills --skill nestjs-architecture
 npx skills add bryanus1/agent-skills --skill glab-cli
 npx skills add bryanus1/agent-skills --skill ts-import-organizer
 
@@ -46,7 +50,7 @@ npx skills add bryanus1/agent-skills --skill ts-import-organizer
 npx skills add bryanus1/agent-skills --all
 
 # Instalar globalmente en tu máquina (disponible para todos tus proyectos):
-npx skills add bryanus1/agent-skills --skill glab-cli -g
+npx skills add bryanus1/agent-skills --skill nextjs-architecture -g
 ```
 
 ### 2. Vía Enlace Simbólico (Symlink Local)
@@ -56,11 +60,13 @@ Si tienes este repositorio clonado en tu máquina y quieres reflejar los cambios
 ```bash
 # Para Google Antigravity:
 mkdir -p .agents/skills
-ln -s /ruta/a/agent-skills/skills/gitlab/glab-cli .agents/skills/glab-cli
+ln -s /ruta/a/agent-skills/skills/architecture/nextjs-architecture .agents/skills/nextjs-architecture
+ln -s /ruta/a/agent-skills/skills/architecture/nestjs-architecture .agents/skills/nestjs-architecture
 
 # Para Claude Code:
 mkdir -p .claude/skills
-ln -s ../../.agents/skills/glab-cli .claude/skills/glab-cli
+ln -s ../../.agents/skills/nextjs-architecture .claude/skills/nextjs-architecture
+ln -s ../../.agents/skills/nestjs-architecture .claude/skills/nestjs-architecture
 ```
 
 ---
@@ -68,6 +74,32 @@ ln -s ../../.agents/skills/glab-cli .claude/skills/glab-cli
 ## 💡 Ejemplos de Activación y Uso con Agentes de IA
 
 Una vez instalada una skill, tu asistente de IA la activará automáticamente cuando uses lenguaje natural:
+
+### ⚡ Ejemplo con `nextjs-architecture`:
+
+* **Andamiar una feature completa**:
+  > *"Estructura la feature de facturación (billing) con Screaming Architecture y un modelo inicial"*
+  > 
+  > 🤖 **El agente ejecutará**: `node skills/architecture/nextjs-architecture/scripts/scaffold-feature.mjs billing --model invoice`  
+  > ➔ Genera las 7 subcarpetas (`components`, `hooks`, `models`, `schemas`, `screens`, `services`, `utils`), modelos planos `.ts` sin tests, screen encapsulada y barrel de hoja terminal.
+
+* **Crear componente modal desacoplado**:
+  > *"Crea un diálogo modal para crear facturas en billing con shadcn Dialog"*
+  > 
+  > 🤖 **El agente ejecutará**: `node skills/architecture/nextjs-architecture/scripts/scaffold-component.mjs create-invoice-dialog --feature billing --variant dialog`  
+  > ➔ Genera el patrón `FormDialog` con TSDoc, validación y tests unitarios.
+
+---
+
+### 🏛️ Ejemplo con `nestjs-architecture`:
+
+* **Andamiar módulo de dominio completo**:
+  > *"Crea el módulo de facturas (invoice) con arquitectura limpia y contrato de repositorio"*
+  > 
+  > 🤖 **El agente ejecutará**: `node skills/architecture/nestjs-architecture/scripts/scaffold-module.mjs invoice --target-dir src/modules`  
+  > ➔ Genera los **18 archivos** del módulo (`entities`, `dto`, `repositories/repository.ts` con contrato `IInvoiceRepository` y token `INVOICE_REPOSITORY_TOKEN`, `repositories/invoice.repository.ts`, `services` desacoplados, `controllers` con Swagger completo, specs unitarias y `invoice.module.ts`).
+
+---
 
 ### 🦊 Ejemplo con `glab-cli`:
 
@@ -114,6 +146,9 @@ agent-skills/
 │   ├── basic-skill/             # Plantilla para flujos basados en Markdown puro
 │   └── tool-assisted-skill/     # Plantilla con scripts ejecutables y referencias
 ├── skills/                      # Catálogo organizado por categorías
+│   ├── architecture/            # Arquitectura empresarial frontend y backend
+│   │   ├── nestjs-architecture/ # Modular Monolith, contratos DIP y Swagger en NestJS
+│   │   └── nextjs-architecture/ # Screaming Architecture y App Router en Next.js
 │   ├── gitlab/
 │   │   └── glab-cli/            # Flujos y scripts para GitLab CLI
 │   └── typescript/
