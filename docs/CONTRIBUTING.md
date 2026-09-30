@@ -99,14 +99,17 @@ Asegúrate de incluir las secciones estándar:
 Antes de hacer commit o crear un PR, ejecuta el linter central:
 
 ```bash
-# Validar todo el repositorio:
-pnpm lint:skills
+# Validar todo el repositorio (modo estricto, como en CI):
+pnpm lint:strict
 
 # Validar tu skill específica:
-node scripts/lint-skills.mjs skills/docker/docker-optimization
+node scripts/lint-skills.mjs --strict skills/docker/docker-optimization
+
+# Regenerar catalog/catalog.json y la tabla/instalación del README:
+pnpm catalog
 ```
 
-El linter debe finalizar con `PASS: 0 errors, 0 warnings`.
+El linter debe finalizar con `0 errors, 0 warnings`. Además del frontmatter, valida que `name` coincida con la carpeta y sea único, que `agents` use valores permitidos, que los enlaces relativos existan, que no haya rutas absolutas de máquina y que estén las secciones obligatorias. CI también falla si el catálogo o el README no están regenerados.
 
 ---
 
@@ -124,7 +127,7 @@ docs(contributing): update step-by-step contribution guide
 
 ## 📋 Criterios de Aceptación para Pull Requests
 
-1. ✅ **Linter en Verde**: `pnpm lint:skills` sin errores.
+1. ✅ **Linter en Verde**: `pnpm lint:strict` sin errores ni warnings, y `pnpm catalog:check` en verde.
 2. ✅ **Progressive Disclosure**: Frontmatter ligero y sin runbooks completos dentro de la descripción.
 3. ✅ **Agnosticismo**: Compatible con múltiples agentes de IA.
 4. ✅ **Seguridad**: Sin credenciales, tokens o scripts destructivos.

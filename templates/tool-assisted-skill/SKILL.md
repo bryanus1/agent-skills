@@ -26,7 +26,7 @@ Descripción del flujo de trabajo automatizado que combina razonamiento del mode
 1. **Paso 1: Diagnóstico y Preparación**:
    - Ejecutar el script de diagnóstico inicial:
      ```bash
-     bash scripts/run.sh --check
+     bash <skill-dir>/scripts/run.sh --check
      ```
 2. **Paso 2: Aplicación del Flujo**:
    - Consultar la guía de referencia en [Guía Técnica](references/guide.md) para detalles sobre la arquitectura o reglas complejas.
@@ -39,6 +39,10 @@ Descripción del flujo de trabajo automatizado que combina razonamiento del mode
 
 * `scripts/run.sh`: Script principal de automatización y validación.
   * Opciones: `--check` (solo diagnóstico), `--fix` (aplica correcciones automáticas).
+
+## ⚠️ Reglas Críticas
+- Ejecutar siempre `--check` antes de `--fix` y revisar su salida.
+- No aplicar `--fix` ni sobrescribir archivos sin confirmación explícita del usuario.
 
 ## 📚 Referencias y Ejemplos
 * [Guía Técnica](references/guide.md)

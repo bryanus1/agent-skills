@@ -2,185 +2,182 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { pathToFileURL } from 'node:url';
+import {
+  rootDir,
+  NAME_REGEX,
+  SEMVER_REGEX,
+  MAX_NAME_LEN,
+  MAX_DESCRIPTION_LEN,
+  ALLOWED_AGENTS,
+  REQUIRED_SECTIONS,
+  findSkillFiles,
+  loadSkill,
+} from './lib/skills.mjs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const rootDir = path.resolve(__dirname, '..');
+const TEXT_EXTENSIONS = new Set(['.md', '.json', '.sh', '.mjs', '.js', '.py', '.yaml', '.yml', '.txt']);
+const ABSOLUTE_PATH_REGEX = /file:\/\/|\/Users\/[A-Za-z]|\/home\/[a-z][\w-]*\//;
+const MARKDOWN_LINK_REGEX = /\[[^\]]*\]\(\s*([^)\s]+)(?:\s+"[^"]*")?\s*\)/g;
 
-const NAME_REGEX = /^[a-z0-9-]+$/;
-const SEMVER_REGEX = /^\d+\.\d+\.\d+/;
-const MAX_DESCRIPTION_LEN = 350;
-
-function parseYamlFrontmatter(content, filePath) {
-  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
-  if (!match) {
-    return { error: 'Missing or malformed YAML frontmatter delimiters (---).' };
-  }
-
-  const rawYaml = match[1];
-  const body = match[2];
-  const data = {};
-
-  const lines = rawYaml.split(/\r?\n/);
-  let currentKey = null;
-  let isArray = false;
-  let isMultilineString = false;
-  let multilineBuffer = [];
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const trimmed = line.trim();
-
-    if (!trimmed || trimmed.startsWith('#')) continue;
-
-    // Multiline string handler (>-, |, >)
-    if (isMultilineString) {
-      if (line.startsWith('  ') || line.startsWith('\t')) {
-        multilineBuffer.push(trimmed);
-        continue;
-      } else {
-        data[currentKey] = multilineBuffer.join(' ');
-        isMultilineString = false;
-        multilineBuffer = [];
-      }
-    }
-
-    // Array item
-    if (trimmed.startsWith('- ') && currentKey && isArray) {
-      data[currentKey].push(trimmed.slice(2).trim().replace(/^['"]|['"]$/g, ''));
-      continue;
-    }
-
-    const keyValMatch = line.match(/^([a-zA-Z0-9_-]+):\s*(.*)$/);
-    if (keyValMatch) {
-      if (isMultilineString) {
-        data[currentKey] = multilineBuffer.join(' ');
-        isMultilineString = false;
-        multilineBuffer = [];
-      }
-
-      currentKey = keyValMatch[1].trim();
-      const value = keyValMatch[2].trim();
-
-      if (value === '>-' || value === '>' || value === '|') {
-        isMultilineString = true;
-        isArray = false;
-        multilineBuffer = [];
-      } else if (value.startsWith('[') && value.endsWith(']')) {
-        isArray = false;
-        const items = value.slice(1, -1).split(',').map(s => s.trim().replace(/^['"]|['"]$/g, '')).filter(Boolean);
-        data[currentKey] = items;
-      } else if (value === '') {
-        isArray = true;
-        data[currentKey] = [];
-      } else {
-        isArray = false;
-        data[currentKey] = value.replace(/^['"]|['"]$/g, '');
-      }
-    }
-  }
-
-  if (isMultilineString && currentKey) {
-    data[currentKey] = multilineBuffer.join(' ');
-  }
-
-  return { data, body };
+function stripCode(markdown) {
+  return markdown.replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '');
 }
 
-function findSkillFiles(dir) {
+function listTextFiles(dir) {
   let results = [];
-  if (!fs.existsSync(dir)) return results;
-
-  const entries = fs.readdirSync(dir, { withFileTypes: true });
-  for (const entry of entries) {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      results = results.concat(findSkillFiles(fullPath));
-    } else if (entry.isFile() && entry.name === 'SKILL.md') {
+      if (entry.name !== 'node_modules' && !entry.name.startsWith('.')) results = results.concat(listTextFiles(fullPath));
+    } else if (TEXT_EXTENSIONS.has(path.extname(entry.name))) {
       results.push(fullPath);
     }
   }
   return results;
 }
 
-function validateSkill(filePath) {
+function checkLinks(skill, errors) {
+  for (const [, rawTarget] of stripCode(skill.body).matchAll(MARKDOWN_LINK_REGEX)) {
+    const target = rawTarget.trim();
+    if (/^(https?:|mailto:|#)/.test(target) || target.includes('<')) continue;
+    if (target.startsWith('file:') || path.isAbsolute(target)) {
+      errors.push(`Link '${target}' is absolute. Use a path relative to the skill directory.`);
+      continue;
+    }
+    const resolved = path.resolve(skill.skillDir, decodeURIComponent(target.split('#')[0]));
+    if (!fs.existsSync(resolved)) {
+      errors.push(`Broken link '${target}': ${path.relative(rootDir, resolved)} does not exist.`);
+    }
+  }
+}
+
+function checkAbsolutePaths(skill, errors) {
+  for (const file of listTextFiles(skill.skillDir)) {
+    const lines = fs.readFileSync(file, 'utf8').split('\n');
+    lines.forEach((line, index) => {
+      if (ABSOLUTE_PATH_REGEX.test(line)) {
+        const location = `${path.relative(skill.skillDir, file)}:${index + 1}`;
+        errors.push(`Machine-specific absolute path at ${location}. Skills are installed elsewhere; use relative paths.`);
+      }
+    });
+  }
+}
+
+/** Validates one loaded skill. Cross-skill checks (duplicate names) live in lintSkills. */
+export function validateSkill(skill) {
   const errors = [];
   const warnings = [];
-  const relativePath = path.relative(rootDir, filePath);
 
-  const content = fs.readFileSync(filePath, 'utf8');
-  const { data, body, error: yamlError } = parseYamlFrontmatter(content, filePath);
-
-  if (yamlError) {
-    errors.push(yamlError);
-    return { filePath, relativePath, errors, warnings };
+  if (skill.error) {
+    errors.push(skill.error);
+    return { errors, warnings };
   }
 
-  // Check required field: name
-  if (!data.name) {
+  const { data, body } = skill;
+  const folderName = path.basename(skill.skillDir);
+
+  if (typeof data.name !== 'string' || !data.name) {
     errors.push("Missing required frontmatter field: 'name'.");
   } else if (!NAME_REGEX.test(data.name)) {
     errors.push(`Invalid name '${data.name}'. Must be kebab-case (a-z, 0-9, -).`);
-  } else if (data.name.length > 40) {
-    errors.push(`Name '${data.name}' is too long (${data.name.length} chars, max 40).`);
+  } else if (data.name.length > MAX_NAME_LEN) {
+    errors.push(`Name '${data.name}' is too long (${data.name.length} chars, max ${MAX_NAME_LEN}).`);
+  } else if (!skill.isTemplate && data.name !== folderName) {
+    errors.push(`Name '${data.name}' must match its directory name '${folderName}'.`);
   }
 
-  // Check required field: version
-  if (!data.version) {
+  if (data.version === undefined || data.version === null) {
     errors.push("Missing required frontmatter field: 'version'.");
-  } else if (!SEMVER_REGEX.test(data.version)) {
+  } else if (!SEMVER_REGEX.test(String(data.version))) {
     errors.push(`Invalid version '${data.version}'. Must follow SemVer (e.g., 1.0.0).`);
   }
 
-  // Check required field: description
-  if (!data.description) {
+  if (typeof data.description !== 'string' || !data.description.trim()) {
     errors.push("Missing required frontmatter field: 'description'.");
-  } else {
-    if (data.description.length > MAX_DESCRIPTION_LEN) {
-      warnings.push(`Description length (${data.description.length} chars) exceeds recommended progressive disclosure limit (${MAX_DESCRIPTION_LEN} chars).`);
-    }
+  } else if (data.description.trim().length > MAX_DESCRIPTION_LEN) {
+    warnings.push(`Description length (${data.description.trim().length} chars) exceeds the progressive disclosure limit (${MAX_DESCRIPTION_LEN} chars).`);
   }
 
-  // Check triggers
-  if (!data.triggers || !Array.isArray(data.triggers) || data.triggers.length < 2) {
+  const triggers = data.triggers;
+  if (!Array.isArray(triggers) || triggers.filter((t) => typeof t === 'string' && t.trim()).length < 2) {
     errors.push("Field 'triggers' must be a list with at least 2 trigger terms or phrases.");
   }
 
-  // Check body structure
-  if (!body || body.trim().length === 0) {
-    errors.push("Skill content body is empty.");
-  } else {
-    if (!body.includes('# ')) {
-      warnings.push("Skill body should include a top-level H1 title (# Title).");
+  if (data.agents !== undefined) {
+    if (!Array.isArray(data.agents)) {
+      errors.push("Field 'agents' must be a list.");
+    } else {
+      const unknown = data.agents.filter((agent) => !ALLOWED_AGENTS.includes(agent));
+      if (unknown.length > 0) {
+        errors.push(`Unknown agent(s) ${unknown.map((a) => `'${a}'`).join(', ')}. Allowed: ${ALLOWED_AGENTS.join(', ')}.`);
+      }
     }
   }
 
-  return { filePath, relativePath, name: data.name, version: data.version, errors, warnings };
+  if (data.tags !== undefined && !Array.isArray(data.tags)) {
+    errors.push("Field 'tags' must be a list.");
+  }
+
+  if (!body || body.trim().length === 0) {
+    errors.push('Skill content body is empty.');
+  } else {
+    if (!/^# /m.test(body)) {
+      warnings.push('Skill body should include a top-level H1 title (# Title).');
+    }
+    const headings = body.split('\n').filter((line) => line.startsWith('## '));
+    for (const section of REQUIRED_SECTIONS) {
+      if (!headings.some((heading) => section.pattern.test(heading))) {
+        warnings.push(`Missing required section: '${section.label}'.`);
+      }
+    }
+    checkLinks(skill, errors);
+  }
+
+  checkAbsolutePaths(skill, errors);
+
+  return { errors, warnings };
+}
+
+/** Lints a list of SKILL.md paths and returns per-file results. */
+export function lintSkills(skillFiles) {
+  const skills = skillFiles.map(loadSkill);
+  const results = skills.map((skill) => ({ skill, ...validateSkill(skill) }));
+
+  const byName = new Map();
+  for (const result of results) {
+    const name = result.skill.data?.name;
+    if (typeof name !== 'string') continue;
+    if (!byName.has(name)) byName.set(name, []);
+    byName.get(name).push(result);
+  }
+  for (const [name, group] of byName) {
+    if (group.length < 2) continue;
+    for (const result of group) {
+      const others = group.filter((r) => r !== result).map((r) => r.skill.relativePath);
+      result.errors.push(`Duplicate skill name '${name}' (also used by ${others.join(', ')}).`);
+    }
+  }
+
+  return results;
 }
 
 function main() {
-  console.log('🔍 Validating skills across repository...\n');
+  const args = process.argv.slice(2);
+  const strict = args.includes('--strict');
+  const targetArg = args.find((arg) => !arg.startsWith('--'));
 
-  const targetArg = process.argv[2];
-  let skillFiles = [];
+  console.log(`🔍 Validating skills across repository...${strict ? ' (strict: warnings fail)' : ''}\n`);
 
+  let skillFiles;
   if (targetArg) {
     const fullTarget = path.resolve(rootDir, targetArg);
-    if (fs.existsSync(fullTarget)) {
-      if (fs.statSync(fullTarget).isDirectory()) {
-        skillFiles = findSkillFiles(fullTarget);
-      } else if (fullTarget.endsWith('SKILL.md')) {
-        skillFiles = [fullTarget];
-      }
-    } else {
+    if (!fs.existsSync(fullTarget)) {
       console.error(`❌ Path not found: ${targetArg}`);
       process.exit(1);
     }
+    skillFiles = fs.statSync(fullTarget).isDirectory() ? findSkillFiles(fullTarget) : [fullTarget];
   } else {
-    const skillsDir = path.join(rootDir, 'skills');
-    const templatesDir = path.join(rootDir, 'templates');
-    skillFiles = [...findSkillFiles(skillsDir), ...findSkillFiles(templatesDir)];
+    skillFiles = [...findSkillFiles(path.join(rootDir, 'skills')), ...findSkillFiles(path.join(rootDir, 'templates'))];
   }
 
   if (skillFiles.length === 0) {
@@ -188,40 +185,39 @@ function main() {
     process.exit(0);
   }
 
+  // Duplicate names are checked across the whole catalog even when linting one path.
+  const allFiles = [...findSkillFiles(path.join(rootDir, 'skills')), ...findSkillFiles(path.join(rootDir, 'templates'))];
+  const allResults = lintSkills([...new Set([...allFiles, ...skillFiles])]);
+  const results = allResults.filter((result) => skillFiles.includes(result.skill.filePath));
+
   let totalErrors = 0;
   let totalWarnings = 0;
 
-  for (const file of skillFiles) {
-    const result = validateSkill(file);
-    const hasIssues = result.errors.length > 0 || result.warnings.length > 0;
-
-    if (result.errors.length > 0) {
-      console.log(`❌ \x1b[31mFAIL\x1b[0m: ${result.relativePath} (${result.name || 'unnamed'}@${result.version || 'unknown'})`);
-      for (const err of result.errors) {
-        console.log(`   ⛔ ${err}`);
-      }
-      totalErrors += result.errors.length;
-    } else if (result.warnings.length > 0) {
-      console.log(`⚠️  \x1b[33mWARN\x1b[0m: ${result.relativePath} (${result.name}@${result.version})`);
-      for (const warn of result.warnings) {
-        console.log(`   🔸 ${warn}`);
-      }
-      totalWarnings += result.warnings.length;
+  for (const { skill, errors, warnings } of results) {
+    const label = `${skill.relativePath} (${skill.data?.name || 'unnamed'}@${skill.data?.version || 'unknown'})`;
+    if (errors.length > 0) {
+      console.log(`❌ \x1b[31mFAIL\x1b[0m: ${label}`);
+    } else if (warnings.length > 0) {
+      console.log(`⚠️  \x1b[33mWARN\x1b[0m: ${label}`);
     } else {
-      console.log(`✔  \x1b[32mPASS\x1b[0m: ${result.relativePath} (${result.name}@${result.version})`);
+      console.log(`✔  \x1b[32mPASS\x1b[0m: ${label}`);
     }
+    for (const err of errors) console.log(`   ⛔ ${err}`);
+    for (const warn of warnings) console.log(`   🔸 ${warn}`);
+    totalErrors += errors.length;
+    totalWarnings += warnings.length;
   }
 
   console.log('\n----------------------------------------');
-  console.log(`📊 Summary: ${skillFiles.length} skills checked, ${totalErrors} errors, ${totalWarnings} warnings.`);
+  console.log(`📊 Summary: ${results.length} skills checked, ${totalErrors} errors, ${totalWarnings} warnings.`);
 
-  if (totalErrors > 0) {
-    console.log('❌ Validation failed with errors.\n');
+  if (totalErrors > 0 || (strict && totalWarnings > 0)) {
+    console.log('❌ Validation failed.\n');
     process.exit(1);
-  } else {
-    console.log('✨ All skills passed validation successfully!\n');
-    process.exit(0);
   }
+  console.log('✨ All skills passed validation successfully!\n');
 }
 
-main();
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main();
+}

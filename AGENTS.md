@@ -65,11 +65,20 @@ Ensure the document has the following standard sections:
 **ALWAYS** run the linter after creating or updating any skill:
 
 ```bash
-pnpm lint:skills
+pnpm lint:strict
 ```
-*(Or `pnpm test` or `node scripts/lint-skills.mjs <path-to-skill>`)*
+*(Or `node scripts/lint-skills.mjs --strict <path-to-skill>`)*
 
-Ensure the linter exits with `PASS` and `0 errors`. Fix any schema or validation issues before finishing.
+Ensure the linter exits with `PASS`, `0 errors` and `0 warnings` (CI runs it in strict mode). Fix any schema or validation issues before finishing.
+
+### 6. Regenerate the Catalog
+When a skill is added or its frontmatter changes, run:
+
+```bash
+pnpm catalog
+```
+
+This rewrites `catalog/catalog.json` and the generated blocks in `README.md` (skills table and install commands). Never edit those blocks by hand; CI fails if they are out of date. Update the README's example and directory tree sections manually.
 
 ---
 

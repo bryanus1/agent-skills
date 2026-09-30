@@ -1,1 +1,2 @@
-pnpm lint:skills
+pnpm lint:strict
+pnpm catalog:check

@@ -1,0 +1,216 @@
+{
+  "repository": "bryanus1/agent-skills",
+  "skills": [
+    {
+      "name": "flutter-architecture",
+      "version": "1.0.0",
+      "description": "Clean Architecture Feature-First para Flutter. Guía el diseño modular en lib/features/<feature>/ (domain, data, presentation) con BLoC/Cubit, Inyección de Dependencias (GetIt/Injectable), manejo funcional de errores con Result sealed class y pruebas unitarias con mocktail y bloc_test.",
+      "category": "architecture",
+      "path": "skills/architecture/flutter-architecture/SKILL.md",
+      "tags": [
+        "flutter",
+        "architecture",
+        "clean-architecture",
+        "feature-first",
+        "bloc",
+        "cubit",
+        "get-it",
+        "dart"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "flutter architecture",
+        "flutter clean architecture",
+        "feature first flutter",
+        "flutter bloc architecture",
+        "scaffold flutter feature",
+        "arquitectura flutter",
+        "clean architecture flutter",
+        "crear feature flutter",
+        "estructurar flutter"
+      ]
+    },
+    {
+      "name": "nestjs-architecture",
+      "version": "1.0.0",
+      "description": "Estándar de Modular Monolith para NestJS. Guía el andamiaje de módulos de dominio desacoplados, contratos DTO estrictos, documentación OpenAPI Swagger exhaustiva, persistencia agnóstica a cualquier ORM con Repository/Entity y doble barrera de seguridad (RBAC).",
+      "category": "architecture",
+      "path": "skills/architecture/nestjs-architecture/SKILL.md",
+      "tags": [
+        "nestjs",
+        "backend",
+        "modular-monolith",
+        "clean-architecture",
+        "swagger",
+        "rbac",
+        "orm-agnostic",
+        "database"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "nestjs architecture",
+        "modular monolith nestjs",
+        "nestjs module",
+        "scaffold nestjs module",
+        "nestjs clean architecture",
+        "arquitectura nestjs",
+        "crear modulo nestjs",
+        "estructurar nestjs"
+      ]
+    },
+    {
+      "name": "nextjs-architecture",
+      "version": "1.0.0",
+      "description": "Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions, hooks con TanStack Query, componentes FormDialog y testing con cobertura >= 90%.",
+      "category": "architecture",
+      "path": "skills/architecture/nextjs-architecture/SKILL.md",
+      "tags": [
+        "nextjs",
+        "react",
+        "screaming-architecture",
+        "frontend",
+        "app-router",
+        "tanstack-query",
+        "form-dialog"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "nextjs architecture",
+        "screaming architecture",
+        "nextjs feature",
+        "scaffold nextjs feature",
+        "nextjs form dialog",
+        "arquitectura nextjs",
+        "crear feature nextjs",
+        "estructurar nextjs"
+      ]
+    },
+    {
+      "name": "dart-import-organizer",
+      "version": "1.0.0",
+      "description": "Organiza y estandariza imports en Dart y Flutter (.dart). Se aplica DESPUÉS de formatear el código. Agrupa jerárquicamente en 6 bloques: dart:* → flutter/terceros → package de app → relativos → export → part, con orden alfabético y líneas en blanco entre grupos.",
+      "category": "dart",
+      "path": "skills/dart/dart-import-organizer/SKILL.md",
+      "tags": [
+        "dart",
+        "flutter",
+        "imports",
+        "clean-code",
+        "linter",
+        "formatting",
+        "refactor"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "organizar imports flutter",
+        "ordenar imports dart",
+        "organize dart imports",
+        "flutter import order",
+        "dart import organizer",
+        "limpiar imports flutter",
+        "fix dart imports",
+        "sort dart imports"
+      ]
+    },
+    {
+      "name": "glab-cli",
+      "version": "1.1.0",
+      "description": "Automatización de flujos de GitLab (MRs con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y releases) usando glab CLI y scripts.",
+      "category": "gitlab",
+      "path": "skills/gitlab/glab-cli/SKILL.md",
+      "tags": [
+        "gitlab",
+        "glab",
+        "cli",
+        "devops",
+        "git",
+        "ci-cd",
+        "merge-requests"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "glab",
+        "gitlab cli",
+        "gitlab mr",
+        "merge request",
+        "gitlab ci",
+        "gitlab pipeline",
+        "gitlab issue",
+        "crear mr gitlab"
+      ]
+    },
+    {
+      "name": "ts-import-organizer",
+      "version": "1.1.0",
+      "description": "Organiza imports en TypeScript/JavaScript (.ts, .tsx, .js, .jsx). Se aplica siempre DESPUÉS de formatear el código. Agrupa: builtins → externos → path aliases → side-effects. Ordena líneas y miembros ({ ... }) por longitud, elimina unused y convierte rutas relativas a aliases. Activa al ordenar imports o escribir código.",
+      "category": "typescript",
+      "path": "skills/typescript/ts-import-organizer/SKILL.md",
+      "tags": [
+        "typescript",
+        "javascript",
+        "imports",
+        "style",
+        "refactor",
+        "linting",
+        "formatter"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "organizar imports",
+        "ordenar imports",
+        "limpiar imports",
+        "reorganizar imports",
+        "arreglar imports",
+        "organize imports",
+        "sort imports",
+        "clean imports",
+        "fix imports",
+        "import order",
+        "unused imports",
+        "path alias",
+        "formatear y ordenar imports",
+        "organizar imports post formateo",
+        "format and sort imports",
+        "post format imports",
+        "ordenar named imports",
+        "sort named imports"
+      ]
+    }
+  ]
+}
