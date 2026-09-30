@@ -137,6 +137,41 @@
       ]
     },
     {
+      "name": "gh-cli",
+      "version": "1.0.0",
+      "description": "Automatización de flujos de GitHub con gh CLI y scripts: Pull Requests con Conventional Commits, emojis y labels verificados, diagnóstico de GitHub Actions, issues y releases con notas generadas. Úsala al crear o revisar PRs, depurar workflows fallidos o publicar releases.",
+      "category": "github",
+      "path": "skills/github/gh-cli/SKILL.md",
+      "tags": [
+        "github",
+        "gh",
+        "cli",
+        "devops",
+        "git",
+        "ci-cd",
+        "pull-requests",
+        "github-actions"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "gh cli",
+        "github cli",
+        "pull request",
+        "crear pr",
+        "abrir pr github",
+        "github actions",
+        "workflow fallido",
+        "github issue",
+        "github release"
+      ]
+    },
+    {
       "name": "glab-cli",
       "version": "1.2.0",
       "description": "Automatización de flujos de GitLab (MRs con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y releases) usando glab CLI y scripts.",

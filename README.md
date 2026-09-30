@@ -29,6 +29,7 @@ Diseñado bajo el principio de **Progressive Disclosure**:
 | **[`nestjs-architecture`](skills/architecture/nestjs-architecture/SKILL.md)** | `architecture` | `1.1.0` | Todos | Estándar de Modular Monolith para NestJS. Guía el andamiaje de módulos de dominio desacoplados, contratos DTO estrictos, documentación OpenAPI Swagger exhaustiva, persistencia agnóstica a cualquier ORM con Repository/Entity y doble barrera de seguridad (RBAC). |
 | **[`nextjs-architecture`](skills/architecture/nextjs-architecture/SKILL.md)** | `architecture` | `1.1.0` | Todos | Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions, hooks con TanStack Query, componentes FormDialog y testing con cobertura &gt;= 90%. |
 | **[`dart-import-organizer`](skills/dart/dart-import-organizer/SKILL.md)** | `dart` | `1.0.1` | Todos | Organiza y estandariza imports en Dart y Flutter (.dart). Se aplica DESPUÉS de formatear el código. Agrupa jerárquicamente en 6 bloques: dart:* → flutter/terceros → package de app → relativos → export → part, con orden alfabético y líneas en blanco entre grupos. |
+| **[`gh-cli`](skills/github/gh-cli/SKILL.md)** | `github` | `1.0.0` | Todos | Automatización de flujos de GitHub con gh CLI y scripts: Pull Requests con Conventional Commits, emojis y labels verificados, diagnóstico de GitHub Actions, issues y releases con notas generadas. Úsala al crear o revisar PRs, depurar workflows fallidos o publicar releases. |
 | **[`glab-cli`](skills/gitlab/glab-cli/SKILL.md)** | `gitlab` | `1.2.0` | Todos | Automatización de flujos de GitLab (MRs con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y releases) usando glab CLI y scripts. |
 | **[`ts-import-organizer`](skills/typescript/ts-import-organizer/SKILL.md)** | `typescript` | `1.1.1` | Todos | Organiza imports en TypeScript/JavaScript (.ts, .tsx, .js, .jsx). Se aplica siempre DESPUÉS de formatear el código. Agrupa: builtins → externos → path aliases → side-effects. Ordena líneas y miembros ({ ... }) por longitud, elimina unused y convierte rutas relativas a aliases. Activa al ordenar imports o escribir código. |
 <!-- catalog-table:end -->
@@ -54,6 +55,7 @@ npx skills add bryanus1/agent-skills --skill flutter-architecture
 npx skills add bryanus1/agent-skills --skill nestjs-architecture
 npx skills add bryanus1/agent-skills --skill nextjs-architecture
 npx skills add bryanus1/agent-skills --skill dart-import-organizer
+npx skills add bryanus1/agent-skills --skill gh-cli
 npx skills add bryanus1/agent-skills --skill glab-cli
 npx skills add bryanus1/agent-skills --skill ts-import-organizer
 ```
@@ -170,6 +172,27 @@ Una vez instalada una skill, tu asistente de IA la activará automáticamente cu
 
 ---
 
+### 🐙 Ejemplo con `gh-cli`:
+
+* **Crear Pull Request estandarizado**:
+  > *"Abre un PR de mi rama feat/42-login-form para el dominio auth y pide revisión a octocat"*
+  > 
+  > 🤖 **El agente ejecutará**: `bash <skill-dir>/scripts/create_pr.sh --domain auth --reviewer octocat --dry-run` y, tras tu confirmación, el mismo comando sin `--dry-run`  
+  > ➔ Título `feat(#42): ✨ login form`, labels `enhancement` y `domain: auth` (verificados en el repo antes de crear nada) y cuerpo con `Closes #42`.
+
+* **Diagnosticar un check fallido de GitHub Actions**:
+  > *"El check de lint de mi PR #57 está en rojo"*
+  > 
+  > 🤖 **El agente ejecutará**: `bash <skill-dir>/scripts/diagnose_run.sh --pr 57 --job lint`  
+  > ➔ Muestra los checks del PR y solo las líneas fallidas del job `lint` del último run fallido.
+
+* **Publicar una release**:
+  > *"Publica la release v1.4.0"*
+  > 
+  > 🤖 **El agente ejecutará**: `bash <skill-dir>/scripts/release_helper.sh create v1.4.0 --dry-run` y, tras tu confirmación, la crea con notas generadas por GitHub.
+
+---
+
 ### 🟦 Ejemplo con `ts-import-organizer`:
 
 * **Limpiar y ordenar imports (Post-formateo)**:
@@ -201,6 +224,8 @@ agent-skills/
 │   │   └── nextjs-architecture/ # Screaming Architecture y App Router en Next.js
 │   ├── dart/
 │   │   └── dart-import-organizer/# Organización canónica de directivas Dart en 6 grupos
+│   ├── github/
+│   │   └── gh-cli/              # PRs, GitHub Actions, issues y releases con GitHub CLI
 │   ├── gitlab/
 │   │   └── glab-cli/            # Flujos y scripts para GitLab CLI
 │   └── typescript/
