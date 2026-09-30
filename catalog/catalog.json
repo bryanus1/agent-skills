@@ -34,7 +34,8 @@
         "clean architecture flutter",
         "crear feature flutter",
         "estructurar flutter"
-      ]
+      ],
+      "requires": []
     },
     {
       "name": "nestjs-architecture",
@@ -68,7 +69,8 @@
         "arquitectura nestjs",
         "crear modulo nestjs",
         "estructurar nestjs"
-      ]
+      ],
+      "requires": []
     },
     {
       "name": "nextjs-architecture",
@@ -101,7 +103,8 @@
         "arquitectura nextjs",
         "crear feature nextjs",
         "estructurar nextjs"
-      ]
+      ],
+      "requires": []
     },
     {
       "name": "dart-import-organizer",
@@ -134,7 +137,8 @@
         "limpiar imports flutter",
         "fix dart imports",
         "sort dart imports"
-      ]
+      ],
+      "requires": []
     },
     {
       "name": "gh-cli",
@@ -169,7 +173,8 @@
         "workflow fallido",
         "github issue",
         "github release"
-      ]
+      ],
+      "requires": []
     },
     {
       "name": "glab-cli",
@@ -202,7 +207,8 @@
         "gitlab pipeline",
         "gitlab issue",
         "crear mr gitlab"
-      ]
+      ],
+      "requires": []
     },
     {
       "name": "ts-import-organizer",
@@ -245,7 +251,8 @@
         "post format imports",
         "ordenar named imports",
         "sort named imports"
-      ]
+      ],
+      "requires": []
     }
   ]
 }

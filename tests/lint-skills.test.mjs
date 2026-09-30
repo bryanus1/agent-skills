@@ -129,6 +129,25 @@ test('reports duplicate names across skills', (t) => {
   }
 });
 
+test('requirements.skills must reference skills that exist in the catalog', (t) => {
+  const dir = makeTempDir(t);
+  const needsOthers = frontmatter({ name: 'consumer', requirements: '\n  skills: [provider, missing-skill]' });
+  writeFiles(dir, {
+    'consumer/SKILL.md': needsOthers + VALID_BODY,
+    'consumer/references/guide.md': '# Guide\n',
+    'provider/SKILL.md': frontmatter({ name: 'provider' }) + VALID_BODY,
+    'provider/references/guide.md': '# Guide\n',
+  });
+  const results = Object.fromEntries(lintSkills(findSkillFiles(dir)).map((r) => [r.skill.data.name, r.errors]));
+  assert.deepEqual(results.provider, []);
+  assert.deepEqual(results.consumer, ["Required skill 'missing-skill' (requirements.skills) does not exist in the catalog."]);
+});
+
+test('requirements.skills must be a list of names', (t) => {
+  const { errors } = lintTempSkill(t, { head: frontmatter({ requirements: '\n  skills: nestjs-architecture' }) });
+  assert.ok(errors.some((e) => /must be a list of skill names/.test(e)), errors.join('\n'));
+});
+
 test('skill discovery skips *-workspace and dot directories', (t) => {
   const dir = makeTempDir(t);
   writeFiles(dir, {
