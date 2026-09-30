@@ -16,24 +16,30 @@ SQUASH=false
 ISSUE_ID=""
 DOMAIN_LABEL=""
 LAYER_LABEL="layer::backend"
+LAYER_EXPLICIT=false
 PRIORITY_LABEL=""
+DOMAINS_FILE=""
 
 usage() {
   cat << 'HELP'
 Usage: create_mr.sh [OPTIONS]
 
 Options:
-  -t, --target <branch>     Target branch (default: main)
-  -i, --issue <id>          GitLab Issue ID (e.g. 42 or #42). Optional.
-  -d, --domain <domain>     Domain label (pets, landing, auth, clinical, operations, users)
-  -l, --layer <layer>       Layer label (backend, frontend) (default: auto-detected or backend)
-  -p, --priority <priority> Priority (high, medium, low)
-  --squash                  Enable squash commits on merge
-  --no-remove-branch        Do not remove source branch on merge
-  --dry-run                 Show the constructed glab command without executing
-  -h, --help                Show this help message
+  -t, --target <branch>       Target branch (default: main)
+  -i, --issue <id>            GitLab Issue ID (e.g. 42 or #42). Optional.
+  -d, --domain <domain>       Domain label in kebab-case (e.g. auth, billing). If a domains
+                              file exists, the value must be listed in it.
+  --domains-file <path>       Allowed domains, one per line (default: .glab-domains at the
+                              repository root; if absent, any kebab-case domain is accepted)
+  -l, --layer <layer>         Layer label: backend or frontend (default: frontend when a
+                              next.config.* file exists, otherwise backend)
+  -p, --priority <priority>   Priority: high, medium or low
+  --squash                    Enable squash commits on merge
+  --no-remove-branch          Do not remove source branch on merge
+  --dry-run                   Show the constructed glab command without executing
+  -h, --help                  Show this help message
 HELP
-  exit 1
+  exit "${1:-1}"
 }
 
 # Parse flags
@@ -42,15 +48,26 @@ while [[ $# -gt 0 ]]; do
     -t|--target) TARGET_BRANCH="$2"; shift 2 ;;
     -i|--issue) ISSUE_ID="$2"; shift 2 ;;
     -d|--domain) DOMAIN_LABEL="$2"; shift 2 ;;
-    -l|--layer) LAYER_LABEL="layer::$2"; shift 2 ;;
+    --domains-file) DOMAINS_FILE="$2"; shift 2 ;;
+    -l|--layer) LAYER_LABEL="layer::$2"; LAYER_EXPLICIT=true; shift 2 ;;
     -p|--priority) PRIORITY_LABEL="priority::$2"; shift 2 ;;
     --squash) SQUASH=true; shift ;;
     --no-remove-branch) REMOVE_SOURCE_BRANCH=false; shift ;;
     --dry-run) DRY_RUN=true; shift ;;
-    -h|--help) usage ;;
-    *) echo "Unknown option: $1"; usage ;;
+    -h|--help) usage 0 ;;
+    *) echo "Unknown option: $1" >&2; usage 1 ;;
   esac
 done
+
+case "$LAYER_LABEL" in
+  layer::backend|layer::frontend) ;;
+  *) echo "❌ Error: Invalid layer '${LAYER_LABEL#layer::}'. Use backend or frontend." >&2; exit 1 ;;
+esac
+
+case "$PRIORITY_LABEL" in
+  ""|priority::high|priority::medium|priority::low) ;;
+  *) echo "❌ Error: Invalid priority '${PRIORITY_LABEL#priority::}'. Use high, medium or low." >&2; exit 1 ;;
+esac
 
 # Ensure inside git repo
 if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
@@ -66,8 +83,34 @@ if [ "$CURRENT_BRANCH" = "$TARGET_BRANCH" ]; then
 fi
 
 # Auto-detect layer if not explicitly passed
-if [ -f "next.config.ts" ] || [ -f "next.config.js" ] || [ -f "next.config.mjs" ]; then
+if [ "$LAYER_EXPLICIT" = false ] && { [ -f "next.config.ts" ] || [ -f "next.config.js" ] || [ -f "next.config.mjs" ]; }; then
   LAYER_LABEL="layer::frontend"
+fi
+
+# Validate the domain label against the project's allowed domains, if configured
+if [ -n "$DOMAIN_LABEL" ]; then
+  DOMAIN_NAME="${DOMAIN_LABEL#domain::}"
+  if ! [[ "$DOMAIN_NAME" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
+    echo "❌ Error: Domain '$DOMAIN_NAME' must be kebab-case (e.g. auth, user-profile)." >&2
+    exit 1
+  fi
+
+  if [ -z "$DOMAINS_FILE" ]; then
+    DOMAINS_FILE="$(git rev-parse --show-toplevel)/.glab-domains"
+  elif [ ! -f "$DOMAINS_FILE" ]; then
+    echo "❌ Error: Domains file '$DOMAINS_FILE' not found." >&2
+    exit 1
+  fi
+
+  if [ -f "$DOMAINS_FILE" ]; then
+    ALLOWED_DOMAINS=$(sed -e 's/#.*//' -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' -e 's/^domain:://' "$DOMAINS_FILE" | grep -v '^$' || true)
+    if ! grep -qxF "$DOMAIN_NAME" <<< "$ALLOWED_DOMAINS"; then
+      echo "❌ Error: Domain '$DOMAIN_NAME' is not listed in $DOMAINS_FILE." >&2
+      echo "   Allowed domains: $(echo "$ALLOWED_DOMAINS" | paste -sd ',' - | sed 's/,/, /g')" >&2
+      exit 1
+    fi
+  fi
+  DOMAIN_LABEL="domain::$DOMAIN_NAME"
 fi
 
 # 1. Parse commit type & raw description from branch name or recent commit
@@ -175,11 +218,7 @@ DESC_EOF
 LABELS=("$TYPE_LABEL" "$LAYER_LABEL")
 
 if [ -n "$DOMAIN_LABEL" ]; then
-  if [[ "$DOMAIN_LABEL" != domain::* ]]; then
-    LABELS+=("domain::$DOMAIN_LABEL")
-  else
-    LABELS+=("$DOMAIN_LABEL")
-  fi
+  LABELS+=("$DOMAIN_LABEL")
 fi
 
 if [ -n "$PRIORITY_LABEL" ]; then

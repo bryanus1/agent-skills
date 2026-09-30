@@ -37,7 +37,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Verify Skills Integrity
-        run: pnpm lint:skills
+        run: pnpm test
 
       - name: Run Semantic Release
         env:

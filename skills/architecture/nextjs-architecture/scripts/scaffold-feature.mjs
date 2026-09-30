@@ -13,6 +13,8 @@ Arguments:
 Options:
   --target-dir <dir>  Base directory for features (default: src/features)
   --with-starter      Generate starter model and screen files
+  --dry-run           List what would be generated without writing anything
+  --force             Overwrite starter files that already exist (default: abort on conflict)
   --help, -h          Show this help message
 `);
 }
@@ -39,6 +41,8 @@ function main() {
 
   let targetDir = 'src/features';
   let withStarter = false;
+  let isDryRun = false;
+  let isForce = false;
 
   for (let i = 1; i < args.length; i++) {
     if (args[i] === '--target-dir' && args[i + 1]) {
@@ -46,14 +50,14 @@ function main() {
       i++;
     } else if (args[i] === '--with-starter') {
       withStarter = true;
+    } else if (args[i] === '--dry-run') {
+      isDryRun = true;
+    } else if (args[i] === '--force') {
+      isForce = true;
     }
   }
 
   const featureRoot = path.resolve(process.cwd(), targetDir, featureName);
-
-  if (fs.existsSync(featureRoot)) {
-    console.warn(`⚠️ Warning: Directory '${featureRoot}' already exists. Skipping directory creation.`);
-  }
 
   const subdirectories = [
     'components',
@@ -66,13 +70,13 @@ function main() {
   ];
 
   console.log(`🚀 Scaffolding Next.js Screaming Feature: ${featureName}`);
-  console.log(`📁 Target directory: ${featureRoot}\n`);
-
-  for (const dir of subdirectories) {
-    const dirPath = path.join(featureRoot, dir);
-    fs.mkdirSync(dirPath, { recursive: true });
-    console.log(`  ✓ Created: ${path.relative(process.cwd(), dirPath)}/`);
+  console.log(`📁 Target directory: ${featureRoot}`);
+  if (isDryRun) {
+    console.log(`🔎 Mode: [DRY RUN - No files will be written]`);
   }
+  console.log('');
+
+  const files = [];
 
   if (withStarter) {
     const pascalName = toPascalCase(featureName);
@@ -89,17 +93,14 @@ export interface I${pascalName} {
   // TODO: Add domain properties here
 }
 `;
-    fs.writeFileSync(modelFile, modelContent, 'utf8');
-    console.log(`  ✓ Created starter model: ${path.relative(process.cwd(), modelFile)}`);
+    files.push({ path: modelFile, content: modelContent });
 
     const modelIndexFile = path.join(featureRoot, 'models', 'index.ts');
     const modelIndexContent = `export * from './${featureName}';\n`;
-    fs.writeFileSync(modelIndexFile, modelIndexContent, 'utf8');
-    console.log(`  ✓ Created models barrel: ${path.relative(process.cwd(), modelIndexFile)}`);
+    files.push({ path: modelIndexFile, content: modelIndexContent });
 
     // 2. Starter Screen (Encapsulated subfolder)
     const screenSubdir = path.join(featureRoot, 'screens', `${featureName}-home`);
-    fs.mkdirSync(screenSubdir, { recursive: true });
 
     const screenFile = path.join(screenSubdir, `${featureName}-home.tsx`);
     const screenTest = path.join(screenSubdir, `${featureName}-home.test.tsx`);
@@ -146,11 +147,47 @@ describe('${pascalName}Home Screen', () => {
 
     const screenIndexContent = `export * from './${featureName}-home';\n`;
 
-    fs.writeFileSync(screenFile, screenContent, 'utf8');
-    fs.writeFileSync(screenTest, screenTestContent, 'utf8');
-    fs.writeFileSync(screenIndex, screenIndexContent, 'utf8');
+    files.push({ path: screenFile, content: screenContent });
+    files.push({ path: screenTest, content: screenTestContent });
+    files.push({ path: screenIndex, content: screenIndexContent });
+  }
 
-    console.log(`  ✓ Created starter screen: ${path.relative(process.cwd(), screenSubdir)}/`);
+  const conflicts = files.map((item) => item.path).filter((file) => fs.existsSync(file));
+  if (conflicts.length > 0 && !isForce) {
+    console.error(`❌ Error: ${conflicts.length} starter file(s) already exist:`);
+    for (const file of conflicts) {
+      console.error(`   - ${path.relative(process.cwd(), file)}`);
+    }
+    console.error(`\nNo files were written. Re-run with --force to overwrite them.`);
+    process.exit(1);
+  }
+
+  for (const dir of subdirectories) {
+    const dirPath = path.join(featureRoot, dir);
+    const displayPath = `${path.relative(process.cwd(), dirPath)}/`;
+    if (isDryRun) {
+      console.log(`  [DRY-RUN] Would ensure directory: ${displayPath}`);
+      continue;
+    }
+    fs.mkdirSync(dirPath, { recursive: true });
+    console.log(`  ✓ Directory ready: ${displayPath}`);
+  }
+
+  for (const item of files) {
+    const displayPath = path.relative(process.cwd(), item.path);
+    if (isDryRun) {
+      const action = conflicts.includes(item.path) ? 'overwrite' : 'create';
+      console.log(`  [DRY-RUN] Would ${action}: ${displayPath}`);
+      continue;
+    }
+    fs.mkdirSync(path.dirname(item.path), { recursive: true });
+    fs.writeFileSync(item.path, item.content, 'utf8');
+    console.log(`  ✓ Created: ${displayPath}`);
+  }
+
+  if (isDryRun) {
+    console.log(`\n🔎 Dry run complete. Nothing was changed.`);
+    return;
   }
 
   console.log(`\n✅ Feature '${featureName}' scaffolded successfully!`);

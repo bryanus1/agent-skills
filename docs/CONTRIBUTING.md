@@ -89,6 +89,13 @@ Asegúrate de incluir las secciones estándar:
 - **Códigos de Salida**: `0` para éxito, `>0` para errores con mensaje claro.
 - **Permisos de Ejecución**: Ejecutar siempre `chmod +x scripts/*.sh` antes de commitear.
 - **Seguridad**: Prohibido ejecutar comandos destructivos sin confirmación explícita (`rm -rf /`, `git push --force`).
+- **No Sobrescritura**: Los scripts que generan archivos deben abortar (código `1`, sin escribir nada) si algún archivo destino ya existe, ofrecer `--dry-run` para previsualizar y exigir `--force` para sobrescribir.
+- **Rutas Portables**: Las skills se instalan en otros proyectos (`.claude/skills/<name>/`, `.agents/skills/<name>/`…). En `SKILL.md` enlaza los archivos propios con rutas relativas a la skill (`references/guia.md`) y muestra los scripts como `node <skill-dir>/scripts/x.mjs`. Nunca uses rutas absolutas ni `file:///`.
+- **Tests**: Todo script nuevo o modificado debe tener tests en `tests/*.test.mjs` (`node:test`, sin dependencias) que ejecuten el script en un directorio temporal. Los scripts Bash deben pasar `shellcheck -S warning`.
+
+### 5.1 Evals (`evals/evals.json`)
+
+Cada skill de `skills/` debe incluir al menos 2 evals con el formato de `skill-creator` (ver [SPECIFICATION.md](SPECIFICATION.md#2-estructura-de-directorios)). `pnpm test:unit` valida que el JSON sea correcto, que `skill_name` coincida y que los archivos de `files` existan. Guarda las ejecuciones de evals en `evals-workspace/`, que está ignorado por git.
 
 ---
 
@@ -97,14 +104,17 @@ Asegúrate de incluir las secciones estándar:
 Antes de hacer commit o crear un PR, ejecuta el linter central:
 
 ```bash
-# Validar todo el repositorio:
-pnpm lint:skills
+# Validar todo el repositorio (modo estricto, como en CI):
+pnpm lint:strict
 
 # Validar tu skill específica:
-node scripts/lint-skills.mjs skills/docker/docker-optimization
+node scripts/lint-skills.mjs --strict skills/docker/docker-optimization
+
+# Regenerar catalog/catalog.json y la tabla/instalación del README:
+pnpm catalog
 ```
 
-El linter debe finalizar con `PASS: 0 errors, 0 warnings`.
+El linter debe finalizar con `0 errors, 0 warnings`. Además del frontmatter, valida que `name` coincida con la carpeta y sea único, que `agents` use valores permitidos, que los enlaces relativos existan, que no haya rutas absolutas de máquina y que estén las secciones obligatorias. CI también falla si el catálogo o el README no están regenerados.
 
 ---
 
@@ -120,9 +130,23 @@ docs(contributing): update step-by-step contribution guide
 
 ---
 
+## 🔢 Versionado de Skills
+
+Cada skill tiene su propia `version` (SemVer) en el frontmatter, independiente de la versión del repositorio que genera semantic-release. Cualquier cambio dentro de una skill (salvo en `evals/`) exige subirla:
+
+| Cambio | Incremento | Ejemplo |
+| :--- | :--- | :--- |
+| Rompe el uso existente: flags eliminados o renombrados, estructura generada distinta, reglas que invalidan código previo | **major** | `1.4.2 → 2.0.0` |
+| Nueva capacidad compatible: flag nuevo, nueva sección o regla, nuevo script | **minor** | `1.4.2 → 1.5.0` |
+| Corrección de bugs, erratas o aclaraciones de documentación | **patch** | `1.4.2 → 1.4.3` |
+
+CI lo verifica con `node scripts/check-skill-versions.mjs --base origin/main` (o `pnpm versions:check`). Después de subir versiones, ejecuta `pnpm catalog` para actualizar el catálogo y el README.
+
+---
+
 ## 📋 Criterios de Aceptación para Pull Requests
 
-1. ✅ **Linter en Verde**: `pnpm lint:skills` sin errores.
+1. ✅ **Linter en Verde**: `pnpm test` en verde (linter estricto, catálogo al día y tests unitarios) y versión de cada skill modificada incrementada.
 2. ✅ **Progressive Disclosure**: Frontmatter ligero y sin runbooks completos dentro de la descripción.
 3. ✅ **Agnosticismo**: Compatible con múltiples agentes de IA.
 4. ✅ **Seguridad**: Sin credenciales, tokens o scripts destructivos.

@@ -1,6 +1,6 @@
 ---
 name: flutter-architecture
-version: 1.0.0
+version: 1.1.0
 description: >-
   Clean Architecture Feature-First para Flutter. Guía el diseño modular en lib/features/<feature>/ (domain, data, presentation) con BLoC/Cubit, Inyección de Dependencias (GetIt/Injectable), manejo funcional de errores con Result sealed class y pruebas unitarias con mocktail y bloc_test.
 tags: [flutter, architecture, clean-architecture, feature-first, bloc, cubit, get-it, dart]
@@ -149,19 +149,26 @@ lib/
 
 ## 🛠️ Scripts y Herramientas Auxiliares
 
+> **Rutas:** `<skill-dir>` es el directorio que contiene este `SKILL.md` (p. ej. `.claude/skills/<name>/` o `.agents/skills/<name>/`). Ejecuta los scripts desde la raíz del proyecto del usuario, no desde `<skill-dir>`.
+
+> **Seguridad:** el script aborta sin escribir nada si alguno de los archivos que genera ya existe. Ejecuta primero con `--dry-run` para ver qué se va a crear. Usa `--force` (sobrescribe esos archivos) solo con confirmación explícita del usuario.
+
 ### CLI Scaffolder: `scaffold-feature.mjs`
 
 La skill incluye un generador CLI determinista para andamiar una feature completa lista para producción en segundos:
 
 ```bash
 # Andamiar una feature completa con BLoC, Domain, Data y Tests:
-node skills/architecture/flutter-architecture/scripts/scaffold-feature.mjs auth --model user
+node <skill-dir>/scripts/scaffold-feature.mjs auth --model user
 
 # Andamiar usando Cubit en lugar de BLoC tradicional:
-node skills/architecture/flutter-architecture/scripts/scaffold-feature.mjs cart --model cart_item --cubit
+node <skill-dir>/scripts/scaffold-feature.mjs cart --model cart_item --cubit
 
 # Modo simulación sin escribir archivos (Dry Run):
-node skills/architecture/flutter-architecture/scripts/scaffold-feature.mjs billing --model invoice --dry-run
+node <skill-dir>/scripts/scaffold-feature.mjs billing --model invoice --dry-run
+
+# Sobrescribir archivos generados que ya existen (solo con confirmación del usuario):
+node <skill-dir>/scripts/scaffold-feature.mjs billing --model invoice --force
 ```
 
 ---

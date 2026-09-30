@@ -1,6 +1,6 @@
 ---
 name: dart-import-organizer
-version: 1.0.0
+version: 1.0.1
 description: >-
   Organiza y estandariza imports en Dart y Flutter (.dart). Se aplica DESPUÉS de formatear el código. Agrupa jerárquicamente en 6 bloques: dart:* → flutter/terceros → package de app → relativos → export → part, con orden alfabético y líneas en blanco entre grupos.
 tags: [dart, flutter, imports, clean-code, linter, formatting, refactor]
@@ -139,23 +139,27 @@ part 'user_dto.freezed.dart';
 
 ## 🛠️ Scripts y Herramientas Auxiliares
 
+> **Rutas:** `<skill-dir>` es el directorio que contiene este `SKILL.md` (p. ej. `.claude/skills/<name>/` o `.agents/skills/<name>/`). Ejecuta los scripts desde la raíz del proyecto del usuario, no desde `<skill-dir>`.
+
 ### CLI Import Organizer: `organize-dart-imports.mjs`
 
 Para procesar archivos o árboles completos de forma automática:
 
 ```bash
 # Organizar y reescribir un archivo Dart específico:
-node skills/dart/dart-import-organizer/scripts/organize-dart-imports.mjs lib/features/auth/presentation/screens/login_screen.dart --write
+node <skill-dir>/scripts/organize-dart-imports.mjs lib/features/auth/presentation/screens/login_screen.dart --write
 
 # Organizar recursivamente toda la carpeta lib/:
-node skills/dart/dart-import-organizer/scripts/organize-dart-imports.mjs lib --write
+node <skill-dir>/scripts/organize-dart-imports.mjs lib --write
 
 # Verificar en modo CI sin modificar (exit code > 0 si hay desorden):
-node skills/dart/dart-import-organizer/scripts/organize-dart-imports.mjs lib --check
+node <skill-dir>/scripts/organize-dart-imports.mjs lib --check
 
 # Vista previa de cambios (Dry-Run):
-node skills/dart/dart-import-organizer/scripts/organize-dart-imports.mjs lib/main.dart --dry-run
+node <skill-dir>/scripts/organize-dart-imports.mjs lib/main.dart --dry-run
 ```
+
+**Limitación:** el script solo reordena directivas de una sola línea. Si el bloque de directivas contiene una directiva multilínea (p. ej. `show` partido en varias líneas), comentarios o código, el archivo se marca como `Skipped` y **no se modifica**. En ese caso, organiza sus imports manualmente siguiendo las reglas de esta skill.
 
 ---
 

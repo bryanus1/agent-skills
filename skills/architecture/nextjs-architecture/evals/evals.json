@@ -1,0 +1,23 @@
+{
+  "skill_name": "nextjs-architecture",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Estructura la feature de facturación (billing) en mi app Next.js con Screaming Architecture y archivos iniciales.",
+      "expected_output": "El agente ejecuta scaffold-feature.mjs billing --with-starter (primero con --dry-run). Crea src/features/billing/ con components, hooks, models, schemas, screens, services y utils, un modelo plano models/billing.ts con su barrel y la screen encapsulada screens/billing-home/ con test e index.ts. No crea index.ts en la raíz de la feature ni en components/.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Crea un diálogo modal para crear facturas dentro de la feature billing.",
+      "expected_output": "El agente usa scaffold-component.mjs create-invoice-dialog --target-dir src/features/billing/components --type dialog. Genera el componente basado en FormDialog con TSDoc, su test adyacente y un index.ts en la carpeta hoja.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Revisa estos imports: `import { usePetSearch, IPet } from '@/features/pets';` y `import { InvoiceCard } from '@/features/pets/components';`",
+      "expected_output": "El agente señala que ambos importan desde carpetas contenedoras sin barrel (política de barrels solo en carpetas hoja) y los reescribe: '@/features/pets/hooks/use-pet-search', '@/features/pets/models' y '@/features/pets/components/invoice-card'. Indica eliminar cualquier index.ts de carpetas contenedoras.",
+      "files": []
+    }
+  ]
+}

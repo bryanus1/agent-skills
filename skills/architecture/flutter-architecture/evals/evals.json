@@ -1,0 +1,29 @@
+{
+  "skill_name": "flutter-architecture",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "En mi app Flutter (paquete shop_app) crea la feature de facturación (billing) con el modelo invoice usando BLoC y Clean Architecture.",
+      "expected_output": "El agente ejecuta primero scaffold-feature.mjs billing --model invoice --dry-run y después sin --dry-run. Resultado: lib/features/billing/{domain,data,presentation} con entidad Invoice, contrato InvoiceRepository en domain, implementación en data que devuelve Result y captura excepciones, caso de uso GetInvoice, InvoiceBloc con eventos y estados inmutables, y tests espejo en test/features/billing. El agente recuerda registrar las dependencias en GetIt (lazySingleton para repositorios y use cases, factory para el BLoC).",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Necesito la feature del carrito (cart) con el modelo cart_item, pero con Cubit en lugar de BLoC.",
+      "expected_output": "El agente usa scaffold-feature.mjs cart --model cart_item --cubit. Genera CartItemCubit con estados sellados/inmutables en presentation/cubit/ y su test con bloc_test y mocktail. No genera eventos de BLoC.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Mi widget LoginScreen llama directamente a AuthRemoteDataSource para hacer login y el dominio importa package:flutter/material.dart. ¿Cómo lo arreglo según la arquitectura?",
+      "expected_output": "El agente identifica las dos violaciones: presentation no puede depender de data (debe usar un caso de uso vía BLoC/Cubit) y domain debe ser Dart puro sin Flutter. Propone mover la llamada a un use case (Login) que devuelve Result, inyectado en el BLoC, y eliminar el import de Flutter en domain.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Vuelve a generar la feature billing con el modelo invoice; ya existe y tiene cambios míos.",
+      "expected_output": "El agente ejecuta con --dry-run, ve que los archivos ya existen y pide confirmación explícita antes de usar --force. Nunca sobrescribe los cambios del usuario sin permiso.",
+      "files": []
+    }
+  ]
+}

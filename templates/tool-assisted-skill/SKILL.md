@@ -26,18 +26,24 @@ Descripción del flujo de trabajo automatizado que combina razonamiento del mode
 1. **Paso 1: Diagnóstico y Preparación**:
    - Ejecutar el script de diagnóstico inicial:
      ```bash
-     bash scripts/run.sh --check
+     bash <skill-dir>/scripts/run.sh --check
      ```
 2. **Paso 2: Aplicación del Flujo**:
-   - Consultar la guía de referencia en [Guía Técnica](file:///Users/brayansanjuan/Development/personal/agent-skills/templates/tool-assisted-skill/references/guide.md) para detalles sobre la arquitectura o reglas complejas.
+   - Consultar la guía de referencia en [Guía Técnica](references/guide.md) para detalles sobre la arquitectura o reglas complejas.
 3. **Paso 3: Validación Final**:
    - Re-ejecutar el script de verificación y confirmar salida exitosa.
 
 ## 🛠️ Scripts Auxiliares
 
+> **Rutas:** `<skill-dir>` es el directorio que contiene este `SKILL.md` (p. ej. `.claude/skills/<name>/` o `.agents/skills/<name>/`). Ejecuta los scripts desde la raíz del proyecto del usuario, no desde `<skill-dir>`.
+
 * `scripts/run.sh`: Script principal de automatización y validación.
   * Opciones: `--check` (solo diagnóstico), `--fix` (aplica correcciones automáticas).
 
+## ⚠️ Reglas Críticas
+- Ejecutar siempre `--check` antes de `--fix` y revisar su salida.
+- No aplicar `--fix` ni sobrescribir archivos sin confirmación explícita del usuario.
+
 ## 📚 Referencias y Ejemplos
-* [Guía Técnica](file:///Users/brayansanjuan/Development/personal/agent-skills/templates/tool-assisted-skill/references/guide.md)
-* [Ejemplos de Entrada/Salida](file:///Users/brayansanjuan/Development/personal/agent-skills/templates/tool-assisted-skill/examples/sample.md)
+* [Guía Técnica](references/guide.md)
+* [Ejemplos de Entrada/Salida](examples/sample.md)

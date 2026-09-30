@@ -1,6 +1,6 @@
 ---
 name: nextjs-architecture
-version: 1.0.0
+version: 1.1.0
 description: >-
   Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions, hooks con TanStack Query, componentes FormDialog y testing con cobertura >= 90%.
 tags: [nextjs, react, screaming-architecture, frontend, app-router, tanstack-query, form-dialog]
@@ -128,16 +128,22 @@ Construir los bloques de interfaz visual:
 
 ## 🛠️ Scripts
 
+> **Rutas:** `<skill-dir>` es el directorio que contiene este `SKILL.md` (p. ej. `.claude/skills/<name>/` o `.agents/skills/<name>/`). Ejecuta los scripts desde la raíz del proyecto del usuario, no desde `<skill-dir>`.
+
+> **Seguridad:** los scripts abortan sin escribir nada si alguno de los archivos que generan ya existe. Ejecuta primero con `--dry-run` para ver qué se va a crear. Usa `--force` (sobrescribe esos archivos) solo con confirmación explícita del usuario.
+
 La skill incluye scripts de Node.js ESM para acelerar el andamiaje del proyecto:
 
 ### 1. Generar una Feature Completa
 ```bash
-node skills/architecture/nextjs-architecture/scripts/scaffold-feature.mjs <feature-name> [--target-dir <path>]
+node <skill-dir>/scripts/scaffold-feature.mjs <feature-name> [--target-dir <path>] [--with-starter] [--dry-run] [--force]
 ```
-*Ejemplo:* `node skills/architecture/nextjs-architecture/scripts/scaffold-feature.mjs billing --target-dir src/features`
+*Ejemplo:* `node <skill-dir>/scripts/scaffold-feature.mjs billing --target-dir src/features --with-starter`
+
+`--with-starter` genera además un modelo plano inicial (`models/<feature>.ts` + barrel) y una screen encapsulada con su test.
 
 ### 2. Generar un Componente Encapsulado
 ```bash
-node skills/architecture/nextjs-architecture/scripts/scaffold-component.mjs <component-name> [--target-dir <path>] [--type default|dialog|section]
+node <skill-dir>/scripts/scaffold-component.mjs <component-name> [--target-dir <path>] [--type default|dialog|section] [--dry-run] [--force]
 ```
-*Ejemplo:* `node skills/architecture/nextjs-architecture/scripts/scaffold-component.mjs user-card --target-dir src/components/common`
+*Ejemplo:* `node <skill-dir>/scripts/scaffold-component.mjs user-card --target-dir src/components/common`

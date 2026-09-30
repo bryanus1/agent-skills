@@ -1,6 +1,6 @@
 ---
 name: glab-cli
-version: 1.1.0
+version: 1.2.0
 description: >-
   Automatización de flujos de GitLab (MRs con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y releases) usando glab CLI y scripts.
 tags: [gitlab, glab, cli, devops, git, ci-cd, merge-requests]
@@ -43,17 +43,17 @@ flowchart TD
 1. **Paso 1: Verificación de Estado y Autenticación**:
    - Ejecutar el script de comprobación previa:
      ```bash
-     ./skills/gitlab/glab-cli/scripts/check_env.sh
+     bash <skill-dir>/scripts/check_env.sh
      ```
 
 2. **Paso 2: Creación Estandarizada de Merge Requests**:
    - Usar el script asistente para generar el MR con el título, emojis, labels y formato exacto:
      ```bash
      # Con Issue ID detectado o explícito:
-     ./skills/gitlab/glab-cli/scripts/create_mr.sh --issue 42 --domain pets
+     bash <skill-dir>/scripts/create_mr.sh --issue 42 --domain auth
 
      # Sin Issue ID (genera título sin scope: <type>: <emoji> <desc>):
-     ./skills/gitlab/glab-cli/scripts/create_mr.sh --domain operations
+     bash <skill-dir>/scripts/create_mr.sh --domain operations
      ```
    - O manualmente con `glab mr create`:
      ```bash
@@ -63,29 +63,33 @@ flowchart TD
 3. **Paso 3: Diagnóstico y Monitoreo de Pipelines de CI/CD**:
    - Inspeccionar el pipeline de la rama activa y jobs fallidos:
      ```bash
-     ./skills/gitlab/glab-cli/scripts/diagnose_pipeline.sh
+     bash <skill-dir>/scripts/diagnose_pipeline.sh
      ```
    - Ver logs del job específico (ej. `lint`, `test:unit`, `build:app`):
      ```bash
-     ./skills/gitlab/glab-cli/scripts/diagnose_pipeline.sh --job lint --lines 50
+     bash <skill-dir>/scripts/diagnose_pipeline.sh --job lint --lines 50
      ```
 
 4. **Paso 4: Gestión de Releases y Notas de Versión**:
    - Listar o crear releases:
      ```bash
-     ./skills/gitlab/glab-cli/scripts/release_helper.sh list
-     ./skills/gitlab/glab-cli/scripts/release_helper.sh draft-notes
+     bash <skill-dir>/scripts/release_helper.sh list
+     bash <skill-dir>/scripts/release_helper.sh draft-notes
      ```
 
 ## 🛠️ Scripts y Herramientas Auxiliares
 
-- [`scripts/check_env.sh`](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/gitlab/glab-cli/scripts/check_env.sh): Valida `git`, `glab` y sesión activa.
-- [`scripts/create_mr.sh`](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/gitlab/glab-cli/scripts/create_mr.sh): Creación automatizada de MR con validación de:
+> **Rutas:** `<skill-dir>` es el directorio que contiene este `SKILL.md` (p. ej. `.claude/skills/<name>/` o `.agents/skills/<name>/`). Ejecuta los scripts desde la raíz del proyecto del usuario, no desde `<skill-dir>`.
+
+- [`scripts/check_env.sh`](scripts/check_env.sh): Valida `git`, `glab` y sesión activa.
+- [`scripts/create_mr.sh`](scripts/create_mr.sh): Creación automatizada de MR con validación de:
   - Formato con issue: `<type>(#<issue-id>): <emoji> <description>`
   - Formato sin issue: `<type>: <emoji> <description>` (sin scope)
   - Scoped Labels obligatorios (`type::*`, `layer::*`, `domain::*`, `priority::*`).
-- [`scripts/diagnose_pipeline.sh`](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/gitlab/glab-cli/scripts/diagnose_pipeline.sh): Inspección de jobs y logs de CI.
-- [`scripts/release_helper.sh`](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/gitlab/glab-cli/scripts/release_helper.sh): Consulta y generación de releases.
+  - Dominios permitidos: si existe `.glab-domains` en la raíz del repo (un dominio por línea), `--domain` debe estar en esa lista; si no existe, se acepta cualquier nombre en kebab-case. Antes de crear el MR, lee ese archivo para elegir el dominio correcto.
+  - Usa siempre `--dry-run` primero para mostrar el título y los labels al usuario.
+- [`scripts/diagnose_pipeline.sh`](scripts/diagnose_pipeline.sh): Inspección de jobs y logs de CI.
+- [`scripts/release_helper.sh`](scripts/release_helper.sh): Consulta y generación de releases.
 
 ## ⚠️ Reglas Críticas
 
@@ -94,12 +98,13 @@ flowchart TD
    - Si **NO hay Issue ID**: `<type>: <emoji> <description>` (ej. `chore: 🔧 upgrade dependencies`).
    - **NUNCA usar carpetas ni paths como scope** (ej. `feat(web): ...` está PROHIBIDO).
 2. **Uso Exclusivo de Scoped Labels de Grupo**:
-   - Solo usar labels de grupo (`type::feature`, `layer::frontend`, `domain::pets`, etc.). Nunca crear labels locales de repo.
+   - Solo usar labels de grupo (`type::feature`, `layer::frontend`, `domain::<dominio>`, etc.). Nunca crear labels locales de repo.
+   - Los dominios válidos son los del archivo `.glab-domains` del proyecto; nunca inventes uno que no esté ahí.
 3. **No interactividad en scripts**: Usar siempre `--yes` o flags no interactivas.
 
 ## 📚 Referencias Adicionales
 
-* [Estándares de GitLab, Emojis y Scoped Labels](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/gitlab/glab-cli/references/gitlab_standards.md)
-* [CheatSheet Completo de Comandos glab](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/gitlab/glab-cli/references/commands_cheatsheet.md)
-* [Guía de CI/CD y Resolución de Problemas](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/gitlab/glab-cli/references/ci_and_troubleshooting.md)
-* [Ejemplos de Flujos de Trabajo](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/gitlab/glab-cli/examples/workflows.md)
+* [Estándares de GitLab, Emojis y Scoped Labels](references/gitlab_standards.md)
+* [CheatSheet Completo de Comandos glab](references/commands_cheatsheet.md)
+* [Guía de CI/CD y Resolución de Problemas](references/ci_and_troubleshooting.md)
+* [Ejemplos de Flujos de Trabajo](examples/workflows.md)

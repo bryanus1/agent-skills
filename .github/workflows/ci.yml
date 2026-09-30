@@ -35,8 +35,24 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run Skills Linter
-        run: pnpm lint:skills
+      - name: Run Skills Linter (strict)
+        run: pnpm lint:strict
+
+      - name: Check Catalog and README Are Up to Date
+        run: pnpm catalog:check
+
+      - name: Run Unit Tests
+        run: pnpm test:unit
+
+      - name: Check Skill Version Bumps
+        run: node scripts/check-skill-versions.mjs --base "origin/${{ github.base_ref || 'main' }}"
+
+      - name: Check Shell Scripts
+        run: |
+          for script in skills/*/*/scripts/*.sh templates/*/scripts/*.sh; do
+            bash -n "$script"
+          done
+          pnpm lint:shell
 
   lint-commits:
     name: Validate Conventional Commits

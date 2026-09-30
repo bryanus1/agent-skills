@@ -1,0 +1,35 @@
+{
+  "skill_name": "gh-cli",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Abre un Pull Request en GitHub para mi rama actual feat/42-login-form. Es del dominio auth y quiero que lo revise octocat.",
+      "expected_output": "El agente verifica el entorno (check_env.sh o gh auth status), ejecuta create_pr.sh con --domain auth --reviewer octocat y --dry-run, y muestra al usuario el título 'feat(#42): ✨ login form', los labels (enhancement, domain: auth) y el cuerpo con 'Closes #42' antes de crear el PR. Solo después de la confirmación lo crea, sin prompts interactivos y sin crear labels.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Crea un PR para actualizar Zod, no hay issue.",
+      "expected_output": "El título no lleva scope: 'chore: 🔧 upgrade zod' (o equivalente). El agente no inventa scopes a partir de carpetas o paquetes (nada de chore(deps)). Si la rama no está publicada, pide permiso antes de usar --push y nunca hace force-push.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "El check de lint de mi PR #57 está en rojo. ¿Qué pasa?",
+      "expected_output": "El agente ejecuta diagnose_run.sh --pr 57 --job lint (o gh pr checks 57 y gh run view <id> --log-failed), identifica el error concreto en el log y propone o aplica la corrección en el código. No relanza el workflow a ciegas ni fusiona el PR.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Añade el label 'domain: payments' a mi PR, creo que no existe todavía.",
+      "expected_output": "El agente comprueba con gh label list si el label existe. Si no existe, no lo crea por su cuenta: informa al usuario y pide permiso explícito (o sugiere que lo cree un maintainer) antes de ejecutar gh label create.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Publica la release v1.4.0 del proyecto.",
+      "expected_output": "El agente ejecuta release_helper.sh draft-notes y create v1.4.0 --dry-run, muestra lo que se publicará y espera confirmación antes de crear la release con notas generadas por GitHub. Rechaza tags que no sean SemVer.",
+      "files": []
+    }
+  ]
+}

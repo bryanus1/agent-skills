@@ -22,3 +22,6 @@ Thumbs.db
 /tmp/
 coverage/
 *.skill
+
+# skill-creator eval runs (outputs, grading, benchmarks)
+evals-workspace/

@@ -14,6 +14,7 @@ Options:
   --model <name>      Primary entity/model singular name (default: derived from feature-name)
   --cubit             Use Cubit instead of BLoC for state management
   --dry-run           Simulate generation without writing files to disk
+  --force             Overwrite generated files that already exist (default: abort on conflict)
   --target-dir <dir>  Base directory for features (default: lib/features)
   --test-dir <dir>    Base directory for unit tests (default: test/features)
   --app-name <name>   Package name (default: auto-detected from pubspec.yaml or 'my_app')
@@ -80,6 +81,7 @@ function main() {
   let modelRaw = null;
   let useCubit = false;
   let isDryRun = false;
+  let isForce = false;
   let targetDir = 'lib/features';
   let testDir = 'test/features';
   let appName = null;
@@ -91,6 +93,8 @@ function main() {
       useCubit = true;
     } else if (args[i] === '--dry-run') {
       isDryRun = true;
+    } else if (args[i] === '--force') {
+      isForce = true;
     } else if (args[i] === '--target-dir' && args[i + 1]) {
       targetDir = args[++i];
     } else if (args[i] === '--test-dir' && args[i + 1]) {
@@ -741,12 +745,23 @@ void main() {
     [path.join(testFeaturePath, `presentation/${stateFolder}`, `${modelSnake}_${stateFolder}_test.dart`)]: stateTestContent,
   };
 
+  const conflicts = Object.keys(filesToCreate).filter((file) => fs.existsSync(file));
+  if (conflicts.length > 0 && !isForce) {
+    console.error(`❌ Error: ${conflicts.length} target file(s) already exist:`);
+    for (const file of conflicts) {
+      console.error(`   - ${path.relative(process.cwd(), file)}`);
+    }
+    console.error(`\nNo files were written. Re-run with --force to overwrite them.`);
+    process.exit(1);
+  }
+
   let count = 0;
   for (const [targetFilePath, content] of Object.entries(filesToCreate)) {
     count++;
     const displayPath = path.relative(process.cwd(), targetFilePath);
     if (isDryRun) {
-      console.log(`   [DRY-RUN] Would create: ${displayPath}`);
+      const action = conflicts.includes(targetFilePath) ? 'overwrite' : 'create';
+      console.log(`   [DRY-RUN] Would ${action}: ${displayPath}`);
     } else {
       const dir = path.dirname(targetFilePath);
       if (!fs.existsSync(dir)) {
@@ -755,6 +770,11 @@ void main() {
       fs.writeFileSync(targetFilePath, content, 'utf8');
       console.log(`   ✔ Created (${count}): ${displayPath}`);
     }
+  }
+
+  if (isDryRun) {
+    console.log(`\n🔎 Dry run complete: ${count} files would be written. Nothing was changed.`);
+    return;
   }
 
   console.log(`\n✨ Successfully scaffolded ${count} files for feature '${featureSnake}'!`);
