@@ -1,0 +1,23 @@
+{
+  "skill_name": "glab-cli",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Crea un Merge Request en GitLab para mi rama actual. Implementa el registro de mascotas y cierra el issue #42. Es trabajo de frontend.",
+      "expected_output": "El agente verifica primero el entorno (check_env.sh o glab auth status) y usa create_mr.sh o glab mr create sin prompts interactivos. El título sigue el formato feat(#42): ✨ <descripción>, con el ID del issue como único scope. Los labels son scoped de grupo (type::feature, layer::frontend, domain::<dominio>). La descripción incluye 'Closes #42'.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Abre un MR para actualizar las dependencias de Zod. No hay issue asociado.",
+      "expected_output": "El título NO lleva scope: 'chore: 🔧 upgrade zod' (o equivalente con el emoji de chore). El agente no inventa un scope a partir de carpetas o paquetes (nada de chore(deps) ni chore(web)). No crea labels locales de repositorio.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "El pipeline de CI de mi rama falló en el job de lint. ¿Qué pasó?",
+      "expected_output": "El agente ejecuta diagnose_pipeline.sh --job lint (o glab ci status y glab ci trace lint), lee el log del job, identifica la causa concreta del fallo y propone una corrección. No reintenta el pipeline a ciegas.",
+      "files": []
+    }
+  ]
+}

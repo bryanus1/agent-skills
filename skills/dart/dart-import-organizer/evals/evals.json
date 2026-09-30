@@ -1,0 +1,23 @@
+{
+  "skill_name": "dart-import-organizer",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Organiza los imports de evals/inputs/login_screen.dart. El paquete de la app se llama my_app. Hay imports duplicados, algunos sin usar y una ruta relativa que se sale de la feature.",
+      "expected_output": "El comentario de copyright queda arriba. Las directivas quedan en grupos separados por una línea en blanco: dart:* (solo dart:async, deduplicado; dart:convert eliminado por no usarse) → package de terceros/flutter en orden alfabético (dio eliminado si no se usa; show ordenado como BuildContext, Key, Widget) → package:my_app/* (incluida la conversión de ../../../../core/utils/result.dart a package:my_app/core/utils/result.dart, o su eliminación si no se usa) → relativos locales (../widgets/login_button.dart). El cuerpo de la clase no cambia.",
+      "files": ["evals/inputs/login_screen.dart"]
+    },
+    {
+      "id": 2,
+      "prompt": "Ordena las directivas de evals/inputs/user_dto.dart, un DTO con freezed y json_serializable del paquete my_app.",
+      "expected_output": "Orden final: package de terceros (freezed_annotation, json_annotation) → package:my_app/... (entities/user.dart) → export → part 'user_dto.freezed.dart' y part 'user_dto.g.dart' al final en orden alfabético. Una línea en blanco entre grupos. Ninguna directiva ni línea del cuerpo se pierde.",
+      "files": ["evals/inputs/user_dto.dart"]
+    },
+    {
+      "id": 3,
+      "prompt": "Acabo de escribir una pantalla nueva en Flutter en evals/inputs/login_screen.dart. Formatea el archivo y deja los imports limpios antes de que haga commit.",
+      "expected_output": "El agente ejecuta (o indica) dart format primero y organiza los imports como paso final, sin volver a formatear después. El resultado respeta los 6 grupos canónicos y el agente menciona el orden formato → imports.",
+      "files": ["evals/inputs/login_screen.dart"]
+    }
+  ]
+}

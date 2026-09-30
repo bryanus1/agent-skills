@@ -1,0 +1,23 @@
+{
+  "skill_name": "nestjs-architecture",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Crea el módulo de facturas (invoice) en mi API NestJS siguiendo la arquitectura del proyecto.",
+      "expected_output": "El agente ejecuta scaffold-module.mjs invoice (primero con --dry-run). Genera los 18 archivos en src/modules/invoices/ (carpeta plural, archivos singulares): entidad, DTOs (incluido InvoiceResponseDto), contrato IInvoiceRepository con INVOICE_REPOSITORY_TOKEN en repositories/repository.ts, InvoiceRepository que lo implementa, servicio que inyecta solo la interfaz por token, controlador con Swagger completo y specs. Sin index.ts en la raíz del módulo. Recuerda añadir InvoiceModule a AppModule.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Revisa este controlador: `@Get(':id') findOne(@Param('id') id: string) { return this.prisma.invoice.findUnique({ where: { id } }); }`",
+      "expected_output": "El agente señala que el controlador usa el ORM directamente y devuelve el registro de base de datos. Propone mover el acceso a datos al repositorio detrás de IInvoiceRepository, llamar al servicio, devolver InvoiceResponseDto.fromEntity(...), documentar el id como UUID y añadir @ApiOperation, @ApiOkResponse, @ApiParam y las respuestas de error.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Un usuario normal puede borrar facturas de otros usuarios con DELETE /invoices/:id aunque tenemos @Roles. ¿Cómo lo corrijo?",
+      "expected_output": "El agente explica la doble barrera: @Roles en el controlador solo filtra por rol, y el servicio debe validar la propiedad (requesterRole === Role.ADMIN o entity.ownerId === requesterId) y lanzar ForbiddenException si no coincide. Muestra el cambio en el servicio y un test unitario del caso prohibido.",
+      "files": []
+    }
+  ]
+}

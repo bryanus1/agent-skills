@@ -91,6 +91,11 @@ Asegúrate de incluir las secciones estándar:
 - **Seguridad**: Prohibido ejecutar comandos destructivos sin confirmación explícita (`rm -rf /`, `git push --force`).
 - **No Sobrescritura**: Los scripts que generan archivos deben abortar (código `1`, sin escribir nada) si algún archivo destino ya existe, ofrecer `--dry-run` para previsualizar y exigir `--force` para sobrescribir.
 - **Rutas Portables**: Las skills se instalan en otros proyectos (`.claude/skills/<name>/`, `.agents/skills/<name>/`…). En `SKILL.md` enlaza los archivos propios con rutas relativas a la skill (`references/guia.md`) y muestra los scripts como `node <skill-dir>/scripts/x.mjs`. Nunca uses rutas absolutas ni `file:///`.
+- **Tests**: Todo script nuevo o modificado debe tener tests en `tests/*.test.mjs` (`node:test`, sin dependencias) que ejecuten el script en un directorio temporal. Los scripts Bash deben pasar `shellcheck -S warning`.
+
+### 5.1 Evals (`evals/evals.json`)
+
+Cada skill de `skills/` debe incluir al menos 2 evals con el formato de `skill-creator` (ver [SPECIFICATION.md](SPECIFICATION.md#2-estructura-de-directorios)). `pnpm test:unit` valida que el JSON sea correcto, que `skill_name` coincida y que los archivos de `files` existan. Guarda las ejecuciones de evals en `evals-workspace/`, que está ignorado por git.
 
 ---
 

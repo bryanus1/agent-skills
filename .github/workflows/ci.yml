@@ -41,6 +41,16 @@ jobs:
       - name: Check Catalog and README Are Up to Date
         run: pnpm catalog:check
 
+      - name: Run Unit Tests
+        run: pnpm test:unit
+
+      - name: Check Shell Scripts
+        run: |
+          for script in skills/*/*/scripts/*.sh templates/*/scripts/*.sh; do
+            bash -n "$script"
+          done
+          pnpm lint:shell
+
   lint-commits:
     name: Validate Conventional Commits
     runs-on: ubuntu-latest

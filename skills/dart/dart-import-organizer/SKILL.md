@@ -159,6 +159,8 @@ node <skill-dir>/scripts/organize-dart-imports.mjs lib --check
 node <skill-dir>/scripts/organize-dart-imports.mjs lib/main.dart --dry-run
 ```
 
+**Limitación:** el script solo reordena directivas de una sola línea. Si el bloque de directivas contiene una directiva multilínea (p. ej. `show` partido en varias líneas), comentarios o código, el archivo se marca como `Skipped` y **no se modifica**. En ese caso, organiza sus imports manualmente siguiendo las reglas de esta skill.
+
 ---
 
 ## 📚 Referencias Adicionales

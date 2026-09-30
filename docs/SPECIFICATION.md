@@ -31,9 +31,12 @@ skill-name/
 │   └── architecture.md
 ├── examples/             # [OPCIONAL] Casos de uso de referencia (Before / After)
 │   └── sample_output.md
-└── tests/                # [OPCIONAL] Prompts de evaluación y bancos de prueba
-    └── evals.json
+└── evals/                # [REQUERIDO en skills/] Prompts de evaluación (formato skill-creator)
+    ├── evals.json        # { "skill_name", "evals": [{ "id", "prompt", "expected_output", "files" }] }
+    └── inputs/           # Archivos de entrada referenciados en "files" (rutas relativas a la skill)
 ```
+
+Los resultados de ejecutar los evals van en `evals-workspace/` (ignorado por git), nunca dentro de `skills/`.
 
 ---
 

@@ -2,6 +2,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 function printHelp() {
   console.log(`
@@ -92,7 +93,7 @@ function classifyDirective(line, appPackageName) {
   return -1;
 }
 
-function organizeContent(originalContent, appPackageName) {
+export function organizeContent(originalContent, appPackageName) {
   const lines = originalContent.split(/\r?\n/);
 
   let firstDirectiveIndex = -1;
@@ -131,14 +132,22 @@ function organizeContent(originalContent, appPackageName) {
 
   for (let i = 0; i < rawDirectiveLines.length; i++) {
     const line = rawDirectiveLines[i].trim();
-    if (
+    if (line === '') continue;
+    const isDirective =
       line.startsWith('import ') ||
       line.startsWith('export ') ||
       line.startsWith('part ') ||
-      line.startsWith('part of ')
-    ) {
-      directiveLines.push(sortShowHideClause(line));
+      line.startsWith('part of ');
+    // Multi-line directives, comments or code between directives cannot be
+    // reordered line by line without losing content, so leave the file untouched.
+    if (!isDirective || !line.endsWith(';')) {
+      return {
+        modified: false,
+        content: originalContent,
+        skipped: `line ${firstDirectiveIndex + i + 1} is a multi-line directive, comment or code inside the directive block`,
+      };
     }
+    directiveLines.push(sortShowHideClause(line));
   }
 
   // Body lines after last directive
@@ -259,13 +268,17 @@ function main() {
   console.log(`   📂 Files to inspect:       \x1b[34m${files.length}\x1b[0m\n`);
 
   let modifiedCount = 0;
+  let skippedCount = 0;
 
   for (const file of files) {
     const rel = path.relative(process.cwd(), file);
     const content = fs.readFileSync(file, 'utf8');
-    const { modified, content: newContent } = organizeContent(content, packageName);
+    const { modified, content: newContent, skipped } = organizeContent(content, packageName);
 
-    if (modified) {
+    if (skipped) {
+      skippedCount++;
+      console.log(`   ⚠️  \x1b[33mSkipped (organize manually)\x1b[0m: ${rel} — ${skipped}`);
+    } else if (modified) {
       modifiedCount++;
       if (isWrite) {
         fs.writeFileSync(file, newContent, 'utf8');
@@ -285,6 +298,9 @@ function main() {
   }
 
   console.log('\n----------------------------------------');
+  if (skippedCount > 0) {
+    console.log(`⚠️  ${skippedCount} file(s) were skipped and left unchanged; organize their imports manually.`);
+  }
   if (modifiedCount === 0) {
     console.log(`✨ All ${files.length} file(s) are perfectly organized!\n`);
     process.exit(0);
@@ -302,4 +318,6 @@ function main() {
   }
 }
 
-main();
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main();
+}

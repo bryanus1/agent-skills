@@ -1,2 +1,1 @@
-pnpm lint:strict
-pnpm catalog:check
+pnpm test
