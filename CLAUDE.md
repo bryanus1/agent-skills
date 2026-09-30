@@ -20,6 +20,7 @@ pnpm catalog:check                             # fail if they are stale (CI)
 pnpm test:unit                                 # node --test over tests/*.test.mjs
 pnpm test                                      # lint:strict + catalog:check + test:unit (pre-commit hook and release)
 pnpm lint:shell                                # shellcheck the skills' Bash scripts (needs shellcheck installed; CI has it)
+node scripts/check-skill-versions.mjs --base main   # every changed skill must bump its frontmatter version (CI)
 ```
 
 Skill scripts are standalone, dependency-free Node (`.mjs`) or Bash, run from the target project's root, e.g.
@@ -36,7 +37,8 @@ Skill scripts are standalone, dependency-free Node (`.mjs`) or Bash, run from th
 ## Git workflow and releases
 
 - The husky `pre-commit` hook runs `pnpm test`. The `commit-msg` hook runs commitlint (Conventional Commits; allowed types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert; scope is typically the skill category, e.g. `feat(flutter): ...`).
-- CI (`.github/workflows/ci.yml`) runs the strict linter, the catalog check, unit tests and shellcheck on non-main pushes and PRs, and validates PR commit messages.
+- CI (`.github/workflows/ci.yml`) runs the strict linter, the catalog check, unit tests, shellcheck and the skill version-bump check on non-main pushes and PRs, and validates PR commit messages.
+- Skill versions (frontmatter) are independent of the repo version. Any change to a skill outside `evals/` needs a SemVer bump; see `docs/CONTRIBUTING.md`.
 - Pushes to `main` trigger semantic-release (`.releaserc.json`). `feat` gives a minor bump; `fix`/`perf`/`refactor`/`docs` give a patch; `ci`/`chore` don't release. npm publish is disabled, so the release only creates a GitHub release and tag.
 
 ## Repo layout notes
@@ -44,5 +46,5 @@ Skill scripts are standalone, dependency-free Node (`.mjs`) or Bash, run from th
 - `skills/<category>/<skill-name>/` holds the published catalog. When adding a skill, run `pnpm catalog`, then update the examples and structure tree in `README.md` by hand.
 - `templates/basic-skill/` and `templates/tool-assisted-skill/` are the starting points for new skills. The linter validates them too.
 - Each skill has `evals/evals.json` (skill-creator format: `skill_name` + `evals[]` with `prompt`, `expected_output`, `files` relative to the skill). Eval runs go in the git-ignored `evals-workspace/`, never inside `skills/`.
-- `tests/*.test.mjs` (Node's built-in `node:test`, no deps) cover the linter, the catalog generator, every scaffold's safety contract and output, the Dart import organizer, and the evals files. Run one file with `node --test tests/scaffolds.test.mjs`, or one test with `--test-name-pattern "<regex>"`.
+- `tests/*.test.mjs` (Node's built-in `node:test`, no deps) cover the linter, the catalog generator, every scaffold's safety contract and output, the Dart import organizer, `glab-cli`'s `create_mr.sh --dry-run`, the version-bump check, and the evals files. Run one file with `node --test tests/scaffolds.test.mjs`, or one test with `--test-name-pattern "<regex>"`.
 - `.agents/skills/skill-creator` and `.claude/skills/skill-creator` are the vendored Anthropic `skill-creator` skill (tracked in `skills-lock.json`). They are tooling for authoring and evaluating skills, not part of the catalog.

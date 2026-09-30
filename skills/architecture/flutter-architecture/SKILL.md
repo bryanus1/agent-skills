@@ -1,6 +1,6 @@
 ---
 name: flutter-architecture
-version: 1.0.0
+version: 1.1.0
 description: >-
   Clean Architecture Feature-First para Flutter. Guía el diseño modular en lib/features/<feature>/ (domain, data, presentation) con BLoC/Cubit, Inyección de Dependencias (GetIt/Injectable), manejo funcional de errores con Result sealed class y pruebas unitarias con mocktail y bloc_test.
 tags: [flutter, architecture, clean-architecture, feature-first, bloc, cubit, get-it, dart]

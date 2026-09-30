@@ -1,6 +1,6 @@
 ---
 name: ts-import-organizer
-version: 1.1.0
+version: 1.1.1
 description: >-
   Organiza imports en TypeScript/JavaScript (.ts, .tsx, .js, .jsx). Se aplica siempre DESPUÉS de formatear el código. Agrupa: builtins → externos → path aliases → side-effects. Ordena líneas y miembros ({ ... }) por longitud, elimina unused y convierte rutas relativas a aliases. Activa al ordenar imports o escribir código.
 tags: [typescript, javascript, imports, style, refactor, linting, formatter]

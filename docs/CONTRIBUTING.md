@@ -130,9 +130,23 @@ docs(contributing): update step-by-step contribution guide
 
 ---
 
+## 🔢 Versionado de Skills
+
+Cada skill tiene su propia `version` (SemVer) en el frontmatter, independiente de la versión del repositorio que genera semantic-release. Cualquier cambio dentro de una skill (salvo en `evals/`) exige subirla:
+
+| Cambio | Incremento | Ejemplo |
+| :--- | :--- | :--- |
+| Rompe el uso existente: flags eliminados o renombrados, estructura generada distinta, reglas que invalidan código previo | **major** | `1.4.2 → 2.0.0` |
+| Nueva capacidad compatible: flag nuevo, nueva sección o regla, nuevo script | **minor** | `1.4.2 → 1.5.0` |
+| Corrección de bugs, erratas o aclaraciones de documentación | **patch** | `1.4.2 → 1.4.3` |
+
+CI lo verifica con `node scripts/check-skill-versions.mjs --base origin/main` (o `pnpm versions:check`). Después de subir versiones, ejecuta `pnpm catalog` para actualizar el catálogo y el README.
+
+---
+
 ## 📋 Criterios de Aceptación para Pull Requests
 
-1. ✅ **Linter en Verde**: `pnpm lint:strict` sin errores ni warnings, y `pnpm catalog:check` en verde.
+1. ✅ **Linter en Verde**: `pnpm test` en verde (linter estricto, catálogo al día y tests unitarios) y versión de cada skill modificada incrementada.
 2. ✅ **Progressive Disclosure**: Frontmatter ligero y sin runbooks completos dentro de la descripción.
 3. ✅ **Agnosticismo**: Compatible con múltiples agentes de IA.
 4. ✅ **Seguridad**: Sin credenciales, tokens o scripts destructivos.

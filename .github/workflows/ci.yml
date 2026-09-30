@@ -44,6 +44,9 @@ jobs:
       - name: Run Unit Tests
         run: pnpm test:unit
 
+      - name: Check Skill Version Bumps
+        run: node scripts/check-skill-versions.mjs --base "origin/${{ github.base_ref || 'main' }}"
+
       - name: Check Shell Scripts
         run: |
           for script in skills/*/*/scripts/*.sh templates/*/scripts/*.sh; do

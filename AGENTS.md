@@ -80,6 +80,9 @@ pnpm catalog
 
 This rewrites `catalog/catalog.json` and the generated blocks in `README.md` (skills table and install commands). Never edit those blocks by hand; CI fails if they are out of date. Update the README's example and directory tree sections manually.
 
+### 7. Bump the Skill Version
+When **updating** an existing skill, bump its frontmatter `version` (major = breaking, minor = new capability, patch = fix or docs; see [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md#-versionado-de-skills)). Changes only under `evals/` are exempt. Verify with `node scripts/check-skill-versions.mjs --base main`, then rerun `pnpm catalog`.
+
 ---
 
 ## 🔒 Safety and Quality Guidelines

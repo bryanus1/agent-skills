@@ -1,6 +1,6 @@
 ---
 name: dart-import-organizer
-version: 1.0.0
+version: 1.0.1
 description: >-
   Organiza y estandariza imports en Dart y Flutter (.dart). Se aplica DESPUÉS de formatear el código. Agrupa jerárquicamente en 6 bloques: dart:* → flutter/terceros → package de app → relativos → export → part, con orden alfabético y líneas en blanco entre grupos.
 tags: [dart, flutter, imports, clean-code, linter, formatting, refactor]

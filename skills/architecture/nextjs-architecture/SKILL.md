@@ -1,6 +1,6 @@
 ---
 name: nextjs-architecture
-version: 1.0.0
+version: 1.1.0
 description: >-
   Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions, hooks con TanStack Query, componentes FormDialog y testing con cobertura >= 90%.
 tags: [nextjs, react, screaming-architecture, frontend, app-router, tanstack-query, form-dialog]

@@ -1,6 +1,6 @@
 ---
 name: nestjs-architecture
-version: 1.0.0
+version: 1.1.0
 description: >-
   Estándar de Modular Monolith para NestJS. Guía el andamiaje de módulos de dominio desacoplados, contratos DTO estrictos, documentación OpenAPI Swagger exhaustiva, persistencia agnóstica a cualquier ORM con Repository/Entity y doble barrera de seguridad (RBAC).
 tags: [nestjs, backend, modular-monolith, clean-architecture, swagger, rbac, orm-agnostic, database]
