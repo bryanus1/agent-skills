@@ -26,8 +26,9 @@ Diseñado bajo el principio de **Progressive Disclosure**:
 | Skill | Categoría | Versión | Agentes | Descripción |
 | :--- | :--- | :--- | :--- | :--- |
 | **[`flutter-architecture`](skills/architecture/flutter-architecture/SKILL.md)** | `architecture` | `1.1.0` | Todos | Clean Architecture Feature-First para Flutter. Guía el diseño modular en lib/features/&lt;feature&gt;/ (domain, data, presentation) con BLoC/Cubit, Inyección de Dependencias (GetIt/Injectable), manejo funcional de errores con Result sealed class y pruebas unitarias con mocktail y bloc_test. |
-| **[`nestjs-architecture`](skills/architecture/nestjs-architecture/SKILL.md)** | `architecture` | `1.1.0` | Todos | Estándar de Modular Monolith para NestJS. Guía el andamiaje de módulos de dominio desacoplados, contratos DTO estrictos, documentación OpenAPI Swagger exhaustiva, persistencia agnóstica a cualquier ORM con Repository/Entity y doble barrera de seguridad (RBAC). |
-| **[`nextjs-architecture`](skills/architecture/nextjs-architecture/SKILL.md)** | `architecture` | `1.1.0` | Todos | Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions, hooks con TanStack Query, componentes FormDialog y testing con cobertura &gt;= 90%. |
+| **[`monorepo-architecture`](skills/architecture/monorepo-architecture/SKILL.md)** | `architecture` | `1.0.0` | Todos | Estándar de monorepo con pnpm workspaces y Turborepo para una web Next.js y una API NestJS: estructura apps/ y packages/, paquetes internos compilados, contratos compartidos (Zod u OpenAPI), límites de dependencias verificables y scaffolding de features full-stack. |
+| **[`nestjs-architecture`](skills/architecture/nestjs-architecture/SKILL.md)** | `architecture` | `1.1.1` | Todos | Estándar de Modular Monolith para NestJS. Guía el andamiaje de módulos de dominio desacoplados, contratos DTO estrictos, documentación OpenAPI Swagger exhaustiva, persistencia agnóstica a cualquier ORM con Repository/Entity y doble barrera de seguridad (RBAC). |
+| **[`nextjs-architecture`](skills/architecture/nextjs-architecture/SKILL.md)** | `architecture` | `1.1.1` | Todos | Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions, hooks con TanStack Query, componentes FormDialog y testing con cobertura &gt;= 90%. |
 | **[`dart-import-organizer`](skills/dart/dart-import-organizer/SKILL.md)** | `dart` | `1.0.1` | Todos | Organiza y estandariza imports en Dart y Flutter (.dart). Se aplica DESPUÉS de formatear el código. Agrupa jerárquicamente en 6 bloques: dart:* → flutter/terceros → package de app → relativos → export → part, con orden alfabético y líneas en blanco entre grupos. |
 | **[`gh-cli`](skills/github/gh-cli/SKILL.md)** | `github` | `1.0.0` | Todos | Automatización de flujos de GitHub con gh CLI y scripts: Pull Requests con Conventional Commits, emojis y labels verificados, diagnóstico de GitHub Actions, issues y releases con notas generadas. Úsala al crear o revisar PRs, depurar workflows fallidos o publicar releases. |
 | **[`glab-cli`](skills/gitlab/glab-cli/SKILL.md)** | `gitlab` | `1.2.0` | Todos | Automatización de flujos de GitLab (MRs con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y releases) usando glab CLI y scripts. |
@@ -52,6 +53,7 @@ Instalar una skill específica en tu proyecto actual:
 <!-- catalog-install:start -->
 ```bash
 npx skills add bryanus1/agent-skills --skill flutter-architecture
+npx skills add bryanus1/agent-skills --skill monorepo-architecture
 npx skills add bryanus1/agent-skills --skill nestjs-architecture
 npx skills add bryanus1/agent-skills --skill nextjs-architecture
 npx skills add bryanus1/agent-skills --skill dart-import-organizer
@@ -193,6 +195,30 @@ Una vez instalada una skill, tu asistente de IA la activará automáticamente cu
 
 ---
 
+### 🗂️ Ejemplo con `monorepo-architecture`:
+
+> Requiere también `nestjs-architecture` y `nextjs-architecture` instaladas junto a ella (`npx skills add bryanus1/agent-skills --skill <nombre>` para cada una).
+
+* **Crear el monorepo**:
+  > *"Crea un monorepo para acme con web en Next.js y API en NestJS que compartan validaciones"*
+  > 
+  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-monorepo.mjs --scope acme --contracts zod --dry-run` y, tras tu confirmación, sin `--dry-run`  
+  > ➔ Raíz con `pnpm-workspace.yaml` y `turbo.json`, `packages/tsconfig`, `packages/eslint-config`, `packages/contracts` y `pnpm check:boundaries`.
+
+* **Dominio de punta a punta**:
+  > *"Añade facturas de punta a punta"*
+  > 
+  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-fullstack-feature.mjs invoice`  
+  > ➔ Contrato Zod en `packages/contracts/src/invoices`, módulo NestJS de 18 archivos en `apps/api/src/modules/invoices` y feature Next.js en `apps/web/src/features/invoices`. Si hay un conflicto en cualquier parte, no escribe nada.
+
+* **Revisar límites**:
+  > *"¿Hay imports prohibidos entre apps y paquetes?"*
+  > 
+  > 🤖 **El agente ejecutará**: `pnpm check:boundaries`  
+  > ➔ Detecta apps importando apps, paquetes importando apps, rutas relativas entre workspaces, dependencias no declaradas, imports profundos y ciclos.
+
+---
+
 ### 🟦 Ejemplo con `ts-import-organizer`:
 
 * **Limpiar y ordenar imports (Post-formateo)**:
@@ -220,6 +246,7 @@ agent-skills/
 ├── skills/                      # Catálogo organizado por categorías
 │   ├── architecture/            # Arquitectura empresarial frontend, mobile y backend
 │   │   ├── flutter-architecture/# Clean Architecture Feature-First, BLoC y Result en Flutter
+│   │   ├── monorepo-architecture/# Monorepo pnpm + Turborepo para Next.js y NestJS, contratos y límites
 │   │   ├── nestjs-architecture/ # Modular Monolith, contratos DIP y Swagger en NestJS
 │   │   └── nextjs-architecture/ # Screaming Architecture y App Router en Next.js
 │   ├── dart/

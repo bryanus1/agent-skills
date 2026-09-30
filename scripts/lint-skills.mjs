@@ -118,6 +118,11 @@ export function validateSkill(skill) {
     errors.push("Field 'tags' must be a list.");
   }
 
+  const requiredSkills = data.requirements?.skills;
+  if (requiredSkills !== undefined && (!Array.isArray(requiredSkills) || !requiredSkills.every((s) => typeof s === 'string'))) {
+    errors.push("Field 'requirements.skills' must be a list of skill names.");
+  }
+
   if (!body || body.trim().length === 0) {
     errors.push('Skill content body is empty.');
   } else {
@@ -155,6 +160,17 @@ export function lintSkills(skillFiles) {
     for (const result of group) {
       const others = group.filter((r) => r !== result).map((r) => r.skill.relativePath);
       result.errors.push(`Duplicate skill name '${name}' (also used by ${others.join(', ')}).`);
+    }
+  }
+
+  // Skills listed in requirements.skills must exist in the same catalog.
+  for (const result of results) {
+    const required = result.skill.data?.requirements?.skills;
+    if (!Array.isArray(required)) continue;
+    for (const name of required) {
+      if (typeof name === 'string' && !byName.has(name)) {
+        result.errors.push(`Required skill '${name}' (requirements.skills) does not exist in the catalog.`);
+      }
     }
   }
 

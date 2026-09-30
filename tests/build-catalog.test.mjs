@@ -14,6 +14,10 @@ test('catalog lists every published skill with its category and path', () => {
     assert.ok(fs.existsSync(path.join(rootDir, skill.path)), skill.path);
     assert.equal(skill.path, `skills/${skill.category}/${skill.name}/SKILL.md`);
     assert.match(skill.version, /^\d+\.\d+\.\d+/);
+    assert.ok(Array.isArray(skill.requires), `${skill.name}: requires must be a list`);
+    for (const required of skill.requires) {
+      assert.ok(catalog.skills.some((s) => s.name === required), `${skill.name} requires unknown skill '${required}'`);
+    }
   }
 });
 

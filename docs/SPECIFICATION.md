@@ -57,8 +57,11 @@ triggers: string[]             # [Requerido] Palabras clave, comandos o condicio
 requirements:                  # [Opcional] Requisitos de ejecución
   tools: string[]              # Herramientas necesarias (ej. 'run_command', 'view_file', 'replace_file_content')
   bins: string[]               # Binarios del sistema requeridos (ej. 'git', 'docker', 'pnpm')
+  skills: string[]             # Otras skills del catálogo de las que depende (ej. 'nestjs-architecture')
 ---
 ```
+
+`requirements.skills` declara dependencias entre skills: cada nombre debe existir en el catálogo (el linter lo valida) y se publica como `requires` en `catalog/catalog.json`. Instala las dependencias junto a la skill (`npx skills add <repo> --skill <nombre>`); los scripts pueden resolverlas como directorios hermanos (`<skill-dir>/../<nombre>/`).
 
 ### Reglas de Validación de Metadatos:
 - **`name`**: Solo letras minúsculas, números y guiones (`^[a-z0-9-]+$`).

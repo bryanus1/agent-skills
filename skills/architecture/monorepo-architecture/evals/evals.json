@@ -1,0 +1,29 @@
+{
+  "skill_name": "monorepo-architecture",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Crea un monorepo para la empresa acme con una web en Next.js y una API en NestJS. Somos un solo equipo y queremos compartir las validaciones entre front y back.",
+      "expected_output": "El agente elige el modo zod justificándolo con la matriz, ejecuta scaffold-monorepo.mjs --scope acme --contracts zod primero con --dry-run y después sin él tras confirmación. No ejecuta create-next-app ni nest new sin permiso. Indica cómo conectar las apps (extends de @acme/tsconfig, dependencias workspace:*) y termina verificando con pnpm turbo run build/typecheck y pnpm check:boundaries.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "En mi monorepo (ya tiene packages/contracts, apps/web y apps/api) añade el dominio de facturas de punta a punta.",
+      "expected_output": "El agente ejecuta scaffold-fullstack-feature.mjs invoice con --dry-run y después sin él. Resultado: packages/contracts/src/invoices con el esquema Zod y la entrada './invoices' en exports; los 18 archivos de nestjs-architecture en apps/api/src/modules/invoices; la feature de nextjs-architecture en apps/web/src/features/invoices; dependencias workspace:* en las apps. Explica cómo derivar CreateInvoiceDto con createZodDto y mantiene InvoiceResponseDto.fromEntity().",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Nuestra API NestJS la consumen también una app móvil y partners externos. ¿Cómo comparto los tipos con la web del monorepo?",
+      "expected_output": "El agente recomienda el modo openapi: packages/api-client con tipos generados por openapi-typescript desde /api-json y cliente openapi-fetch. La API mantiene class-validator y Swagger como exige nestjs-architecture, y el cliente se regenera en el mismo PR que cambia un endpoint. No propone importar código de apps/api desde la web.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Para ahorrar tiempo, en la web importé la entidad directamente con import { Invoice } from '../../../../api/src/modules/invoices/entities'. ¿Está bien?",
+      "expected_output": "El agente explica que viola dos reglas: las apps son hojas y nadie importa una app, y las rutas relativas no pueden salir de su workspace. Propone usar el tipo del contrato (@acme/contracts/invoices) o del cliente generado, y ejecutar check-boundaries.mjs para confirmar que no quedan violaciones.",
+      "files": []
+    }
+  ]
+}

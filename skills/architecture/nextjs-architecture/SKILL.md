@@ -1,6 +1,6 @@
 ---
 name: nextjs-architecture
-version: 1.1.0
+version: 1.1.1
 description: >-
   Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions, hooks con TanStack Query, componentes FormDialog y testing con cobertura >= 90%.
 tags: [nextjs, react, screaming-architecture, frontend, app-router, tanstack-query, form-dialog]
@@ -35,6 +35,8 @@ Estandarizar el diseño, modularización y construcción de aplicaciones en **Ne
 - Al construir modales de creación o edición siguiendo el estándar **FormDialog** (`*-form-dialog`).
 - Al definir esquemas de validación Zod (`*.schema.ts`) o contratos de dominio (`models/*.ts`).
 - Al validar convenciones de nombres, sufijos de archivo y prohibición de barrel files contenedores.
+
+> **Monorepo:** si la web vive en un monorepo (`apps/web`), estas reglas aplican dentro de `apps/web/src/`. Para la estructura raíz, los paquetes compartidos, los contratos entre web y API y los límites de dependencias, usa también la skill [`monorepo-architecture`](../monorepo-architecture/SKILL.md). Genera las features con `--target-dir apps/web/src/features`.
 
 ---
 

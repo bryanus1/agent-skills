@@ -33,6 +33,7 @@ export function buildCatalog() {
         tags: data.tags ?? [],
         agents: data.agents ?? [],
         triggers: data.triggers ?? [],
+        requires: data.requirements?.skills ?? [],
       };
     }),
   };
