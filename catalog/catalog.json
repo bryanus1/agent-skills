@@ -138,7 +138,7 @@
     },
     {
       "name": "glab-cli",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "description": "Automatización de flujos de GitLab (MRs con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y releases) usando glab CLI y scripts.",
       "category": "gitlab",
       "path": "skills/gitlab/glab-cli/SKILL.md",

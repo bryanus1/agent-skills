@@ -2,12 +2,21 @@
 
 ## Caso 1: Crear MR con Issue ID asociado
 
-Estás en la rama `feat/42-pet-registration`:
+Estás en la rama `feat/42-pet-registration` de un proyecto Next.js cuyo `.glab-domains` contiene:
+
+```text
+auth
+pets
+users
+```
 
 ```bash
-# Ejecutar el script asistente:
+# Previsualizar título y labels, y después crear el MR:
+bash <skill-dir>/scripts/create_mr.sh --domain pets --priority high --dry-run
 bash <skill-dir>/scripts/create_mr.sh --domain pets --priority high
 ```
+
+Con `--domain billing`, el script fallaría porque `billing` no está en `.glab-domains`.
 
 **Resultado generado**:
 - **Título**: `feat(#42): ✨ pet registration`

@@ -1,6 +1,6 @@
 ---
 name: glab-cli
-version: 1.1.0
+version: 1.2.0
 description: >-
   Automatización de flujos de GitLab (MRs con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y releases) usando glab CLI y scripts.
 tags: [gitlab, glab, cli, devops, git, ci-cd, merge-requests]
@@ -50,7 +50,7 @@ flowchart TD
    - Usar el script asistente para generar el MR con el título, emojis, labels y formato exacto:
      ```bash
      # Con Issue ID detectado o explícito:
-     bash <skill-dir>/scripts/create_mr.sh --issue 42 --domain pets
+     bash <skill-dir>/scripts/create_mr.sh --issue 42 --domain auth
 
      # Sin Issue ID (genera título sin scope: <type>: <emoji> <desc>):
      bash <skill-dir>/scripts/create_mr.sh --domain operations
@@ -86,6 +86,8 @@ flowchart TD
   - Formato con issue: `<type>(#<issue-id>): <emoji> <description>`
   - Formato sin issue: `<type>: <emoji> <description>` (sin scope)
   - Scoped Labels obligatorios (`type::*`, `layer::*`, `domain::*`, `priority::*`).
+  - Dominios permitidos: si existe `.glab-domains` en la raíz del repo (un dominio por línea), `--domain` debe estar en esa lista; si no existe, se acepta cualquier nombre en kebab-case. Antes de crear el MR, lee ese archivo para elegir el dominio correcto.
+  - Usa siempre `--dry-run` primero para mostrar el título y los labels al usuario.
 - [`scripts/diagnose_pipeline.sh`](scripts/diagnose_pipeline.sh): Inspección de jobs y logs de CI.
 - [`scripts/release_helper.sh`](scripts/release_helper.sh): Consulta y generación de releases.
 
@@ -96,7 +98,8 @@ flowchart TD
    - Si **NO hay Issue ID**: `<type>: <emoji> <description>` (ej. `chore: 🔧 upgrade dependencies`).
    - **NUNCA usar carpetas ni paths como scope** (ej. `feat(web): ...` está PROHIBIDO).
 2. **Uso Exclusivo de Scoped Labels de Grupo**:
-   - Solo usar labels de grupo (`type::feature`, `layer::frontend`, `domain::pets`, etc.). Nunca crear labels locales de repo.
+   - Solo usar labels de grupo (`type::feature`, `layer::frontend`, `domain::<dominio>`, etc.). Nunca crear labels locales de repo.
+   - Los dominios válidos son los del archivo `.glab-domains` del proyecto; nunca inventes uno que no esté ahí.
 3. **No interactividad en scripts**: Usar siempre `--yes` o flags no interactivas.
 
 ## 📚 Referencias Adicionales

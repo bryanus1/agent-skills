@@ -50,12 +50,15 @@ Esta referencia documenta las reglas estrictas de convenciones para Merge Reques
    - `layer::frontend` (para aplicaciones web, UI/UX)
    - `layer::backend` (para APIs, base de datos, lógica de servidor)
 3. **`domain::*` (Al menos 1 según el módulo)**:
-   - `domain::pets` — Mascotas, microchips, expedientes
-   - `domain::landing` — Web pública, portal de búsqueda
-   - `domain::auth` — Login, sesiones, seguridad
-   - `domain::clinical` — Historiales clínicos, vacunas
-   - `domain::operations` — Inventario, microchips físicos
-   - `domain::users` — Gestión de usuarios, veterinarias
+   - Los dominios son propios de cada proyecto. Defínelos en un archivo `.glab-domains` en la raíz del repositorio, uno por línea (se permiten comentarios con `#`):
+     ```text
+     # .glab-domains
+     auth        # Login, sesiones, seguridad
+     billing     # Facturación y pagos
+     users       # Gestión de usuarios
+     ```
+   - `create_mr.sh --domain <name>` rechaza cualquier dominio que no esté en ese archivo. Sin `.glab-domains`, acepta cualquier nombre en kebab-case.
+   - Usa `--domains-file <ruta>` si el archivo vive en otra ubicación.
 4. **`priority::*` (Opcional)**:
    - `priority::high`, `priority::medium`, `priority::low`
 5. **`status::*` (Opcional / Estado)**:
