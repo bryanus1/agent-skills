@@ -117,10 +117,12 @@ Cuando se crea un módulo para un sustantivo singular (`<noun>`), generar los ar
 
 ## 🛠️ Scripts
 
+> **Rutas:** `<skill-dir>` es el directorio que contiene este `SKILL.md` (p. ej. `.claude/skills/<name>/` o `.agents/skills/<name>/`). Ejecuta los scripts desde la raíz del proyecto del usuario, no desde `<skill-dir>`.
+
 La skill proporciona un script generador Node.js ESM para andamiar automáticamente los 18 archivos del módulo:
 
 ### Generar un Módulo NestJS Completo
 ```bash
-node skills/architecture/nestjs-architecture/scripts/scaffold-module.mjs <noun-singular> [--target-dir <path>]
+node <skill-dir>/scripts/scaffold-module.mjs <noun-singular> [--target-dir <path>]
 ```
-*Ejemplo:* `node skills/architecture/nestjs-architecture/scripts/scaffold-module.mjs invoice --target-dir src/modules`
+*Ejemplo:* `node <skill-dir>/scripts/scaffold-module.mjs invoice --target-dir src/modules`

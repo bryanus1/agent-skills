@@ -149,19 +149,21 @@ lib/
 
 ## 🛠️ Scripts y Herramientas Auxiliares
 
+> **Rutas:** `<skill-dir>` es el directorio que contiene este `SKILL.md` (p. ej. `.claude/skills/<name>/` o `.agents/skills/<name>/`). Ejecuta los scripts desde la raíz del proyecto del usuario, no desde `<skill-dir>`.
+
 ### CLI Scaffolder: `scaffold-feature.mjs`
 
 La skill incluye un generador CLI determinista para andamiar una feature completa lista para producción en segundos:
 
 ```bash
 # Andamiar una feature completa con BLoC, Domain, Data y Tests:
-node skills/architecture/flutter-architecture/scripts/scaffold-feature.mjs auth --model user
+node <skill-dir>/scripts/scaffold-feature.mjs auth --model user
 
 # Andamiar usando Cubit en lugar de BLoC tradicional:
-node skills/architecture/flutter-architecture/scripts/scaffold-feature.mjs cart --model cart_item --cubit
+node <skill-dir>/scripts/scaffold-feature.mjs cart --model cart_item --cubit
 
 # Modo simulación sin escribir archivos (Dry Run):
-node skills/architecture/flutter-architecture/scripts/scaffold-feature.mjs billing --model invoice --dry-run
+node <skill-dir>/scripts/scaffold-feature.mjs billing --model invoice --dry-run
 ```
 
 ---

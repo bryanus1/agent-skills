@@ -139,22 +139,24 @@ part 'user_dto.freezed.dart';
 
 ## 🛠️ Scripts y Herramientas Auxiliares
 
+> **Rutas:** `<skill-dir>` es el directorio que contiene este `SKILL.md` (p. ej. `.claude/skills/<name>/` o `.agents/skills/<name>/`). Ejecuta los scripts desde la raíz del proyecto del usuario, no desde `<skill-dir>`.
+
 ### CLI Import Organizer: `organize-dart-imports.mjs`
 
 Para procesar archivos o árboles completos de forma automática:
 
 ```bash
 # Organizar y reescribir un archivo Dart específico:
-node skills/dart/dart-import-organizer/scripts/organize-dart-imports.mjs lib/features/auth/presentation/screens/login_screen.dart --write
+node <skill-dir>/scripts/organize-dart-imports.mjs lib/features/auth/presentation/screens/login_screen.dart --write
 
 # Organizar recursivamente toda la carpeta lib/:
-node skills/dart/dart-import-organizer/scripts/organize-dart-imports.mjs lib --write
+node <skill-dir>/scripts/organize-dart-imports.mjs lib --write
 
 # Verificar en modo CI sin modificar (exit code > 0 si hay desorden):
-node skills/dart/dart-import-organizer/scripts/organize-dart-imports.mjs lib --check
+node <skill-dir>/scripts/organize-dart-imports.mjs lib --check
 
 # Vista previa de cambios (Dry-Run):
-node skills/dart/dart-import-organizer/scripts/organize-dart-imports.mjs lib/main.dart --dry-run
+node <skill-dir>/scripts/organize-dart-imports.mjs lib/main.dart --dry-run
 ```
 
 ---

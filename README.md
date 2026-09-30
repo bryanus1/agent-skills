@@ -88,13 +88,13 @@ Una vez instalada una skill, tu asistente de IA la activará automáticamente cu
 * **Andamiar una feature completa con BLoC**:
   > *"Estructura la feature de facturación (billing) con Clean Architecture y el modelo invoice en Flutter"*
   > 
-  > 🤖 **El agente ejecutará**: `node skills/architecture/flutter-architecture/scripts/scaffold-feature.mjs billing --model invoice`  
+  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-feature.mjs billing --model invoice`  
   > ➔ Genera las 3 capas (`domain`, `data`, `presentation`), contratos de repositorio con Result, BLoC con estados inmutables y tests unitarios con `mocktail`.
 
 * **Andamiar con Cubit**:
   > *"Crea la feature del carrito de compras (cart) usando Cubit"*
   > 
-  > 🤖 **El agente ejecutará**: `node skills/architecture/flutter-architecture/scripts/scaffold-feature.mjs cart --model cart_item --cubit`  
+  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-feature.mjs cart --model cart_item --cubit`  
   > ➔ Genera la feature con `CartItemCubit`, estados sellados y suite de pruebas en `test/features/cart/`.
 
 ---
@@ -109,7 +109,7 @@ Una vez instalada una skill, tu asistente de IA la activará automáticamente cu
   > 2. Reorganización en los 6 bloques canónicos: `dart:*` ➔ terceros y `package:flutter/*` ➔ paquete de la app ➔ relativos locales ➔ `export` ➔ `part`.
   > 3. Ordenamiento alfabético por URI y de miembros en cláusulas `show`/`hide`.
   > 
-  > O ejecutará: `node skills/dart/dart-import-organizer/scripts/organize-dart-imports.mjs lib/features/auth --write`
+  > O ejecutará: `node <skill-dir>/scripts/organize-dart-imports.mjs lib/features/auth --write`
 
 ---
 
@@ -118,13 +118,13 @@ Una vez instalada una skill, tu asistente de IA la activará automáticamente cu
 * **Andamiar una feature completa**:
   > *"Estructura la feature de facturación (billing) con Screaming Architecture y un modelo inicial"*
   > 
-  > 🤖 **El agente ejecutará**: `node skills/architecture/nextjs-architecture/scripts/scaffold-feature.mjs billing --model invoice`  
+  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-feature.mjs billing --with-starter`  
   > ➔ Genera las 7 subcarpetas (`components`, `hooks`, `models`, `schemas`, `screens`, `services`, `utils`), modelos planos `.ts` sin tests, screen encapsulada y barrel de hoja terminal.
 
 * **Crear componente modal desacoplado**:
   > *"Crea un diálogo modal para crear facturas en billing con shadcn Dialog"*
   > 
-  > 🤖 **El agente ejecutará**: `node skills/architecture/nextjs-architecture/scripts/scaffold-component.mjs create-invoice-dialog --feature billing --variant dialog`  
+  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-component.mjs create-invoice-dialog --target-dir src/features/billing/components --type dialog`  
   > ➔ Genera el patrón `FormDialog` con TSDoc, validación y tests unitarios.
 
 ---
@@ -134,7 +134,7 @@ Una vez instalada una skill, tu asistente de IA la activará automáticamente cu
 * **Andamiar módulo de dominio completo**:
   > *"Crea el módulo de facturas (invoice) con arquitectura limpia y contrato de repositorio"*
   > 
-  > 🤖 **El agente ejecutará**: `node skills/architecture/nestjs-architecture/scripts/scaffold-module.mjs invoice --target-dir src/modules`  
+  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-module.mjs invoice --target-dir src/modules`  
   > ➔ Genera los **18 archivos** del módulo (`entities`, `dto`, `repositories/repository.ts` con contrato `IInvoiceRepository` y token `INVOICE_REPOSITORY_TOKEN`, `repositories/invoice.repository.ts`, `services` desacoplados, `controllers` con Swagger completo, specs unitarias y `invoice.module.ts`).
 
 ---
@@ -144,19 +144,19 @@ Una vez instalada una skill, tu asistente de IA la activará automáticamente cu
 * **Crear Merge Request estandarizado**:
   > *"Crea un Merge Request para la funcionalidad de autenticación vinculada al issue #42"*
   > 
-  > 🤖 **El agente ejecutará**: `./skills/gitlab/glab-cli/scripts/create_mr.sh --issue 42 --domain auth`  
+  > 🤖 **El agente ejecutará**: `bash <skill-dir>/scripts/create_mr.sh --issue 42 --domain auth`  
   > ➔ Genera el título con emoji: `feat(#42): ✨ nextauth credentials`, asigna los Scoped Labels oficiales (`type::feature`, `domain::auth`, `layer::frontend`) y redacta la descripción estructurada.
 
 * **Sin Issue ID (sin scope)**:
   > *"Crea un MR para actualizar las dependencias de Zod"*
   > 
-  > 🤖 **El agente ejecutará**: `./skills/gitlab/glab-cli/scripts/create_mr.sh --domain operations`  
+  > 🤖 **El agente ejecutará**: `bash <skill-dir>/scripts/create_mr.sh --domain operations`  
   > ➔ Genera título limpio sin paréntesis de scope: `chore: 🔧 upgrade zod`.
 
 * **Diagnosticar pipeline fallido**:
   > *"El pipeline de CI falló en mi rama, ayúdame a ver qué pasó"*
   > 
-  > 🤖 **El agente ejecutará**: `./skills/gitlab/glab-cli/scripts/diagnose_pipeline.sh --job lint`
+  > 🤖 **El agente ejecutará**: `bash <skill-dir>/scripts/diagnose_pipeline.sh --job lint`
 
 ---
 

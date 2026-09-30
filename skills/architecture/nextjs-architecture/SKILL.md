@@ -128,16 +128,20 @@ Construir los bloques de interfaz visual:
 
 ## 🛠️ Scripts
 
+> **Rutas:** `<skill-dir>` es el directorio que contiene este `SKILL.md` (p. ej. `.claude/skills/<name>/` o `.agents/skills/<name>/`). Ejecuta los scripts desde la raíz del proyecto del usuario, no desde `<skill-dir>`.
+
 La skill incluye scripts de Node.js ESM para acelerar el andamiaje del proyecto:
 
 ### 1. Generar una Feature Completa
 ```bash
-node skills/architecture/nextjs-architecture/scripts/scaffold-feature.mjs <feature-name> [--target-dir <path>]
+node <skill-dir>/scripts/scaffold-feature.mjs <feature-name> [--target-dir <path>] [--with-starter]
 ```
-*Ejemplo:* `node skills/architecture/nextjs-architecture/scripts/scaffold-feature.mjs billing --target-dir src/features`
+*Ejemplo:* `node <skill-dir>/scripts/scaffold-feature.mjs billing --target-dir src/features --with-starter`
+
+`--with-starter` genera además un modelo plano inicial (`models/<feature>.ts` + barrel) y una screen encapsulada con su test.
 
 ### 2. Generar un Componente Encapsulado
 ```bash
-node skills/architecture/nextjs-architecture/scripts/scaffold-component.mjs <component-name> [--target-dir <path>] [--type default|dialog|section]
+node <skill-dir>/scripts/scaffold-component.mjs <component-name> [--target-dir <path>] [--type default|dialog|section]
 ```
-*Ejemplo:* `node skills/architecture/nextjs-architecture/scripts/scaffold-component.mjs user-card --target-dir src/components/common`
+*Ejemplo:* `node <skill-dir>/scripts/scaffold-component.mjs user-card --target-dir src/components/common`

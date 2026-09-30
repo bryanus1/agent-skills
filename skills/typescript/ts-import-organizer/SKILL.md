@@ -239,4 +239,4 @@ Respeta el estilo de comillas que ya existe en el archivo (simples `'` o dobles 
 
 ## 📚 Referencias
 
-- [Ejemplos de transformación](file:///Users/brayansanjuan/Development/personal/agent-skills/skills/typescript/ts-import-organizer/examples/transformations.md)
+- [Ejemplos de transformación](examples/transformations.md)

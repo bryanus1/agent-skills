@@ -6,7 +6,7 @@ Estás en la rama `feat/42-pet-registration`:
 
 ```bash
 # Ejecutar el script asistente:
-./skills/gitlab/glab-cli/scripts/create_mr.sh --domain pets --priority high
+bash <skill-dir>/scripts/create_mr.sh --domain pets --priority high
 ```
 
 **Resultado generado**:
@@ -32,7 +32,7 @@ Estás en la rama `feat/42-pet-registration`:
 Estás en la rama `chore/upgrade-zod`:
 
 ```bash
-./skills/gitlab/glab-cli/scripts/create_mr.sh --domain operations
+bash <skill-dir>/scripts/create_mr.sh --domain operations
 ```
 
 **Resultado generado**:
@@ -58,8 +58,8 @@ Cuando un pipeline falla en GitLab CI:
 
 ```bash
 # 1. Ver estado general
-./skills/gitlab/glab-cli/scripts/diagnose_pipeline.sh
+bash <skill-dir>/scripts/diagnose_pipeline.sh
 
 # 2. Inspeccionar logs del job fallido
-./skills/gitlab/glab-cli/scripts/diagnose_pipeline.sh --job lint --lines 40
+bash <skill-dir>/scripts/diagnose_pipeline.sh --job lint --lines 40
 ```

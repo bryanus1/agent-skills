@@ -7,7 +7,7 @@ You are assisting in the **Agent Skills Hub** repository. Your primary responsib
 ## 🎯 Repository Overview
 
 - **Purpose**: Centralized, standardized repository of skills for AI assistants and coding agents (*Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf, etc.*).
-- **Core Standard**: Follow [`docs/SPECIFICATION.md`](file:///Users/brayansanjuan/Development/personal/agent-skills/docs/SPECIFICATION.md) strictly for all skills.
+- **Core Standard**: Follow [`docs/SPECIFICATION.md`](docs/SPECIFICATION.md) strictly for all skills.
 
 ---
 
@@ -17,9 +17,9 @@ Whenever the user asks to create a new skill (e.g., *"Crea una skill para X"* or
 
 ### 1. Determine Scope and Template
 - **Basic Skill (Markdown Only)**: Use for procedural workflows, design rules, architecture checklists, and standard coding conventions.
-  - Base template: [`templates/basic-skill/`](file:///Users/brayansanjuan/Development/personal/agent-skills/templates/basic-skill/SKILL.md)
+  - Base template: [`templates/basic-skill/`](templates/basic-skill/SKILL.md)
 - **Tool-Assisted Skill**: Use when the workflow benefits from executable scripts (`scripts/`), deep technical documentation (`references/`), or reference outputs (`examples/`).
-  - Base template: [`templates/tool-assisted-skill/`](file:///Users/brayansanjuan/Development/personal/agent-skills/templates/tool-assisted-skill/SKILL.md)
+  - Base template: [`templates/tool-assisted-skill/`](templates/tool-assisted-skill/SKILL.md)
 
 ### 2. Choose Directory Location & Name
 - Place the skill in:
@@ -77,4 +77,5 @@ Ensure the linter exits with `PASS` and `0 errors`. Fix any schema or validation
 
 - **Determinism**: Provide explicit, testable instructions rather than vague suggestions.
 - **No Destructive Operations**: Scripts or instructions must never execute unchecked destructive commands (`rm -rf /`, `git push --force`).
-- **File Links**: When referencing other files in markdown, use clickable links in github-style `[label](file:///absolute/path/to/file)`.
+- **File Links**: Inside a skill, link to its own files with paths relative to the skill directory (`[label](references/guide.md)`). Never use absolute paths or `file:///` URLs: skills are installed into other projects and machines, where those paths do not exist.
+- **Script Paths**: Show script invocations as `node <skill-dir>/scripts/<script>.mjs` (or `bash <skill-dir>/scripts/<script>.sh`), never `skills/<category>/<name>/scripts/...`, and state that `<skill-dir>` is the directory containing the `SKILL.md`.
