@@ -26,6 +26,7 @@ Diseñado bajo el principio de **Progressive Disclosure**:
 | Skill | Categoría | Versión | Agentes | Descripción |
 | :--- | :--- | :--- | :--- | :--- |
 | **[`flutter-architecture`](skills/architecture/flutter-architecture/SKILL.md)** | `architecture` | `1.1.0` | Todos | Clean Architecture Feature-First para Flutter. Guía el diseño modular en lib/features/&lt;feature&gt;/ (domain, data, presentation) con BLoC/Cubit, Inyección de Dependencias (GetIt/Injectable), manejo funcional de errores con Result sealed class y pruebas unitarias con mocktail y bloc_test. |
+| **[`monorepo-architecture`](skills/architecture/monorepo-architecture/SKILL.md)** | `architecture` | `1.0.0` | Todos | Estándar de monorepo con pnpm workspaces y Turborepo para una web Next.js y una API NestJS: estructura apps/ y packages/, paquetes internos compilados, contratos compartidos (Zod u OpenAPI), límites de dependencias verificables y scaffolding de features full-stack. |
 | **[`nestjs-architecture`](skills/architecture/nestjs-architecture/SKILL.md)** | `architecture` | `1.1.0` | Todos | Estándar de Modular Monolith para NestJS. Guía el andamiaje de módulos de dominio desacoplados, contratos DTO estrictos, documentación OpenAPI Swagger exhaustiva, persistencia agnóstica a cualquier ORM con Repository/Entity y doble barrera de seguridad (RBAC). |
 | **[`nextjs-architecture`](skills/architecture/nextjs-architecture/SKILL.md)** | `architecture` | `1.1.0` | Todos | Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions, hooks con TanStack Query, componentes FormDialog y testing con cobertura &gt;= 90%. |
 | **[`dart-import-organizer`](skills/dart/dart-import-organizer/SKILL.md)** | `dart` | `1.0.1` | Todos | Organiza y estandariza imports en Dart y Flutter (.dart). Se aplica DESPUÉS de formatear el código. Agrupa jerárquicamente en 6 bloques: dart:* → flutter/terceros → package de app → relativos → export → part, con orden alfabético y líneas en blanco entre grupos. |
@@ -52,6 +53,7 @@ Instalar una skill específica en tu proyecto actual:
 <!-- catalog-install:start -->
 ```bash
 npx skills add bryanus1/agent-skills --skill flutter-architecture
+npx skills add bryanus1/agent-skills --skill monorepo-architecture
 npx skills add bryanus1/agent-skills --skill nestjs-architecture
 npx skills add bryanus1/agent-skills --skill nextjs-architecture
 npx skills add bryanus1/agent-skills --skill dart-import-organizer

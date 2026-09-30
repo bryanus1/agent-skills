@@ -38,6 +38,46 @@
       "requires": []
     },
     {
+      "name": "monorepo-architecture",
+      "version": "1.0.0",
+      "description": "Estándar de monorepo con pnpm workspaces y Turborepo para una web Next.js y una API NestJS: estructura apps/ y packages/, paquetes internos compilados, contratos compartidos (Zod u OpenAPI), límites de dependencias verificables y scaffolding de features full-stack.",
+      "category": "architecture",
+      "path": "skills/architecture/monorepo-architecture/SKILL.md",
+      "tags": [
+        "monorepo",
+        "turborepo",
+        "pnpm",
+        "workspaces",
+        "nextjs",
+        "nestjs",
+        "architecture",
+        "fullstack"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "monorepo",
+        "turborepo",
+        "pnpm workspaces",
+        "crear monorepo",
+        "estructurar monorepo",
+        "paquete compartido",
+        "shared package",
+        "feature full-stack",
+        "límites de módulos",
+        "module boundaries"
+      ],
+      "requires": [
+        "nestjs-architecture",
+        "nextjs-architecture"
+      ]
+    },
+    {
       "name": "nestjs-architecture",
       "version": "1.1.0",
       "description": "Estándar de Modular Monolith para NestJS. Guía el andamiaje de módulos de dominio desacoplados, contratos DTO estrictos, documentación OpenAPI Swagger exhaustiva, persistencia agnóstica a cualquier ORM con Repository/Entity y doble barrera de seguridad (RBAC).",
