@@ -1,6 +1,6 @@
 ---
 name: nestjs-architecture
-version: 1.1.0
+version: 1.1.1
 description: >-
   Estándar de Modular Monolith para NestJS. Guía el andamiaje de módulos de dominio desacoplados, contratos DTO estrictos, documentación OpenAPI Swagger exhaustiva, persistencia agnóstica a cualquier ORM con Repository/Entity y doble barrera de seguridad (RBAC).
 tags: [nestjs, backend, modular-monolith, clean-architecture, swagger, rbac, orm-agnostic, database]
@@ -35,6 +35,8 @@ Estandarizar el diseño, modularización y construcción de backends y microserv
 - Al estructurar DTOs de validación con `class-validator` y `class-transformer` (`CreateDto`, `UpdateDto`, `QueryDto`, `ResponseDto`).
 - Al diseñar repositorios con Inversión de Dependencias (contrato `repository.ts` e implementación `<noun>.repository.ts`).
 - Al implementar autorización: Guards globales (`JwtAuthGuard`, `RolesGuard`) y verificación de propiedad (*ownership*) en el servicio.
+
+> **Monorepo:** si la API vive en un monorepo (`apps/api`), estas reglas aplican dentro de `apps/api/src/`. Para la estructura raíz, los paquetes compartidos, los contratos entre web y API y los límites de dependencias, usa también la skill [`monorepo-architecture`](../monorepo-architecture/SKILL.md). Genera los módulos con `--target-dir apps/api/src/modules`.
 
 ---
 
