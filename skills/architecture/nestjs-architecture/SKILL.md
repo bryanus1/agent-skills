@@ -90,18 +90,18 @@ Cuando se crea un módulo para un sustantivo singular (`<noun>`), generar los ar
 3. **Aislamiento Total del ORM / Base de Datos**:
    - Ningún ORM ni librería de base de datos se importa directamente en controladores ni servicios.
    - El Repositorio es la única capa que interactúa con el motor de persistencia y siempre debe retornar Domain Entities inmutables.
-3. **Regla de Nombres: Carpeta Plural, Archivos Singulares**:
+4. **Regla de Nombres: Carpeta Plural, Archivos Singulares**:
    - La carpeta del módulo es siempre **plural** en `kebab-case` (ej. `src/modules/pets/`, `src/modules/invoices/`). Excepción: `auth` se mantiene en singular.
-4. **Regla de Barrels de Hoja Terminal (*Leaf-Folder Barrel Policy*)**:
+5. **Regla de Barrels de Hoja Terminal (*Leaf-Folder Barrel Policy*)**:
    - La raíz del módulo `src/modules/<nouns>/` **NUNCA** lleva un archivo `index.ts` (es un contenedor que agrupa subcarpetas).
    - Las subcarpetas internas (`controllers/`, `dto/`, `entities/`, `repositories/`, `services/`) **SÍ** llevan `index.ts` porque contienen directamente archivos de implementación.
    - El consumo de servicios entre módulos se realiza inyectando el servicio provisto por el módulo exportador, importando desde la subcarpeta hoja: `import { UserService } from '@/modules/users/services';`.
-5. **Doble Barrera de Autorización (RBAC + Ownership)**:
+6. **Doble Barrera de Autorización (RBAC + Ownership)**:
    - Los decoradores `@Roles(...)` en el controlador filtran el acceso a nivel de ruta HTTP.
    - La capa de servicio **DEBE** validar la propiedad del recurso (`requesterRole === Role.ADMIN` o `entity.ownerId === requesterId`), lanzando `ForbiddenException` si no coincide.
-6. **Documentación Swagger Exhaustiva**:
+7. **Documentación Swagger Exhaustiva**:
    - Cada método del controlador debe incluir `@ApiOperation`, decoradores de respuesta (`@ApiOkResponse`, `@ApiCreatedResponse`), `@ApiParam` con formato UUID en rutas con ID, y respuestas de error (`@ApiUnauthorizedResponse`, `@ApiForbiddenResponse`).
-7. **Exclusión de Pruebas Unitarias en `src/config/`**:
+8. **Exclusión de Pruebas Unitarias en `src/config/`**:
    - La carpeta `src/config/` (esquemas de validación de entorno Joi, loaders de configuración con `@nestjs/config` y constantes) contiene configuraciones estáticas declarativas del sistema y **NO** lleva pruebas unitarias directas (`*.spec.ts`).
 
 ---
@@ -119,10 +119,12 @@ Cuando se crea un módulo para un sustantivo singular (`<noun>`), generar los ar
 
 > **Rutas:** `<skill-dir>` es el directorio que contiene este `SKILL.md` (p. ej. `.claude/skills/<name>/` o `.agents/skills/<name>/`). Ejecuta los scripts desde la raíz del proyecto del usuario, no desde `<skill-dir>`.
 
+> **Seguridad:** el script aborta sin escribir nada si alguno de los archivos que genera ya existe. Ejecuta primero con `--dry-run` para ver qué se va a crear. Usa `--force` (sobrescribe esos archivos) solo con confirmación explícita del usuario.
+
 La skill proporciona un script generador Node.js ESM para andamiar automáticamente los 18 archivos del módulo:
 
 ### Generar un Módulo NestJS Completo
 ```bash
-node <skill-dir>/scripts/scaffold-module.mjs <noun-singular> [--target-dir <path>]
+node <skill-dir>/scripts/scaffold-module.mjs <noun-singular> [--target-dir <path>] [--plural <name>] [--dry-run] [--force]
 ```
 *Ejemplo:* `node <skill-dir>/scripts/scaffold-module.mjs invoice --target-dir src/modules`

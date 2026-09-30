@@ -104,6 +104,7 @@ Enlaces a documentos complementarios en `references/`.
   - `> 0`: Error con mensaje explícito en `stderr` / `stdout`.
 - **Portabilidad**: Preferir scripts de Shell POSIX (`#!/usr/bin/env sh` o `bash`), Python 3 estándar o Node.js sin dependencias pesadas innecesarias.
 - **Seguridad**: No ejecutar comandos destructivos (`rm -rf /`, `git push --force`) sin confirmación explícita.
+- **No Sobrescritura**: Los scripts que generan archivos deben abortar (código `1`, sin escribir nada) si algún archivo destino ya existe, ofrecer `--dry-run` para previsualizar y exigir `--force` para sobrescribir.
 - **Rutas Portables**: Las skills se instalan en otros proyectos (`.claude/skills/<name>/`, `.agents/skills/<name>/`…). En `SKILL.md` enlaza los archivos propios con rutas relativas a la skill (`references/guia.md`) y muestra los scripts como `node <skill-dir>/scripts/x.mjs`. Nunca uses rutas absolutas ni `file:///`.
 
 ---

@@ -89,6 +89,7 @@ Asegúrate de incluir las secciones estándar:
 - **Códigos de Salida**: `0` para éxito, `>0` para errores con mensaje claro.
 - **Permisos de Ejecución**: Ejecutar siempre `chmod +x scripts/*.sh` antes de commitear.
 - **Seguridad**: Prohibido ejecutar comandos destructivos sin confirmación explícita (`rm -rf /`, `git push --force`).
+- **No Sobrescritura**: Los scripts que generan archivos deben abortar (código `1`, sin escribir nada) si algún archivo destino ya existe, ofrecer `--dry-run` para previsualizar y exigir `--force` para sobrescribir.
 - **Rutas Portables**: Las skills se instalan en otros proyectos (`.claude/skills/<name>/`, `.agents/skills/<name>/`…). En `SKILL.md` enlaza los archivos propios con rutas relativas a la skill (`references/guia.md`) y muestra los scripts como `node <skill-dir>/scripts/x.mjs`. Nunca uses rutas absolutas ni `file:///`.
 
 ---

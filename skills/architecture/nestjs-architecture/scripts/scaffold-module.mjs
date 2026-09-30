@@ -13,6 +13,8 @@ Arguments:
 Options:
   --target-dir <dir>  Base directory for modules (default: src/modules)
   --plural <name>     Custom plural name (default: auto-detected plural)
+  --dry-run           List the files that would be generated without writing anything
+  --force             Overwrite generated files that already exist (default: abort on conflict)
   --help, -h          Show this help message
 `);
 }
@@ -54,6 +56,8 @@ function main() {
 
   let targetDir = 'src/modules';
   let customPlural = null;
+  let isDryRun = false;
+  let isForce = false;
 
   for (let i = 1; i < args.length; i++) {
     if (args[i] === '--target-dir' && args[i + 1]) {
@@ -62,6 +66,10 @@ function main() {
     } else if (args[i] === '--plural' && args[i + 1]) {
       customPlural = args[i + 1].toLowerCase();
       i++;
+    } else if (args[i] === '--dry-run') {
+      isDryRun = true;
+    } else if (args[i] === '--force') {
+      isForce = true;
     }
   }
 
@@ -74,20 +82,13 @@ function main() {
 
   const moduleRoot = path.resolve(process.cwd(), targetDir, nounsKebab);
 
-  if (fs.existsSync(moduleRoot)) {
-    console.error(`❌ Error: Module folder '${moduleRoot}' already exists.`);
-    process.exit(1);
-  }
-
   console.log(`🏛️ Scaffolding NestJS Modular Monolith: ${NounPascal}`);
   console.log(`📁 Module directory (plural): ${nounsKebab}/`);
-  console.log(`📄 Internal files (singular): ${nounKebab}.*.ts\n`);
-
-  fs.mkdirSync(path.join(moduleRoot, 'entities'), { recursive: true });
-  fs.mkdirSync(path.join(moduleRoot, 'dto'), { recursive: true });
-  fs.mkdirSync(path.join(moduleRoot, 'repositories'), { recursive: true });
-  fs.mkdirSync(path.join(moduleRoot, 'services'), { recursive: true });
-  fs.mkdirSync(path.join(moduleRoot, 'controllers'), { recursive: true });
+  console.log(`📄 Internal files (singular): ${nounKebab}.*.ts`);
+  if (isDryRun) {
+    console.log(`🔎 Mode: [DRY RUN - No files will be written]`);
+  }
+  console.log('');
 
   const files = [];
 
@@ -647,11 +648,35 @@ export class ${NounPascal}Module {}
 `,
   });
 
-  // Write all 18 files in order
+  const conflicts = files.map((item) => item.path).filter((file) => fs.existsSync(file));
+  if (conflicts.length > 0 && !isForce) {
+    console.error(`❌ Error: ${conflicts.length} target file(s) already exist:`);
+    for (const file of conflicts) {
+      console.error(`   - ${path.relative(process.cwd(), file)}`);
+    }
+    console.error(`\nNo files were written. Re-run with --force to overwrite them.`);
+    process.exit(1);
+  }
+
+  // Write all files in order
+  const total = String(files.length).padStart(2, '0');
   for (let i = 0; i < files.length; i++) {
     const item = files[i];
+    const displayPath = path.relative(process.cwd(), item.path);
+    const counter = `[${String(i + 1).padStart(2, '0')}/${total}]`;
+    if (isDryRun) {
+      const action = conflicts.includes(item.path) ? 'overwrite' : 'create';
+      console.log(`  ${counter} [DRY-RUN] Would ${action}: ${displayPath}`);
+      continue;
+    }
+    fs.mkdirSync(path.dirname(item.path), { recursive: true });
     fs.writeFileSync(item.path, item.content, 'utf8');
-    console.log(`  [${String(i + 1).padStart(2, '0')}/18] Created: ${path.relative(process.cwd(), item.path)}`);
+    console.log(`  ${counter} Created: ${displayPath}`);
+  }
+
+  if (isDryRun) {
+    console.log(`\n🔎 Dry run complete: ${files.length} files would be written. Nothing was changed.`);
+    return;
   }
 
   console.log(`\n✅ Module '${NounPascal}Module' successfully scaffolded!`);

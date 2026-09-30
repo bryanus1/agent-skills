@@ -13,6 +13,8 @@ Arguments:
 Options:
   --target-dir <dir>  Target directory (default: src/components/common)
   --type <type>       Component archetype: 'default', 'dialog', 'section' (default: default)
+  --dry-run           List the files that would be generated without writing anything
+  --force             Overwrite component files that already exist (default: abort on conflict)
   --help, -h          Show this help message
 `);
 }
@@ -39,6 +41,8 @@ function main() {
 
   let targetDir = 'src/components/common';
   let componentType = 'default';
+  let isDryRun = false;
+  let isForce = false;
 
   for (let i = 1; i < args.length; i++) {
     if (args[i] === '--target-dir' && args[i + 1]) {
@@ -47,18 +51,21 @@ function main() {
     } else if (args[i] === '--type' && args[i + 1]) {
       componentType = args[i + 1];
       i++;
+    } else if (args[i] === '--dry-run') {
+      isDryRun = true;
+    } else if (args[i] === '--force') {
+      isForce = true;
     }
+  }
+
+  const allowedTypes = ['default', 'dialog', 'section'];
+  if (!allowedTypes.includes(componentType)) {
+    console.error(`❌ Error: Unknown --type '${componentType}'. Use one of: ${allowedTypes.join(', ')}.`);
+    process.exit(1);
   }
 
   const pascalName = toPascalCase(componentName);
   const componentFolder = path.resolve(process.cwd(), targetDir, componentName);
-
-  if (fs.existsSync(componentFolder)) {
-    console.error(`❌ Error: Folder already exists at '${componentFolder}'`);
-    process.exit(1);
-  }
-
-  fs.mkdirSync(componentFolder, { recursive: true });
 
   const componentFile = path.join(componentFolder, `${componentName}.tsx`);
   const testFile = path.join(componentFolder, `${componentName}.test.tsx`);
@@ -190,14 +197,40 @@ describe('${pascalName} Component', () => {
 
   const indexCode = `export * from './${componentName}';\n`;
 
-  fs.writeFileSync(componentFile, componentCode, 'utf8');
-  fs.writeFileSync(testFile, testCode, 'utf8');
-  fs.writeFileSync(indexFile, indexCode, 'utf8');
+  const files = [
+    { path: componentFile, content: componentCode },
+    { path: testFile, content: testCode },
+    { path: indexFile, content: indexCode },
+  ];
+
+  const conflicts = files.map((item) => item.path).filter((file) => fs.existsSync(file));
+  if (conflicts.length > 0 && !isForce) {
+    console.error(`❌ Error: ${conflicts.length} component file(s) already exist:`);
+    for (const file of conflicts) {
+      console.error(`   - ${path.relative(process.cwd(), file)}`);
+    }
+    console.error(`\nNo files were written. Re-run with --force to overwrite them.`);
+    process.exit(1);
+  }
+
+  if (isDryRun) {
+    console.log(`🔎 [DRY RUN] Component '${pascalName}' would write:`);
+    for (const item of files) {
+      const action = conflicts.includes(item.path) ? 'overwrite' : 'create';
+      console.log(`   - ${action}: ${path.relative(process.cwd(), item.path)}`);
+    }
+    return;
+  }
+
+  fs.mkdirSync(componentFolder, { recursive: true });
+  for (const item of files) {
+    fs.writeFileSync(item.path, item.content, 'utf8');
+  }
 
   console.log(`✅ Component '${pascalName}' created at:`);
-  console.log(`   - ${path.relative(process.cwd(), componentFile)}`);
-  console.log(`   - ${path.relative(process.cwd(), testFile)}`);
-  console.log(`   - ${path.relative(process.cwd(), indexFile)}`);
+  for (const item of files) {
+    console.log(`   - ${path.relative(process.cwd(), item.path)}`);
+  }
 }
 
 main();
