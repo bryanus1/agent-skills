@@ -29,6 +29,7 @@ Diseñado bajo el principio de **Progressive Disclosure**:
 | **[`monorepo-architecture`](skills/architecture/monorepo-architecture/SKILL.md)** | `architecture` | `1.0.0` | Todos | Estándar de monorepo con pnpm workspaces y Turborepo para una web Next.js y una API NestJS: estructura apps/ y packages/, paquetes internos compilados, contratos compartidos (Zod u OpenAPI), límites de dependencias verificables y scaffolding de features full-stack. |
 | **[`nestjs-architecture`](skills/architecture/nestjs-architecture/SKILL.md)** | `architecture` | `1.1.1` | Todos | Estándar de Modular Monolith para NestJS. Guía el andamiaje de módulos de dominio desacoplados, contratos DTO estrictos, documentación OpenAPI Swagger exhaustiva, persistencia agnóstica a cualquier ORM con Repository/Entity y doble barrera de seguridad (RBAC). |
 | **[`nextjs-architecture`](skills/architecture/nextjs-architecture/SKILL.md)** | `architecture` | `1.1.1` | Todos | Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions, hooks con TanStack Query, componentes FormDialog y testing con cobertura &gt;= 90%. |
+| **[`react-native-architecture`](skills/architecture/react-native-architecture/SKILL.md)** | `architecture` | `1.0.0` | Todos | Estándar de Screaming Architecture para React Native con Expo Router. Guía la estructuración por features, rutas delgadas en src/app, hooks con TanStack Query, estilos NativeWind y tests con cobertura &gt;= 90%. Incluye scaffolds de feature y componente. |
 | **[`dart-import-organizer`](skills/dart/dart-import-organizer/SKILL.md)** | `dart` | `1.0.1` | Todos | Organiza y estandariza imports en Dart y Flutter (.dart). Se aplica DESPUÉS de formatear el código. Agrupa jerárquicamente en 6 bloques: dart:* → flutter/terceros → package de app → relativos → export → part, con orden alfabético y líneas en blanco entre grupos. |
 | **[`gh-cli`](skills/github/gh-cli/SKILL.md)** | `github` | `1.0.0` | Todos | Automatización de flujos de GitHub con gh CLI y scripts: Pull Requests con Conventional Commits, emojis y labels verificados, diagnóstico de GitHub Actions, issues y releases con notas generadas. Úsala al crear o revisar PRs, depurar workflows fallidos o publicar releases. |
 | **[`glab-cli`](skills/gitlab/glab-cli/SKILL.md)** | `gitlab` | `1.2.0` | Todos | Automatización de flujos de GitLab (MRs con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y releases) usando glab CLI y scripts. |
@@ -56,6 +57,7 @@ npx skills add bryanus1/agent-skills --skill flutter-architecture
 npx skills add bryanus1/agent-skills --skill monorepo-architecture
 npx skills add bryanus1/agent-skills --skill nestjs-architecture
 npx skills add bryanus1/agent-skills --skill nextjs-architecture
+npx skills add bryanus1/agent-skills --skill react-native-architecture
 npx skills add bryanus1/agent-skills --skill dart-import-organizer
 npx skills add bryanus1/agent-skills --skill gh-cli
 npx skills add bryanus1/agent-skills --skill glab-cli
@@ -248,7 +250,8 @@ agent-skills/
 │   │   ├── flutter-architecture/# Clean Architecture Feature-First, BLoC y Result en Flutter
 │   │   ├── monorepo-architecture/# Monorepo pnpm + Turborepo para Next.js y NestJS, contratos y límites
 │   │   ├── nestjs-architecture/ # Modular Monolith, contratos DIP y Swagger en NestJS
-│   │   └── nextjs-architecture/ # Screaming Architecture y App Router en Next.js
+│   │   ├── nextjs-architecture/ # Screaming Architecture y App Router en Next.js
+│   │   └── react-native-architecture/# Screaming Architecture con Expo Router, TanStack Query y NativeWind
 │   ├── dart/
 │   │   └── dart-import-organizer/# Organización canónica de directivas Dart en 6 grupos
 │   ├── github/

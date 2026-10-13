@@ -8,6 +8,8 @@ const FLUTTER = 'skills/architecture/flutter-architecture/scripts/scaffold-featu
 const NEST = 'skills/architecture/nestjs-architecture/scripts/scaffold-module.mjs';
 const NEXT_FEATURE = 'skills/architecture/nextjs-architecture/scripts/scaffold-feature.mjs';
 const NEXT_COMPONENT = 'skills/architecture/nextjs-architecture/scripts/scaffold-component.mjs';
+const RN_FEATURE = 'skills/architecture/react-native-architecture/scripts/scaffold-feature.mjs';
+const RN_COMPONENT = 'skills/architecture/react-native-architecture/scripts/scaffold-component.mjs';
 
 // Every scaffold must follow the same safety contract (docs/SPECIFICATION.md §5).
 const scaffolds = [
@@ -15,6 +17,8 @@ const scaffolds = [
   { name: 'nestjs scaffold-module', script: NEST, args: ['invoice'], probe: 'src/modules/invoices/invoice.module.ts' },
   { name: 'nextjs scaffold-feature', script: NEXT_FEATURE, args: ['billing', '--with-starter'], probe: 'src/features/billing/models/billing.ts' },
   { name: 'nextjs scaffold-component', script: NEXT_COMPONENT, args: ['user-card', '--type', 'dialog'], probe: 'src/components/common/user-card/user-card.tsx' },
+  { name: 'react-native scaffold-feature', script: RN_FEATURE, args: ['billing', '--with-starter', '--with-route'], probe: 'src/features/billing/models/billing.ts' },
+  { name: 'react-native scaffold-component', script: RN_COMPONENT, args: ['user-card', '--type', 'modal'], probe: 'src/components/common/user-card/user-card.tsx' },
 ];
 
 for (const { name, script, args, probe } of scaffolds) {
@@ -151,6 +155,69 @@ test('nextjs scaffold-component: generates component, test and barrel for each t
 test('nextjs scaffold-component: rejects an unknown --type', (t) => {
   const cwd = makeTempDir(t);
   const result = runScript(NEXT_COMPONENT, ['user-card', '--type', 'modal'], cwd);
+  assert.equal(result.code, 1);
+  assert.match(result.stderr, /Unknown --type/);
+  assert.deepEqual(listFiles(cwd), []);
+});
+
+test('react-native scaffold-feature: creates the 7 folders, starter and route only on request', (t) => {
+  const cwd = makeTempDir(t);
+  assert.equal(runScript(RN_FEATURE, ['billing'], cwd).code, 0);
+  const featureRoot = path.join(cwd, 'src/features/billing');
+  assert.deepEqual(fs.readdirSync(featureRoot).sort(), ['components', 'hooks', 'models', 'schemas', 'screens', 'services', 'utils']);
+  assert.deepEqual(listFiles(cwd), []);
+
+  assert.equal(runScript(RN_FEATURE, ['billing', '--with-starter', '--with-route'], cwd).code, 0);
+  assert.deepEqual(listFiles(cwd), [
+    'src/app/billing/index.tsx',
+    'src/features/billing/models/billing.ts',
+    'src/features/billing/models/index.ts',
+    'src/features/billing/screens/billing-home/billing-home.test.tsx',
+    'src/features/billing/screens/billing-home/billing-home.tsx',
+    'src/features/billing/screens/billing-home/index.ts',
+  ]);
+  assert.ok(!fs.existsSync(path.join(featureRoot, 'index.ts')), 'feature root must not have a barrel');
+
+  const screen = fs.readFileSync(path.join(featureRoot, 'screens/billing-home/billing-home.tsx'), 'utf8');
+  assert.match(screen, /from 'react-native'/);
+  assert.match(screen, /className=/);
+  assert.doesNotMatch(screen, /<div/);
+  const route = fs.readFileSync(path.join(cwd, 'src/app/billing/index.tsx'), 'utf8');
+  assert.match(route, /@\/features\/billing\/screens\/billing-home/);
+});
+
+test('react-native scaffold-feature: --with-route requires --with-starter and honors --app-dir', (t) => {
+  const cwd = makeTempDir(t);
+  const result = runScript(RN_FEATURE, ['billing', '--with-route'], cwd);
+  assert.equal(result.code, 1);
+  assert.match(result.stderr, /--with-starter/);
+  assert.deepEqual(fs.readdirSync(cwd), []);
+
+  assert.equal(runScript(RN_FEATURE, ['billing', '--with-starter', '--with-route', '--app-dir', 'apps/mobile/src/app'], cwd).code, 0);
+  assert.ok(fs.existsSync(path.join(cwd, 'apps/mobile/src/app/billing/index.tsx')));
+});
+
+test('react-native scaffold-feature: rejects names that are not kebab-case', (t) => {
+  const cwd = makeTempDir(t);
+  assert.equal(runScript(RN_FEATURE, ['Invoice_Item!'], cwd).code, 1);
+  assert.deepEqual(fs.readdirSync(cwd), []);
+});
+
+test('react-native scaffold-component: generates component, test and barrel for each type', (t) => {
+  const cwd = makeTempDir(t);
+  for (const type of ['default', 'modal', 'section']) {
+    const name = `${type}-card`;
+    assert.equal(runScript(RN_COMPONENT, [name, '--type', type], cwd).code, 0);
+    assert.deepEqual(listFiles(path.join(cwd, 'src/components/common', name)), [`${name}.test.tsx`, `${name}.tsx`, 'index.ts'].sort());
+  }
+  const modal = fs.readFileSync(path.join(cwd, 'src/components/common/modal-card/modal-card.tsx'), 'utf8');
+  assert.match(modal, /Modal/);
+  assert.match(modal, /from 'react-native'/);
+});
+
+test('react-native scaffold-component: rejects an unknown --type', (t) => {
+  const cwd = makeTempDir(t);
+  const result = runScript(RN_COMPONENT, ['user-card', '--type', 'dialog'], cwd);
   assert.equal(result.code, 1);
   assert.match(result.stderr, /Unknown --type/);
   assert.deepEqual(listFiles(cwd), []);
