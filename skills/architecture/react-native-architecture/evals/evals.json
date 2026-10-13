@@ -1,0 +1,23 @@
+{
+  "skill_name": "react-native-architecture",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Estructura la feature de facturación (billing) en mi app Expo con Expo Router, con archivos iniciales y su ruta.",
+      "expected_output": "El agente ejecuta scaffold-feature.mjs billing --with-starter --with-route (primero con --dry-run). Crea src/features/billing/ con components, hooks, models, schemas, screens, services y utils, models/billing.ts con su barrel, la screen screens/billing-home/ con test e index.ts y una ruta delgada src/app/billing/index.tsx que solo reexporta la screen. No crea index.ts en la raíz de la feature ni en components/.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Crea un modal para crear facturas dentro de la feature billing.",
+      "expected_output": "El agente usa scaffold-component.mjs create-invoice-modal --target-dir src/features/billing/components --type modal. Genera un componente con Modal de React Native y NativeWind, TSDoc, un test con @testing-library/react-native y un index.ts en la carpeta hoja.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Revisa estos imports: `import { usePetSearch, IPet } from '@/features/pets';` y `import { InvoiceCard } from '@/features/pets/components';`",
+      "expected_output": "El agente señala que ambos importan desde carpetas contenedoras sin barrel (política de barrels solo en carpetas hoja) y los reescribe: '@/features/pets/hooks/use-pet-search', '@/features/pets/models' y '@/features/pets/components/invoice-card'. Indica eliminar cualquier index.ts de carpetas contenedoras.",
+      "files": []
+    }
+  ]
+}

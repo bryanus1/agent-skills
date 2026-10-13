@@ -147,6 +147,40 @@
       "requires": []
     },
     {
+      "name": "react-native-architecture",
+      "version": "1.0.0",
+      "description": "Estándar de Screaming Architecture para React Native con Expo Router. Guía la estructuración por features, rutas delgadas en src/app, hooks con TanStack Query, estilos NativeWind y tests con cobertura >= 90%. Incluye scaffolds de feature y componente.",
+      "category": "architecture",
+      "path": "skills/architecture/react-native-architecture/SKILL.md",
+      "tags": [
+        "react-native",
+        "expo",
+        "expo-router",
+        "screaming-architecture",
+        "mobile",
+        "tanstack-query",
+        "nativewind"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "react native architecture",
+        "expo router architecture",
+        "scaffold react native feature",
+        "react native feature",
+        "screaming architecture react native",
+        "arquitectura react native",
+        "crear feature react native",
+        "estructurar expo"
+      ],
+      "requires": []
+    },
+    {
       "name": "dart-import-organizer",
       "version": "1.0.1",
       "description": "Organiza y estandariza imports en Dart y Flutter (.dart). Se aplica DESPUÉS de formatear el código. Agrupa jerárquicamente en 6 bloques: dart:* → flutter/terceros → package de app → relativos → export → part, con orden alfabético y líneas en blanco entre grupos.",
