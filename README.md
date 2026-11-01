@@ -21,60 +21,45 @@ Diseñado bajo el principio de **Progressive Disclosure**:
 
 ## ⚡ Skills Disponibles en el Catálogo
 
+> Haz clic en el nombre de cualquier skill para abrir su **`README.md`**, donde encontrarás su comando de instalación específico, requisitos, ejemplos de prompts, scripts CLI y referencias técnicas.
+
 <!-- Tabla generada por `pnpm catalog` a partir del frontmatter de cada SKILL.md. No editar a mano. -->
 <!-- catalog-table:start -->
 | Skill | Categoría | Versión | Agentes | Descripción |
 | :--- | :--- | :--- | :--- | :--- |
-| **[`flutter-architecture`](skills/architecture/flutter-architecture/SKILL.md)** | `architecture` | `1.1.0` | Todos | Clean Architecture Feature-First para Flutter. Guía el diseño modular en lib/features/&lt;feature&gt;/ (domain, data, presentation) con BLoC/Cubit, Inyección de Dependencias (GetIt/Injectable), manejo funcional de errores con Result sealed class y pruebas unitarias con mocktail y bloc_test. |
-| **[`monorepo-architecture`](skills/architecture/monorepo-architecture/SKILL.md)** | `architecture` | `1.0.0` | Todos | Estándar de monorepo con pnpm workspaces y Turborepo para una web Next.js y una API NestJS: estructura apps/ y packages/, paquetes internos compilados, contratos compartidos (Zod u OpenAPI), límites de dependencias verificables y scaffolding de features full-stack. |
-| **[`nestjs-architecture`](skills/architecture/nestjs-architecture/SKILL.md)** | `architecture` | `1.1.1` | Todos | Estándar de Modular Monolith para NestJS. Guía el andamiaje de módulos de dominio desacoplados, contratos DTO estrictos, documentación OpenAPI Swagger exhaustiva, persistencia agnóstica a cualquier ORM con Repository/Entity y doble barrera de seguridad (RBAC). |
-| **[`nextjs-architecture`](skills/architecture/nextjs-architecture/SKILL.md)** | `architecture` | `1.1.1` | Todos | Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions, hooks con TanStack Query, componentes FormDialog y testing con cobertura &gt;= 90%. |
-| **[`react-native-architecture`](skills/architecture/react-native-architecture/SKILL.md)** | `architecture` | `1.0.0` | Todos | Estándar de Screaming Architecture para React Native con Expo Router. Guía la estructuración por features, rutas delgadas en src/app, hooks con TanStack Query, estilos NativeWind y tests con cobertura &gt;= 90%. Incluye scaffolds de feature y componente. |
-| **[`dart-import-organizer`](skills/dart/dart-import-organizer/SKILL.md)** | `dart` | `1.0.1` | Todos | Organiza y estandariza imports en Dart y Flutter (.dart). Se aplica DESPUÉS de formatear el código. Agrupa jerárquicamente en 6 bloques: dart:* → flutter/terceros → package de app → relativos → export → part, con orden alfabético y líneas en blanco entre grupos. |
-| **[`ssh-connect`](skills/devops/ssh-connect/SKILL.md)** | `devops` | `1.0.0` | Todos | Gestión, conexión y ejecución remota en servidores SSH con ssh-connect. Soporta llaves .pem con permisos asegurados, contraseñas automatizadas (Keychain) y multiplexación persistente sin bloqueos de TTY. |
-| **[`git-cleanup`](skills/git/git-cleanup/SKILL.md)** | `git` | `1.0.0` | Todos | Limpieza segura de ramas locales de Git tras fusionar PRs (Squash/Merge). Protege ramas principales (main/master/develop), detecta ramas eliminadas en origin y elimina ramas obsoletas sin falsos negativos. |
-| **[`gh-cli`](skills/github/gh-cli/SKILL.md)** | `github` | `1.0.0` | Todos | Automatización de flujos de GitHub con gh CLI y scripts: Pull Requests con Conventional Commits, emojis y labels verificados, diagnóstico de GitHub Actions, issues y releases con notas generadas. Úsala al crear o revisar PRs, depurar workflows fallidos o publicar releases. |
-| **[`glab-cli`](skills/gitlab/glab-cli/SKILL.md)** | `gitlab` | `1.2.0` | Todos | Automatización de flujos de GitLab (MRs con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y releases) usando glab CLI y scripts. |
-| **[`ts-import-organizer`](skills/typescript/ts-import-organizer/SKILL.md)** | `typescript` | `1.1.1` | Todos | Organiza imports en TypeScript/JavaScript (.ts, .tsx, .js, .jsx). Se aplica siempre DESPUÉS de formatear el código. Agrupa: builtins → externos → path aliases → side-effects. Ordena líneas y miembros ({ ... }) por longitud, elimina unused y convierte rutas relativas a aliases. Activa al ordenar imports o escribir código. |
+| **[`flutter-architecture`](skills/architecture/flutter-architecture/README.md)** | `architecture` | `1.1.0` | Todos | Clean Architecture Feature-First para Flutter. Guía el diseño modular en lib/features/&lt;feature&gt;/ (domain, data, presentation) con BLoC/Cubit, Inyección de Dependencias (GetIt/Injectable), manejo funcional de errores con Result sealed class y pruebas unitarias con mocktail y bloc_test. |
+| **[`monorepo-architecture`](skills/architecture/monorepo-architecture/README.md)** | `architecture` | `1.0.0` | Todos | Estándar de monorepo con pnpm workspaces y Turborepo para una web Next.js y una API NestJS: estructura apps/ y packages/, paquetes internos compilados, contratos compartidos (Zod u OpenAPI), límites de dependencias verificables y scaffolding de features full-stack. |
+| **[`nestjs-architecture`](skills/architecture/nestjs-architecture/README.md)** | `architecture` | `1.1.1` | Todos | Estándar de Modular Monolith para NestJS. Guía el andamiaje de módulos de dominio desacoplados, contratos DTO estrictos, documentación OpenAPI Swagger exhaustiva, persistencia agnóstica a cualquier ORM con Repository/Entity y doble barrera de seguridad (RBAC). |
+| **[`nextjs-architecture`](skills/architecture/nextjs-architecture/README.md)** | `architecture` | `1.1.1` | Todos | Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions, hooks con TanStack Query, componentes FormDialog y testing con cobertura &gt;= 90%. |
+| **[`react-native-architecture`](skills/architecture/react-native-architecture/README.md)** | `architecture` | `1.0.0` | Todos | Estándar de Screaming Architecture para React Native con Expo Router. Guía la estructuración por features, rutas delgadas en src/app, hooks con TanStack Query, estilos NativeWind y tests con cobertura &gt;= 90%. Incluye scaffolds de feature y componente. |
+| **[`dart-import-organizer`](skills/dart/dart-import-organizer/README.md)** | `dart` | `1.0.1` | Todos | Organiza y estandariza imports en Dart y Flutter (.dart). Se aplica DESPUÉS de formatear el código. Agrupa jerárquicamente en 6 bloques: dart:* → flutter/terceros → package de app → relativos → export → part, con orden alfabético y líneas en blanco entre grupos. |
+| **[`ssh-connect`](skills/devops/ssh-connect/README.md)** | `devops` | `1.0.0` | Todos | Gestión, conexión y ejecución remota en servidores SSH con ssh-connect. Soporta llaves .pem con permisos asegurados, contraseñas automatizadas (Keychain) y multiplexación persistente sin bloqueos de TTY. |
+| **[`git-cleanup`](skills/git/git-cleanup/README.md)** | `git` | `1.0.0` | Todos | Limpieza segura de ramas locales de Git tras fusionar PRs (Squash/Merge). Protege ramas principales (main/master/develop), detecta ramas eliminadas en origin y elimina ramas obsoletas sin falsos negativos. |
+| **[`gh-cli`](skills/github/gh-cli/README.md)** | `github` | `1.0.0` | Todos | Automatización de flujos de GitHub con gh CLI y scripts: Pull Requests con Conventional Commits, emojis y labels verificados, diagnóstico de GitHub Actions, issues y releases con notas generadas. Úsala al crear o revisar PRs, depurar workflows fallidos o publicar releases. |
+| **[`glab-cli`](skills/gitlab/glab-cli/README.md)** | `gitlab` | `1.2.0` | Todos | Automatización de flujos de GitLab (MRs con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y releases) usando glab CLI y scripts. |
+| **[`ts-import-organizer`](skills/typescript/ts-import-organizer/README.md)** | `typescript` | `1.1.1` | Todos | Organiza imports en TypeScript/JavaScript (.ts, .tsx, .js, .jsx). Se aplica siempre DESPUÉS de formatear el código. Agrupa: builtins → externos → path aliases → side-effects. Ordena líneas y miembros ({ ... }) por longitud, elimina unused y convierte rutas relativas a aliases. Activa al ordenar imports o escribir código. |
 <!-- catalog-table:end -->
 
 ---
 
-## 📦 Cómo Instalar y Usar las Skills en Cualquier Proyecto
+## 📦 Cómo Instalar y Usar las Skills
 
-Puedes instalar estas skills directamente desde GitHub en cualquier proyecto o asistente de IA usando [`skills.sh`](https://skills.sh) CLI o enlaces directos:
+Puedes instalar estas skills directamente desde GitHub en cualquier proyecto o asistente de IA usando [`skills.sh`](https://skills.sh) CLI o mediante enlaces simbólicos locales. Consulta el `README.md` de cada skill en la tabla superior para ver sus dependencias y ejemplos de activación.
 
 ### 1. Vía CLI oficial (`skills.sh`) — *Recomendado*
 
 ```bash
-# Ver todas las skills disponibles en este repositorio
+# Listar todas las skills disponibles en este repositorio:
 npx skills add bryanus1/agent-skills --list
-```
 
-Instalar una skill específica en tu proyecto actual:
+# Instalar una skill específica en tu proyecto actual:
+npx skills add bryanus1/agent-skills --skill <skill-name>
 
-<!-- catalog-install:start -->
-```bash
-npx skills add bryanus1/agent-skills --skill flutter-architecture
-npx skills add bryanus1/agent-skills --skill monorepo-architecture
-npx skills add bryanus1/agent-skills --skill nestjs-architecture
-npx skills add bryanus1/agent-skills --skill nextjs-architecture
-npx skills add bryanus1/agent-skills --skill react-native-architecture
-npx skills add bryanus1/agent-skills --skill dart-import-organizer
-npx skills add bryanus1/agent-skills --skill ssh-connect
-npx skills add bryanus1/agent-skills --skill git-cleanup
-npx skills add bryanus1/agent-skills --skill gh-cli
-npx skills add bryanus1/agent-skills --skill glab-cli
-npx skills add bryanus1/agent-skills --skill ts-import-organizer
-```
-<!-- catalog-install:end -->
+# Instalar una skill globalmente en tu máquina (disponible para todos tus proyectos):
+npx skills add bryanus1/agent-skills --skill <skill-name> -g
 
-```bash
 # Instalar todas las skills del repositorio:
 npx skills add bryanus1/agent-skills --all
-
-# Instalar globalmente en tu máquina (disponible para todos tus proyectos):
-npx skills add bryanus1/agent-skills --skill flutter-architecture -g
 ```
 
 ### 2. Vía Enlace Simbólico (Symlink Local)
@@ -84,183 +69,12 @@ Si tienes este repositorio clonado en tu máquina y quieres reflejar los cambios
 ```bash
 # Para Google Antigravity:
 mkdir -p .agents/skills
-ln -s /ruta/a/agent-skills/skills/architecture/flutter-architecture .agents/skills/flutter-architecture
-ln -s /ruta/a/agent-skills/skills/dart/dart-import-organizer .agents/skills/dart-import-organizer
-ln -s /ruta/a/agent-skills/skills/architecture/nextjs-architecture .agents/skills/nextjs-architecture
-ln -s /ruta/a/agent-skills/skills/architecture/nestjs-architecture .agents/skills/nestjs-architecture
+ln -s /ruta/a/agent-skills/skills/<categoria>/<skill-name> .agents/skills/<skill-name>
 
 # Para Claude Code:
 mkdir -p .claude/skills
-ln -s ../../.agents/skills/flutter-architecture .claude/skills/flutter-architecture
-ln -s ../../.agents/skills/dart-import-organizer .claude/skills/dart-import-organizer
-ln -s ../../.agents/skills/nextjs-architecture .claude/skills/nextjs-architecture
-ln -s ../../.agents/skills/nestjs-architecture .claude/skills/nestjs-architecture
+ln -s ../../.agents/skills/<skill-name> .claude/skills/<skill-name>
 ```
-
----
-
-## 💡 Ejemplos de Activación y Uso con Agentes de IA
-
-Una vez instalada una skill, tu asistente de IA la activará automáticamente cuando uses lenguaje natural:
-
-### 📱 Ejemplo con `flutter-architecture`:
-
-* **Andamiar una feature completa con BLoC**:
-  > *"Estructura la feature de facturación (billing) con Clean Architecture y el modelo invoice en Flutter"*
-  > 
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-feature.mjs billing --model invoice`  
-  > ➔ Genera las 3 capas (`domain`, `data`, `presentation`), contratos de repositorio con Result, BLoC con estados inmutables y tests unitarios con `mocktail`.
-
-* **Andamiar con Cubit**:
-  > *"Crea la feature del carrito de compras (cart) usando Cubit"*
-  > 
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-feature.mjs cart --model cart_item --cubit`  
-  > ➔ Genera la feature con `CartItemCubit`, estados sellados y suite de pruebas en `test/features/cart/`.
-
----
-
-### 🎯 Ejemplo con `dart-import-organizer`:
-
-* **Organizar imports de un archivo o directorio**:
-  > *"Reorganiza y limpia los imports de este archivo `login_screen.dart` después de darle formato"*
-  > 
-  > 🤖 **El agente aplicará**:
-  > 1. Formato sintáctico asegurado con `dart format`.
-  > 2. Reorganización en los 6 bloques canónicos: `dart:*` ➔ terceros y `package:flutter/*` ➔ paquete de la app ➔ relativos locales ➔ `export` ➔ `part`.
-  > 3. Ordenamiento alfabético por URI y de miembros en cláusulas `show`/`hide`.
-  > 
-  > O ejecutará: `node <skill-dir>/scripts/organize-dart-imports.mjs lib/features/auth --write`
-
----
-
-### ⚡ Ejemplo con `nextjs-architecture`:
-
-* **Andamiar una feature completa**:
-  > *"Estructura la feature de facturación (billing) con Screaming Architecture y un modelo inicial"*
-  > 
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-feature.mjs billing --with-starter`  
-  > ➔ Genera las 7 subcarpetas (`components`, `hooks`, `models`, `schemas`, `screens`, `services`, `utils`), modelos planos `.ts` sin tests, screen encapsulada y barrel de hoja terminal.
-
-* **Crear componente modal desacoplado**:
-  > *"Crea un diálogo modal para crear facturas en billing con shadcn Dialog"*
-  > 
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-component.mjs create-invoice-dialog --target-dir src/features/billing/components --type dialog`  
-  > ➔ Genera el patrón `FormDialog` con TSDoc, validación y tests unitarios.
-
----
-
-### 🏛️ Ejemplo con `nestjs-architecture`:
-
-* **Andamiar módulo de dominio completo**:
-  > *"Crea el módulo de facturas (invoice) con arquitectura limpia y contrato de repositorio"*
-  > 
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-module.mjs invoice --target-dir src/modules`  
-  > ➔ Genera los **18 archivos** del módulo (`entities`, `dto`, `repositories/repository.ts` con contrato `IInvoiceRepository` y token `INVOICE_REPOSITORY_TOKEN`, `repositories/invoice.repository.ts`, `services` desacoplados, `controllers` con Swagger completo, specs unitarias y `invoice.module.ts`).
-
----
-
-### 🦊 Ejemplo con `glab-cli`:
-
-* **Crear Merge Request estandarizado**:
-  > *"Crea un Merge Request para la funcionalidad de autenticación vinculada al issue #42"*
-  > 
-  > 🤖 **El agente ejecutará**: `bash <skill-dir>/scripts/create_mr.sh --issue 42 --domain auth`  
-  > ➔ Genera el título con emoji: `feat(#42): ✨ nextauth credentials`, asigna los Scoped Labels oficiales (`type::feature`, `domain::auth`, `layer::frontend`) y redacta la descripción estructurada.
-
-* **Sin Issue ID (sin scope)**:
-  > *"Crea un MR para actualizar las dependencias de Zod"*
-  > 
-  > 🤖 **El agente ejecutará**: `bash <skill-dir>/scripts/create_mr.sh --domain operations`  
-  > ➔ Genera título limpio sin paréntesis de scope: `chore: 🔧 upgrade zod`.
-
-* **Diagnosticar pipeline fallido**:
-  > *"El pipeline de CI falló en mi rama, ayúdame a ver qué pasó"*
-  > 
-  > 🤖 **El agente ejecutará**: `bash <skill-dir>/scripts/diagnose_pipeline.sh --job lint`
-
----
-
-### 🐙 Ejemplo con `gh-cli`:
-
-* **Crear Pull Request estandarizado**:
-  > *"Abre un PR de mi rama feat/42-login-form para el dominio auth y pide revisión a octocat"*
-  > 
-  > 🤖 **El agente ejecutará**: `bash <skill-dir>/scripts/create_pr.sh --domain auth --reviewer octocat --dry-run` y, tras tu confirmación, el mismo comando sin `--dry-run`  
-  > ➔ Título `feat(#42): ✨ login form`, labels `enhancement` y `domain: auth` (verificados en el repo antes de crear nada) y cuerpo con `Closes #42`.
-
-* **Diagnosticar un check fallido de GitHub Actions**:
-  > *"El check de lint de mi PR #57 está en rojo"*
-  > 
-  > 🤖 **El agente ejecutará**: `bash <skill-dir>/scripts/diagnose_run.sh --pr 57 --job lint`  
-  > ➔ Muestra los checks del PR y solo las líneas fallidas del job `lint` del último run fallido.
-
-* **Publicar una release**:
-  > *"Publica la release v1.4.0"*
-  > 
-  > 🤖 **El agente ejecutará**: `bash <skill-dir>/scripts/release_helper.sh create v1.4.0 --dry-run` y, tras tu confirmación, la crea con notas generadas por GitHub.
-
----
-
-### 🗂️ Ejemplo con `monorepo-architecture`:
-
-> Requiere también `nestjs-architecture` y `nextjs-architecture` instaladas junto a ella (`npx skills add bryanus1/agent-skills --skill <nombre>` para cada una).
-
-* **Crear el monorepo**:
-  > *"Crea un monorepo para acme con web en Next.js y API en NestJS que compartan validaciones"*
-  > 
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-monorepo.mjs --scope acme --contracts zod --dry-run` y, tras tu confirmación, sin `--dry-run`  
-  > ➔ Raíz con `pnpm-workspace.yaml` y `turbo.json`, `packages/tsconfig`, `packages/eslint-config`, `packages/contracts` y `pnpm check:boundaries`.
-
-* **Dominio de punta a punta**:
-  > *"Añade facturas de punta a punta"*
-  > 
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-fullstack-feature.mjs invoice`  
-  > ➔ Contrato Zod en `packages/contracts/src/invoices`, módulo NestJS de 18 archivos en `apps/api/src/modules/invoices` y feature Next.js en `apps/web/src/features/invoices`. Si hay un conflicto en cualquier parte, no escribe nada.
-
-* **Revisar límites**:
-  > *"¿Hay imports prohibidos entre apps y paquetes?"*
-  > 
-  > 🤖 **El agente ejecutará**: `pnpm check:boundaries`  
-  > ➔ Detecta apps importando apps, paquetes importando apps, rutas relativas entre workspaces, dependencias no declaradas, imports profundos y ciclos.
-
----
-
-### 🟦 Ejemplo con `ts-import-organizer`:
-
-* **Limpiar y ordenar imports (Post-formateo)**:
-  > *"Organiza los imports de este archivo `Dashboard.tsx`, elimina los que no use y cambia las rutas relativas `../../../` por `@/`"*
-  > 
-  > 🤖 **El agente aplicará**:
-  > 1. Formateo previo del código (sintaxis y cuerpo del archivo asegurados primero).
-  > 2. Depuración de imports: elimina unused, consolida duplicados y convierte rutas relativas a `@/`.
-  > 3. Conversión a `import type` para interfaces y tipos de TypeScript.
-  > 4. Agrupación en 4 bloques: `builtins` ➔ `externos` ➔ `@/ aliases / locales` ➔ `side-effects`.
-  > 5. Jerarquía dentro del grupo: imports multilínea primero y monolíneas después, con todos los miembros internos ordenados por longitud ascendente.
-
----
-
-### 🖥️ Ejemplo con `ssh-connect`:
-
-* **Diagnosticar un servidor sin bloquear el TTY**:
-  > *"Conéctate al servidor prod-api y dime el uso de disco y memoria"*
-  > 
-  > 🤖 **El agente ejecutará**: `ssh-connect --exec prod-api "df -h && free -m"`  
-  > ➔ Consulta sin prompts interactivos, valida permisos de llave `.pem` o credenciales Keychain y reutiliza el socket `ControlMaster` para ejecuciones instantáneas.
-
-* **Descargar logs remotos**:
-  > *"Descarga los logs de error de Nginx de prod-api a mi máquina"*
-  > 
-  > 🤖 **El agente ejecutará**: `ssh-connect --download prod-api /var/log/nginx/error.log ./logs/`
-
----
-
-### 🧹 Ejemplo con `git-cleanup`:
-
-* **Limpieza tras fusionar un PR**:
-  > *"Acabo de fusionar mi PR en GitHub, actualiza main y limpia las ramas locales"*
-  > 
-  > 🤖 **El agente ejecutará**: `git switch main && git pull && git-cleanup`  
-  > ➔ Actualiza `origin`, poda referencias obsoletas (`fetch --prune`), protege `main`/`master`/`develop` y elimina con seguridad las ramas locales ya inexistentes en el remoto sin los falsos negativos del Squash Merge.
 
 ---
 
@@ -271,54 +85,48 @@ agent-skills/
 ├── docs/                        # Estándares técnicos y de contribución
 │   ├── SPECIFICATION.md         # Especificación técnica v1.0.0 del formato de skills
 │   └── CONTRIBUTING.md          # Flujo de trabajo y normas para contribuir
-├── templates/                   # Plantillas para crear nuevas skills
+├── templates/                   # Plantillas base (incluyen README.md y SKILL.md)
 │   ├── basic-skill/             # Plantilla para flujos basados en Markdown puro
 │   └── tool-assisted-skill/     # Plantilla con scripts ejecutables y referencias
-├── skills/                      # Catálogo organizado por categorías
-│   ├── architecture/            # Arquitectura empresarial frontend, mobile y backend
-│   │   ├── flutter-architecture/# Clean Architecture Feature-First, BLoC y Result en Flutter
-│   │   ├── monorepo-architecture/# Monorepo pnpm + Turborepo para Next.js y NestJS, contratos y límites
-│   │   ├── nestjs-architecture/ # Modular Monolith, contratos DIP y Swagger en NestJS
-│   │   ├── nextjs-architecture/ # Screaming Architecture y App Router en Next.js
-│   │   └── react-native-architecture/# Screaming Architecture con Expo Router, TanStack Query y NativeWind
-│   ├── dart/
-│   │   └── dart-import-organizer/# Organización canónica de directivas Dart en 6 grupos
-│   ├── devops/
-│   │   └── ssh-connect/         # Conexión y ejecución en servidores SSH para humanos y agentes
-│   ├── git/
-│   │   └── git-cleanup/         # Limpieza e higiene de ramas locales de Git (Squash & Merge)
-│   ├── github/
-│   │   └── gh-cli/              # PRs, GitHub Actions, issues y releases con GitHub CLI
-│   ├── gitlab/
-│   │   └── glab-cli/            # Flujos y scripts para GitLab CLI
-│   └── typescript/
-│       └── ts-import-organizer/ # Reglas y ejemplos de imports limpios en TypeScript
+├── skills/                      # Catálogo organizado por categorías (<categoría>/<skill>/)
+│   ├── architecture/            # flutter, monorepo, nestjs, nextjs, react-native
+│   ├── dart/                    # dart-import-organizer
+│   ├── devops/                  # ssh-connect
+│   ├── git/                     # git-cleanup
+│   ├── github/                  # gh-cli
+│   ├── gitlab/                  # glab-cli
+│   └── typescript/              # ts-import-organizer
 ├── catalog/
 │   └── catalog.json             # Índice de skills generado por `pnpm catalog`
-├── scripts/                     # Herramientas de automatización del hub
+├── scripts/                     # Herramientas de automatización y validación del hub
 │   ├── lib/skills.mjs           # Descubrimiento y parseo de SKILL.md compartido
-│   ├── lint-skills.mjs          # Linter: schema, enlaces, rutas absolutas y secciones
-│   └── build-catalog.mjs        # Genera catalog.json y la tabla/instalación del README
+│   ├── lint-skills.mjs          # Linter: schema, README.md, enlaces, rutas absolutas y secciones
+│   ├── build-catalog.mjs        # Genera catalog.json y la tabla del README
+│   └── check-skill-versions.mjs # Verifica incrementos SemVer en PRs
+├── tests/                       # Suite de pruebas unitarias (node:test)
 ├── AGENTS.md                    # Instrucciones y reglas para agentes trabajando en este repo
 ├── package.json
 └── README.md
 ```
 
+Cada carpeta de skill (`skills/<categoría>/<skill>/`) contiene su propio **`README.md`** (documentación humana, instalación y ejemplos) y su **`SKILL.md`** (instrucciones operativas para el agente).
+
 ---
 
 ## 🤝 Cómo Contribuir y Trabajar en este Repo
 
-Para mantener la calidad y el estándar agnóstico, revisa la [**Guía de Contribución (`docs/CONTRIBUTING.md`)**](docs/CONTRIBUTING.md).
+Para mantener la calidad y el estándar agnóstico, revisa la [**Guía de Contribución (`docs/CONTRIBUTING.md`)**](docs/CONTRIBUTING.md) y la [**Especificación Técnica (`docs/SPECIFICATION.md`)**](docs/SPECIFICATION.md).
 
 ### Resumen del flujo de desarrollo:
 
 1. **Crear una rama**: `git checkout -b feat/mi-nueva-skill`.
 2. **Elegir plantilla**: Copiar desde `templates/basic-skill` o `templates/tool-assisted-skill`.
-3. **Escribir `SKILL.md`**: Definir Frontmatter YAML válido (`name`, `version`, `description` < 350 chars, `triggers`).
-4. **Validar con el Linter y regenerar el catálogo**:
+3. **Escribir `SKILL.md` y `README.md`**: Definir Frontmatter YAML válido en `SKILL.md` (`name`, `version`, `description` < 350 chars, `triggers`) y documentar la instalación y ejemplos de uso en `README.md`.
+4. **Validar con el Linter, regenerar el catálogo y ejecutar tests**:
    ```bash
    pnpm lint:strict
    pnpm catalog
+   pnpm test
    ```
 5. **Commit con Conventional Commits**: `feat(categoria): add mi-nueva-skill`.
 

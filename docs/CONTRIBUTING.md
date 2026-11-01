@@ -70,9 +70,9 @@ requirements:
 
 ---
 
-### 4. Estructura del Cuerpo del Markdown
+### 4. Estructura del Cuerpo del Markdown (`SKILL.md` y `README.md`)
 
-Asegúrate de incluir las secciones estándar:
+Asegúrate de incluir las secciones estándar en `SKILL.md`:
 1. `# Nombre de la Skill`
 2. `## 🎯 Propósito`: Objetivo claro y problema que resuelve.
 3. `## ⚡ Cuándo Activar esta Skill`: Disparadores inequívocos.
@@ -80,6 +80,12 @@ Asegúrate de incluir las secciones estándar:
 5. `## 🛠️ Scripts y Herramientas Auxiliares`: (Si aplica) explicación de cómo invocar los scripts en `scripts/`.
 6. `## ⚠️ Reglas Críticas`: Restricciones de seguridad y directrices no negociables.
 7. `## 📚 Referencias Adicionales`: Enlaces a archivos dentro de `references/` o `examples/`.
+
+Además, cada skill debe contar con su propio **`README.md`** orientado a desarrolladores con:
+- Tabla de metadatos (nombre, categoría, versión, agentes compatibles, requisitos).
+- Comandos de instalación (`npx skills add bryanus1/agent-skills --skill <name>` y symlink).
+- Ejemplos de activación y uso con agentes de IA.
+- Resumen de scripts CLI (si aplica) y enlaces a `SKILL.md` y `references/`.
 
 ---
 
@@ -132,7 +138,7 @@ docs(contributing): update step-by-step contribution guide
 
 ## 🔢 Versionado de Skills
 
-Cada skill tiene su propia `version` (SemVer) en el frontmatter, independiente de la versión del repositorio que genera semantic-release. Cualquier cambio dentro de una skill (salvo en `evals/`) exige subirla:
+Cada skill tiene su propia `version` (SemVer) en el frontmatter, independiente de la versión del repositorio que genera semantic-release. Cualquier cambio dentro de una skill (salvo en `README.md` o `evals/`) exige subirla:
 
 | Cambio | Incremento | Ejemplo |
 | :--- | :--- | :--- |

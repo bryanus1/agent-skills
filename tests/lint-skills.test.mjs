@@ -37,13 +37,17 @@ function frontmatter(overrides = {}) {
 }
 
 /** Writes a skill under <tmp>/<folder>/ and returns its validation result. */
-function lintTempSkill(t, { folder = 'demo-skill', head = frontmatter(), body = VALID_BODY, extraFiles = {} } = {}) {
+function lintTempSkill(t, { folder = 'demo-skill', head = frontmatter(), body = VALID_BODY, readme = '# Demo Skill\n\nSee [SKILL.md](SKILL.md).\n', extraFiles = {} } = {}) {
   const dir = makeTempDir(t);
-  writeFiles(dir, {
+  const files = {
     [`${folder}/SKILL.md`]: head + body,
     [`${folder}/references/guide.md`]: '# Guide\n',
     ...Object.fromEntries(Object.entries(extraFiles).map(([p, c]) => [`${folder}/${p}`, c])),
-  });
+  };
+  if (readme !== null) {
+    files[`${folder}/README.md`] = readme;
+  }
+  writeFiles(dir, files);
   return validateSkill(loadSkill(path.join(dir, folder, 'SKILL.md')));
 }
 
@@ -81,6 +85,9 @@ const errorCases = [
   ['file:// link', { body: `${VALID_BODY}\nSee [abs](file:///tmp/guide.md).\n` }, /is absolute/],
   ['machine-specific path in a script', { extraFiles: { 'scripts/run.sh': 'cd /Users/someone/project\n' } }, /absolute path at scripts\/run\.sh:1/],
   ['empty body', { body: '\n' }, /body is empty/],
+  ['missing README.md', { readme: null }, /Missing required file: README\.md/],
+  ['empty README.md', { readme: '\n' }, /README\.md is empty/],
+  ['broken link in README.md', { readme: '# Demo\n\nSee [missing](references/nope.md).\n' }, /README\.md: Broken link 'references\/nope\.md'/],
 ];
 
 for (const [label, options, pattern] of errorCases) {
@@ -118,8 +125,10 @@ test('reports duplicate names across skills', (t) => {
   const dir = makeTempDir(t);
   writeFiles(dir, {
     'a/demo-skill/SKILL.md': frontmatter() + VALID_BODY,
+    'a/demo-skill/README.md': '# Demo\n',
     'a/demo-skill/references/guide.md': '# Guide\n',
     'b/demo-skill/SKILL.md': frontmatter() + VALID_BODY,
+    'b/demo-skill/README.md': '# Demo\n',
     'b/demo-skill/references/guide.md': '# Guide\n',
   });
   const results = lintSkills(findSkillFiles(dir));
@@ -134,8 +143,10 @@ test('requirements.skills must reference skills that exist in the catalog', (t) 
   const needsOthers = frontmatter({ name: 'consumer', requirements: '\n  skills: [provider, missing-skill]' });
   writeFiles(dir, {
     'consumer/SKILL.md': needsOthers + VALID_BODY,
+    'consumer/README.md': '# Consumer\n',
     'consumer/references/guide.md': '# Guide\n',
     'provider/SKILL.md': frontmatter({ name: 'provider' }) + VALID_BODY,
+    'provider/README.md': '# Provider\n',
     'provider/references/guide.md': '# Guide\n',
   });
   const results = Object.fromEntries(lintSkills(findSkillFiles(dir)).map((r) => [r.skill.data.name, r.errors]));
@@ -162,6 +173,7 @@ test('CLI: --strict turns warnings into a failure', (t) => {
   const dir = makeTempDir(t);
   writeFiles(dir, {
     'demo-skill/SKILL.md': frontmatter() + '\n# Demo\n\n## Propósito\nOnly this.\n',
+    'demo-skill/README.md': '# Demo\n',
   });
   const target = path.join(dir, 'demo-skill');
   assert.equal(runScript('scripts/lint-skills.mjs', [target], rootDir).code, 0);

@@ -73,17 +73,23 @@ test('a lower version is rejected', (t) => {
   assert.equal(byPath(checkSkillVersions(cwd, 'main'))['skills/beta/SKILL.md'].ok, false);
 });
 
-test('evals-only changes and new skills do not need a bump', (t) => {
+test('README.md, evals-only changes and new skills do not need a bump', (t) => {
   const cwd = makeRepo(t);
   writeFiles(cwd, {
     'skills/cat/alpha/evals/evals.json': '{"evals": []}\n',
+    'skills/cat/alpha/README.md': '# Alpha\n',
+    'skills/beta/README.md': '# Beta\n',
     'skills/cat/gamma/SKILL.md': skill('gamma', '0.1.0'),
   });
-  commitAll(cwd, 'evals and new skill');
+  commitAll(cwd, 'readme, evals and new skill');
   const results = byPath(checkSkillVersions(cwd, 'main'));
   assert.deepEqual(
-    [results['skills/cat/alpha/SKILL.md'].reason, results['skills/cat/gamma/SKILL.md'].reason],
-    ['evals-only change', 'new skill'],
+    [
+      results['skills/cat/alpha/SKILL.md'].reason,
+      results['skills/beta/SKILL.md'].reason,
+      results['skills/cat/gamma/SKILL.md'].reason,
+    ],
+    ['docs/evals-only change', 'docs/evals-only change', 'new skill'],
   );
   assert.ok(Object.values(results).every((r) => r.ok));
 });

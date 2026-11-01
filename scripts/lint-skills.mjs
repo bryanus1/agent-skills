@@ -36,17 +36,18 @@ function listTextFiles(dir) {
   return results;
 }
 
-function checkLinks(skill, errors) {
-  for (const [, rawTarget] of stripCode(skill.body).matchAll(MARKDOWN_LINK_REGEX)) {
+function checkLinks(markdown, skillDir, errors, sourceFile = 'SKILL.md') {
+  const prefix = sourceFile === 'SKILL.md' ? '' : `${sourceFile}: `;
+  for (const [, rawTarget] of stripCode(markdown).matchAll(MARKDOWN_LINK_REGEX)) {
     const target = rawTarget.trim();
     if (/^(https?:|mailto:|#)/.test(target) || target.includes('<')) continue;
     if (target.startsWith('file:') || path.isAbsolute(target)) {
-      errors.push(`Link '${target}' is absolute. Use a path relative to the skill directory.`);
+      errors.push(`${prefix}Link '${target}' is absolute. Use a path relative to the skill directory.`);
       continue;
     }
-    const resolved = path.resolve(skill.skillDir, decodeURIComponent(target.split('#')[0]));
+    const resolved = path.resolve(skillDir, decodeURIComponent(target.split('#')[0]));
     if (!fs.existsSync(resolved)) {
-      errors.push(`Broken link '${target}': ${path.relative(rootDir, resolved)} does not exist.`);
+      errors.push(`${prefix}Broken link '${target}': ${path.relative(rootDir, resolved)} does not exist.`);
     }
   }
 }
@@ -135,7 +136,22 @@ export function validateSkill(skill) {
         warnings.push(`Missing required section: '${section.label}'.`);
       }
     }
-    checkLinks(skill, errors);
+    checkLinks(body, skill.skillDir, errors, 'SKILL.md');
+  }
+
+  const readmePath = path.join(skill.skillDir, 'README.md');
+  if (!fs.existsSync(readmePath)) {
+    errors.push('Missing required file: README.md.');
+  } else {
+    const readmeBody = fs.readFileSync(readmePath, 'utf8');
+    if (readmeBody.trim().length === 0) {
+      errors.push('README.md is empty.');
+    } else {
+      if (!/^# /m.test(readmeBody)) {
+        warnings.push('README.md should include a top-level H1 title (# Title).');
+      }
+      checkLinks(readmeBody, skill.skillDir, errors, 'README.md');
+    }
   }
 
   checkAbsolutePaths(skill, errors);
