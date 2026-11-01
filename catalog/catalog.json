@@ -249,6 +249,38 @@
       "requires": []
     },
     {
+      "name": "git-cleanup",
+      "version": "1.0.0",
+      "description": "Limpieza segura de ramas locales de Git tras fusionar PRs (Squash/Merge). Protege ramas principales (main/master/develop), detecta ramas eliminadas en origin y elimina ramas obsoletas sin falsos negativos.",
+      "category": "git",
+      "path": "skills/git/git-cleanup/SKILL.md",
+      "tags": [
+        "git",
+        "cleanup",
+        "branches",
+        "trunk-based",
+        "devops",
+        "hygiene",
+        "squash-merge"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "git cleanup",
+        "limpiar ramas locales",
+        "borrar ramas fusionadas",
+        "clean merged branches",
+        "post-merge cleanup",
+        "eliminar ramas viejas"
+      ],
+      "requires": []
+    },
+    {
       "name": "gh-cli",
       "version": "1.0.0",
       "description": "Automatización de flujos de GitHub con gh CLI y scripts: Pull Requests con Conventional Commits, emojis y labels verificados, diagnóstico de GitHub Actions, issues y releases con notas generadas. Úsala al crear o revisar PRs, depurar workflows fallidos o publicar releases.",

@@ -32,6 +32,7 @@ Diseñado bajo el principio de **Progressive Disclosure**:
 | **[`react-native-architecture`](skills/architecture/react-native-architecture/SKILL.md)** | `architecture` | `1.0.0` | Todos | Estándar de Screaming Architecture para React Native con Expo Router. Guía la estructuración por features, rutas delgadas en src/app, hooks con TanStack Query, estilos NativeWind y tests con cobertura &gt;= 90%. Incluye scaffolds de feature y componente. |
 | **[`dart-import-organizer`](skills/dart/dart-import-organizer/SKILL.md)** | `dart` | `1.0.1` | Todos | Organiza y estandariza imports en Dart y Flutter (.dart). Se aplica DESPUÉS de formatear el código. Agrupa jerárquicamente en 6 bloques: dart:* → flutter/terceros → package de app → relativos → export → part, con orden alfabético y líneas en blanco entre grupos. |
 | **[`ssh-connect`](skills/devops/ssh-connect/SKILL.md)** | `devops` | `1.0.0` | Todos | Gestión, conexión y ejecución remota en servidores SSH con ssh-connect. Soporta llaves .pem con permisos asegurados, contraseñas automatizadas (Keychain) y multiplexación persistente sin bloqueos de TTY. |
+| **[`git-cleanup`](skills/git/git-cleanup/SKILL.md)** | `git` | `1.0.0` | Todos | Limpieza segura de ramas locales de Git tras fusionar PRs (Squash/Merge). Protege ramas principales (main/master/develop), detecta ramas eliminadas en origin y elimina ramas obsoletas sin falsos negativos. |
 | **[`gh-cli`](skills/github/gh-cli/SKILL.md)** | `github` | `1.0.0` | Todos | Automatización de flujos de GitHub con gh CLI y scripts: Pull Requests con Conventional Commits, emojis y labels verificados, diagnóstico de GitHub Actions, issues y releases con notas generadas. Úsala al crear o revisar PRs, depurar workflows fallidos o publicar releases. |
 | **[`glab-cli`](skills/gitlab/glab-cli/SKILL.md)** | `gitlab` | `1.2.0` | Todos | Automatización de flujos de GitLab (MRs con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y releases) usando glab CLI y scripts. |
 | **[`ts-import-organizer`](skills/typescript/ts-import-organizer/SKILL.md)** | `typescript` | `1.1.1` | Todos | Organiza imports en TypeScript/JavaScript (.ts, .tsx, .js, .jsx). Se aplica siempre DESPUÉS de formatear el código. Agrupa: builtins → externos → path aliases → side-effects. Ordena líneas y miembros ({ ... }) por longitud, elimina unused y convierte rutas relativas a aliases. Activa al ordenar imports o escribir código. |
@@ -61,6 +62,7 @@ npx skills add bryanus1/agent-skills --skill nextjs-architecture
 npx skills add bryanus1/agent-skills --skill react-native-architecture
 npx skills add bryanus1/agent-skills --skill dart-import-organizer
 npx skills add bryanus1/agent-skills --skill ssh-connect
+npx skills add bryanus1/agent-skills --skill git-cleanup
 npx skills add bryanus1/agent-skills --skill gh-cli
 npx skills add bryanus1/agent-skills --skill glab-cli
 npx skills add bryanus1/agent-skills --skill ts-import-organizer
@@ -252,6 +254,16 @@ Una vez instalada una skill, tu asistente de IA la activará automáticamente cu
 
 ---
 
+### 🧹 Ejemplo con `git-cleanup`:
+
+* **Limpieza tras fusionar un PR**:
+  > *"Acabo de fusionar mi PR en GitHub, actualiza main y limpia las ramas locales"*
+  > 
+  > 🤖 **El agente ejecutará**: `git switch main && git pull && git-cleanup`  
+  > ➔ Actualiza `origin`, poda referencias obsoletas (`fetch --prune`), protege `main`/`master`/`develop` y elimina con seguridad las ramas locales ya inexistentes en el remoto sin los falsos negativos del Squash Merge.
+
+---
+
 ## 📂 Estructura del Repositorio
 
 ```
@@ -273,6 +285,8 @@ agent-skills/
 │   │   └── dart-import-organizer/# Organización canónica de directivas Dart en 6 grupos
 │   ├── devops/
 │   │   └── ssh-connect/         # Conexión y ejecución en servidores SSH para humanos y agentes
+│   ├── git/
+│   │   └── git-cleanup/         # Limpieza e higiene de ramas locales de Git (Squash & Merge)
 │   ├── github/
 │   │   └── gh-cli/              # PRs, GitHub Actions, issues y releases con GitHub CLI
 │   ├── gitlab/
