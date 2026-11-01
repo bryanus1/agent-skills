@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 
 // Fails when a skill under skills/ changed relative to a base ref without a
-// version bump in its SKILL.md frontmatter. Changes limited to evals/ are exempt
-// because they do not alter what gets installed and executed.
+// version bump in its SKILL.md frontmatter. Changes limited to README.md or
+// evals/ are exempt because they do not alter what gets installed and executed.
 
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
 import { parseFrontmatter } from './lib/skills.mjs';
+
+const isExemptFile = (file) => file === 'README.md' || file.startsWith('evals/');
 
 const git = (cwd, ...args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
 
@@ -63,8 +65,8 @@ export function checkSkillVersions(cwd, baseRef) {
       results.push({ skillPath, before, after, ok: true, reason: 'removed' });
     } else if (before === null) {
       results.push({ skillPath, before, after, ok: true, reason: 'new skill' });
-    } else if (files.every((file) => file.startsWith('evals/'))) {
-      results.push({ skillPath, before, after, ok: true, reason: 'evals-only change' });
+    } else if (files.every(isExemptFile)) {
+      results.push({ skillPath, before, after, ok: true, reason: 'docs/evals-only change' });
     } else if (compareSemver(after, before) > 0) {
       results.push({ skillPath, before, after, ok: true, reason: 'bumped' });
     } else {

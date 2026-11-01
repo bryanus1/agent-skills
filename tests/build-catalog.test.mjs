@@ -2,17 +2,19 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { buildCatalog, renderTable, renderInstallList, replaceBlock } from '../scripts/build-catalog.mjs';
+import { buildCatalog, renderTable, replaceBlock } from '../scripts/build-catalog.mjs';
 import { findSkillFiles } from '../scripts/lib/skills.mjs';
 import { rootDir, runScript } from './helpers.mjs';
 
-test('catalog lists every published skill with its category and path', () => {
+test('catalog lists every published skill with its category, SKILL.md path and README.md path', () => {
   const catalog = buildCatalog();
   const skillFiles = findSkillFiles(path.join(rootDir, 'skills'));
   assert.equal(catalog.skills.length, skillFiles.length);
   for (const skill of catalog.skills) {
     assert.ok(fs.existsSync(path.join(rootDir, skill.path)), skill.path);
+    assert.ok(fs.existsSync(path.join(rootDir, skill.readme)), skill.readme);
     assert.equal(skill.path, `skills/${skill.category}/${skill.name}/SKILL.md`);
+    assert.equal(skill.readme, `skills/${skill.category}/${skill.name}/README.md`);
     assert.match(skill.version, /^\d+\.\d+\.\d+/);
     assert.ok(Array.isArray(skill.requires), `${skill.name}: requires must be a list`);
     for (const required of skill.requires) {
@@ -26,17 +28,23 @@ test('committed catalog.json and README blocks are up to date', () => {
   assert.equal(result.code, 0, `${result.stdout}${result.stderr}`);
 });
 
-test('table cells escape pipes and angle brackets', () => {
+test('table cells escape pipes and angle brackets and link to skill README.md', () => {
   const table = renderTable({
-    skills: [{ name: 'x', path: 'skills/c/x/SKILL.md', category: 'c', version: '1.0.0', agents: ['all'], description: 'a | b <feature>\nnext' }],
+    skills: [
+      {
+        name: 'x',
+        path: 'skills/c/x/SKILL.md',
+        readme: 'skills/c/x/README.md',
+        category: 'c',
+        version: '1.0.0',
+        agents: ['all'],
+        description: 'a | b <feature>\nnext',
+      },
+    ],
   });
+  assert.match(table, /\*\*\[`x`\]\(skills\/c\/x\/README\.md\)\*\*/);
   assert.match(table, /a \\\| b &lt;feature&gt; next \|$/m);
   assert.match(table, /\| Todos \|/);
-});
-
-test('install list is a fenced bash block with one command per skill', () => {
-  const list = renderInstallList({ skills: [{ name: 'one' }, { name: 'two' }] });
-  assert.equal(list, '```bash\nnpx skills add bryanus1/agent-skills --skill one\nnpx skills add bryanus1/agent-skills --skill two\n```');
 });
 
 test('replaceBlock swaps only the marked region and is idempotent', () => {

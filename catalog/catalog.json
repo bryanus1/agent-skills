@@ -7,6 +7,7 @@
       "description": "Clean Architecture Feature-First para Flutter. Guía el diseño modular en lib/features/<feature>/ (domain, data, presentation) con BLoC/Cubit, Inyección de Dependencias (GetIt/Injectable), manejo funcional de errores con Result sealed class y pruebas unitarias con mocktail y bloc_test.",
       "category": "architecture",
       "path": "skills/architecture/flutter-architecture/SKILL.md",
+      "readme": "skills/architecture/flutter-architecture/README.md",
       "tags": [
         "flutter",
         "architecture",
@@ -43,6 +44,7 @@
       "description": "Estándar de monorepo con pnpm workspaces y Turborepo para una web Next.js y una API NestJS: estructura apps/ y packages/, paquetes internos compilados, contratos compartidos (Zod u OpenAPI), límites de dependencias verificables y scaffolding de features full-stack.",
       "category": "architecture",
       "path": "skills/architecture/monorepo-architecture/SKILL.md",
+      "readme": "skills/architecture/monorepo-architecture/README.md",
       "tags": [
         "monorepo",
         "turborepo",
@@ -83,6 +85,7 @@
       "description": "Estándar de Modular Monolith para NestJS. Guía el andamiaje de módulos de dominio desacoplados, contratos DTO estrictos, documentación OpenAPI Swagger exhaustiva, persistencia agnóstica a cualquier ORM con Repository/Entity y doble barrera de seguridad (RBAC).",
       "category": "architecture",
       "path": "skills/architecture/nestjs-architecture/SKILL.md",
+      "readme": "skills/architecture/nestjs-architecture/README.md",
       "tags": [
         "nestjs",
         "backend",
@@ -118,6 +121,7 @@
       "description": "Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions, hooks con TanStack Query, componentes FormDialog y testing con cobertura >= 90%.",
       "category": "architecture",
       "path": "skills/architecture/nextjs-architecture/SKILL.md",
+      "readme": "skills/architecture/nextjs-architecture/README.md",
       "tags": [
         "nextjs",
         "react",
@@ -152,6 +156,7 @@
       "description": "Estándar de Screaming Architecture para React Native con Expo Router. Guía la estructuración por features, rutas delgadas en src/app, hooks con TanStack Query, estilos NativeWind y tests con cobertura >= 90%. Incluye scaffolds de feature y componente.",
       "category": "architecture",
       "path": "skills/architecture/react-native-architecture/SKILL.md",
+      "readme": "skills/architecture/react-native-architecture/README.md",
       "tags": [
         "react-native",
         "expo",
@@ -186,6 +191,7 @@
       "description": "Organiza y estandariza imports en Dart y Flutter (.dart). Se aplica DESPUÉS de formatear el código. Agrupa jerárquicamente en 6 bloques: dart:* → flutter/terceros → package de app → relativos → export → part, con orden alfabético y líneas en blanco entre grupos.",
       "category": "dart",
       "path": "skills/dart/dart-import-organizer/SKILL.md",
+      "readme": "skills/dart/dart-import-organizer/README.md",
       "tags": [
         "dart",
         "flutter",
@@ -220,6 +226,7 @@
       "description": "Gestión, conexión y ejecución remota en servidores SSH con ssh-connect. Soporta llaves .pem con permisos asegurados, contraseñas automatizadas (Keychain) y multiplexación persistente sin bloqueos de TTY.",
       "category": "devops",
       "path": "skills/devops/ssh-connect/SKILL.md",
+      "readme": "skills/devops/ssh-connect/README.md",
       "tags": [
         "ssh",
         "devops",
@@ -254,6 +261,7 @@
       "description": "Limpieza segura de ramas locales de Git tras fusionar PRs (Squash/Merge). Protege ramas principales (main/master/develop), detecta ramas eliminadas en origin y elimina ramas obsoletas sin falsos negativos.",
       "category": "git",
       "path": "skills/git/git-cleanup/SKILL.md",
+      "readme": "skills/git/git-cleanup/README.md",
       "tags": [
         "git",
         "cleanup",
@@ -286,6 +294,7 @@
       "description": "Automatización de flujos de GitHub con gh CLI y scripts: Pull Requests con Conventional Commits, emojis y labels verificados, diagnóstico de GitHub Actions, issues y releases con notas generadas. Úsala al crear o revisar PRs, depurar workflows fallidos o publicar releases.",
       "category": "github",
       "path": "skills/github/gh-cli/SKILL.md",
+      "readme": "skills/github/gh-cli/README.md",
       "tags": [
         "github",
         "gh",
@@ -322,6 +331,7 @@
       "description": "Automatización de flujos de GitLab (MRs con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y releases) usando glab CLI y scripts.",
       "category": "gitlab",
       "path": "skills/gitlab/glab-cli/SKILL.md",
+      "readme": "skills/gitlab/glab-cli/README.md",
       "tags": [
         "gitlab",
         "glab",
@@ -356,6 +366,7 @@
       "description": "Organiza imports en TypeScript/JavaScript (.ts, .tsx, .js, .jsx). Se aplica siempre DESPUÉS de formatear el código. Agrupa: builtins → externos → path aliases → side-effects. Ordena líneas y miembros ({ ... }) por longitud, elimina unused y convierte rutas relativas a aliases. Activa al ordenar imports o escribir código.",
       "category": "typescript",
       "path": "skills/typescript/ts-import-organizer/SKILL.md",
+      "readme": "skills/typescript/ts-import-organizer/README.md",
       "tags": [
         "typescript",
         "javascript",

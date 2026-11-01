@@ -22,7 +22,8 @@ Cada skill debe ubicarse en su propio directorio con la siguiente anatomía:
 
 ```
 skill-name/
-├── SKILL.md              # [REQUERIDO] Metadatos YAML + Instrucciones del flujo
+├── SKILL.md              # [REQUERIDO] Metadatos YAML + Instrucciones para el agente
+├── README.md             # [REQUERIDO] Documentación humana: instalación, ejemplos y CLI
 ├── metadata.json         # [OPCIONAL] Esquema extendido y compatibilidad
 ├── scripts/              # [OPCIONAL] Scripts ejecutables por el agente (Bash, Python, Node)
 │   ├── run_check.sh

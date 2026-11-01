@@ -30,6 +30,7 @@ export function buildCatalog() {
         description: data.description.trim(),
         category: segments.length > 1 ? segments[0] : null,
         path: toPosix(relativePath),
+        readme: toPosix(path.join(path.dirname(relativePath), 'README.md')),
         tags: data.tags ?? [],
         agents: data.agents ?? [],
         triggers: data.triggers ?? [],
@@ -49,14 +50,9 @@ const escapeCell = (text) =>
 
 export function renderTable(catalog) {
   const rows = catalog.skills.map((skill) =>
-    `| **[\`${skill.name}\`](${skill.path})** | ${skill.category ? `\`${skill.category}\`` : '—'} | \`${skill.version}\` | ${formatAgents(skill.agents)} | ${escapeCell(skill.description)} |`,
+    `| **[\`${skill.name}\`](${skill.readme})** | ${skill.category ? `\`${skill.category}\`` : '—'} | \`${skill.version}\` | ${formatAgents(skill.agents)} | ${escapeCell(skill.description)} |`,
   );
   return ['| Skill | Categoría | Versión | Agentes | Descripción |', '| :--- | :--- | :--- | :--- | :--- |', ...rows].join('\n');
-}
-
-export function renderInstallList(catalog) {
-  const commands = catalog.skills.map((skill) => `npx skills add ${REPO_SLUG} --skill ${skill.name}`);
-  return ['```bash', ...commands, '```'].join('\n');
 }
 
 export function replaceBlock(content, marker, replacement) {
@@ -76,7 +72,6 @@ function main() {
   const catalogJson = `${JSON.stringify(catalog, null, 2)}\n`;
   let readme = fs.readFileSync(README_PATH, 'utf8');
   readme = replaceBlock(readme, 'catalog-table', renderTable(catalog));
-  readme = replaceBlock(readme, 'catalog-install', renderInstallList(catalog));
 
   const outputs = [
     [CATALOG_PATH, catalogJson],

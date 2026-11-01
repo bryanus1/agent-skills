@@ -51,8 +51,8 @@ requirements:
 - **`description`**: Must be under **350 characters** (Progressive Disclosure rule). Do not put full runbooks inside the description.
 - **`triggers`**: Minimum 2 trigger phrases representing user intent in relevant languages (English / Spanish).
 
-### 4. Structure the `SKILL.md` Body
-Ensure the document has the following standard sections:
+### 4. Structure the `SKILL.md` Body and Per-Skill `README.md`
+Ensure `SKILL.md` has the following standard sections:
 1. `# Title of the Skill`
 2. `## 🎯 Propósito / Purpose`: Clear objective and problem it solves.
 3. `## ⚡ Cuándo Activar esta Skill / When to Trigger`: Unambiguous conditions for activation.
@@ -60,6 +60,8 @@ Ensure the document has the following standard sections:
 5. `## ⚠️ Reglas Críticas / Critical Rules`: Security constraints and non-negotiable guidelines.
 6. `## 📚 Referencias / References` (Optional): Links to markdown files in `references/`.
 7. `## 🛠️ Scripts` (Optional): Instructions on scripts in `scripts/`.
+
+Every skill directory MUST also have its own `README.md` (human-facing documentation with metadata table, installation commands, prompt examples, CLI script usage, and relative links to `SKILL.md` and `references/`).
 
 ### 5. Validate with the Linter
 **ALWAYS** run the linter after creating or updating any skill:
@@ -78,10 +80,10 @@ When a skill is added or its frontmatter changes, run:
 pnpm catalog
 ```
 
-This rewrites `catalog/catalog.json` and the generated blocks in `README.md` (skills table and install commands). Never edit those blocks by hand; CI fails if they are out of date. Update the README's example and directory tree sections manually.
+This rewrites `catalog/catalog.json` and the generated `<!-- catalog-table -->` block in the root `README.md` (which links each skill to its own `README.md`). Never edit that block by hand; CI fails if it is out of date. Keep the root `README.md` focused strictly on repository-level information; put skill-specific examples and commands in each skill's own `README.md`.
 
 ### 7. Bump the Skill Version
-When **updating** an existing skill, bump its frontmatter `version` (major = breaking, minor = new capability, patch = fix or docs; see [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md#-versionado-de-skills)). Changes only under `evals/` are exempt. Verify with `node scripts/check-skill-versions.mjs --base main`, then rerun `pnpm catalog`.
+When **updating** an existing skill, bump its frontmatter `version` (major = breaking, minor = new capability, patch = fix or docs; see [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md#-versionado-de-skills)). Changes limited to `README.md` or `evals/` are exempt. Verify with `node scripts/check-skill-versions.mjs --base main`, then rerun `pnpm catalog`.
 
 ---
 
