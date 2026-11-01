@@ -1,0 +1,25 @@
+{
+  "skill_name": "ssh-connect",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Revisa los servidores configurados en ssh-connect y dime el estado y memoria libre del servidor prod-api.",
+      "expected_output": "El agente ejecuta `ssh-connect --list --json` para descubrir los servidores sin bloquear la terminal. Identifica el alias 'prod-api', prueba la conexión con `ssh-connect --test prod-api` o ejecuta directamente `ssh-connect --exec prod-api 'free -h'` (o diagnóstico equivalente con uptime/df) de forma no interactiva, devolviendo la salida limpia al usuario sin iniciar una sesión interactiva.",
+      "files": [
+        "references/commands_cheatsheet.md"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Conéctate al servidor nuevo en 54.123.45.67 con usuario ubuntu usando mi llave ~/.ssh/aws-key.pem y reinicia nginx.",
+      "expected_output": "El agente no abre una shell interactiva que bloquee el proceso. Registra el servidor de forma no interactiva con `ssh-connect --add --alias <nombre> --host 54.123.45.67 --user ubuntu --type pem --key ~/.ssh/aws-key.pem` (o usa `--quick` / `--exec`). Antes de ejecutar el reinicio, valida la conexión y, al tratarse de una acción con impacto en servicio, confirma o ejecuta el comando con `ssh-connect --exec <alias> 'sudo systemctl restart nginx'`. La herramienta asegura automáticamente los permisos 600 de la llave .pem.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Descarga los logs de error de Nginx del servidor legacy-app (/var/log/nginx/error.log) a mi carpeta ./logs locales.",
+      "expected_output": "El agente utiliza el modo de transferencia `ssh-connect --download legacy-app /var/log/nginx/error.log ./logs/` reutilizando las credenciales configuradas para el alias 'legacy-app' y sin requerir interacción manual.",
+      "files": []
+    }
+  ]
+}

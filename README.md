@@ -31,6 +31,7 @@ Diseñado bajo el principio de **Progressive Disclosure**:
 | **[`nextjs-architecture`](skills/architecture/nextjs-architecture/SKILL.md)** | `architecture` | `1.1.1` | Todos | Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions, hooks con TanStack Query, componentes FormDialog y testing con cobertura &gt;= 90%. |
 | **[`react-native-architecture`](skills/architecture/react-native-architecture/SKILL.md)** | `architecture` | `1.0.0` | Todos | Estándar de Screaming Architecture para React Native con Expo Router. Guía la estructuración por features, rutas delgadas en src/app, hooks con TanStack Query, estilos NativeWind y tests con cobertura &gt;= 90%. Incluye scaffolds de feature y componente. |
 | **[`dart-import-organizer`](skills/dart/dart-import-organizer/SKILL.md)** | `dart` | `1.0.1` | Todos | Organiza y estandariza imports en Dart y Flutter (.dart). Se aplica DESPUÉS de formatear el código. Agrupa jerárquicamente en 6 bloques: dart:* → flutter/terceros → package de app → relativos → export → part, con orden alfabético y líneas en blanco entre grupos. |
+| **[`ssh-connect`](skills/devops/ssh-connect/SKILL.md)** | `devops` | `1.0.0` | Todos | Gestión, conexión y ejecución remota en servidores SSH con ssh-connect. Soporta llaves .pem con permisos asegurados, contraseñas automatizadas (Keychain) y multiplexación persistente sin bloqueos de TTY. |
 | **[`gh-cli`](skills/github/gh-cli/SKILL.md)** | `github` | `1.0.0` | Todos | Automatización de flujos de GitHub con gh CLI y scripts: Pull Requests con Conventional Commits, emojis y labels verificados, diagnóstico de GitHub Actions, issues y releases con notas generadas. Úsala al crear o revisar PRs, depurar workflows fallidos o publicar releases. |
 | **[`glab-cli`](skills/gitlab/glab-cli/SKILL.md)** | `gitlab` | `1.2.0` | Todos | Automatización de flujos de GitLab (MRs con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y releases) usando glab CLI y scripts. |
 | **[`ts-import-organizer`](skills/typescript/ts-import-organizer/SKILL.md)** | `typescript` | `1.1.1` | Todos | Organiza imports en TypeScript/JavaScript (.ts, .tsx, .js, .jsx). Se aplica siempre DESPUÉS de formatear el código. Agrupa: builtins → externos → path aliases → side-effects. Ordena líneas y miembros ({ ... }) por longitud, elimina unused y convierte rutas relativas a aliases. Activa al ordenar imports o escribir código. |
@@ -59,6 +60,7 @@ npx skills add bryanus1/agent-skills --skill nestjs-architecture
 npx skills add bryanus1/agent-skills --skill nextjs-architecture
 npx skills add bryanus1/agent-skills --skill react-native-architecture
 npx skills add bryanus1/agent-skills --skill dart-import-organizer
+npx skills add bryanus1/agent-skills --skill ssh-connect
 npx skills add bryanus1/agent-skills --skill gh-cli
 npx skills add bryanus1/agent-skills --skill glab-cli
 npx skills add bryanus1/agent-skills --skill ts-import-organizer
@@ -235,6 +237,21 @@ Una vez instalada una skill, tu asistente de IA la activará automáticamente cu
 
 ---
 
+### 🖥️ Ejemplo con `ssh-connect`:
+
+* **Diagnosticar un servidor sin bloquear el TTY**:
+  > *"Conéctate al servidor prod-api y dime el uso de disco y memoria"*
+  > 
+  > 🤖 **El agente ejecutará**: `ssh-connect --exec prod-api "df -h && free -m"`  
+  > ➔ Consulta sin prompts interactivos, valida permisos de llave `.pem` o credenciales Keychain y reutiliza el socket `ControlMaster` para ejecuciones instantáneas.
+
+* **Descargar logs remotos**:
+  > *"Descarga los logs de error de Nginx de prod-api a mi máquina"*
+  > 
+  > 🤖 **El agente ejecutará**: `ssh-connect --download prod-api /var/log/nginx/error.log ./logs/`
+
+---
+
 ## 📂 Estructura del Repositorio
 
 ```
@@ -254,6 +271,8 @@ agent-skills/
 │   │   └── react-native-architecture/# Screaming Architecture con Expo Router, TanStack Query y NativeWind
 │   ├── dart/
 │   │   └── dart-import-organizer/# Organización canónica de directivas Dart en 6 grupos
+│   ├── devops/
+│   │   └── ssh-connect/         # Conexión y ejecución en servidores SSH para humanos y agentes
 │   ├── github/
 │   │   └── gh-cli/              # PRs, GitHub Actions, issues y releases con GitHub CLI
 │   ├── gitlab/
