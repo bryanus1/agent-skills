@@ -215,6 +215,40 @@
       "requires": []
     },
     {
+      "name": "ssh-connect",
+      "version": "1.0.0",
+      "description": "Gestión, conexión y ejecución remota en servidores SSH con ssh-connect. Soporta llaves .pem con permisos asegurados, contraseñas automatizadas (Keychain) y multiplexación persistente sin bloqueos de TTY.",
+      "category": "devops",
+      "path": "skills/devops/ssh-connect/SKILL.md",
+      "tags": [
+        "ssh",
+        "devops",
+        "servers",
+        "remote",
+        "pem",
+        "deployment",
+        "sysadmin",
+        "cli"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "ssh-connect",
+        "conectar al servidor",
+        "conectarse por ssh",
+        "ejecutar en el servidor",
+        "servidor remoto",
+        "archivo .pem",
+        "ssh server"
+      ],
+      "requires": []
+    },
+    {
       "name": "gh-cli",
       "version": "1.0.0",
       "description": "Automatización de flujos de GitHub con gh CLI y scripts: Pull Requests con Conventional Commits, emojis y labels verificados, diagnóstico de GitHub Actions, issues y releases con notas generadas. Úsala al crear o revisar PRs, depurar workflows fallidos o publicar releases.",
