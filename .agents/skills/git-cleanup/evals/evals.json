@@ -1,0 +1,19 @@
+{
+  "skill_name": "git-cleanup",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Acabo de fusionar el Pull Request de mi rama feat/user-auth en GitHub. Limpia las ramas locales del repo.",
+      "expected_output": "El agente cambia a la rama principal (git switch main), actualiza los cambios (git pull), y ejecuta git-cleanup (o realiza git fetch --prune verificando la ausencia de refs/remotes/origin/feat/user-auth). Elimina la rama obsoleta con seguridad protegiendo main y reporta el resultado al usuario.",
+      "files": [
+        "references/branch_hygiene.md"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Tengo muchas ramas locales viejas acumuladas después de varios squash merges. Bórralas pero no toques develop ni main.",
+      "expected_output": "El agente protege explícitamente main y develop (vía argumentos de git-cleanup o lista de exclusión en el flujo nativo), ejecuta la poda remota git fetch --prune, identifica las ramas locales que ya no existen en origin y las elimina sin intentar borrar main ni develop.",
+      "files": []
+    }
+  ]
+}

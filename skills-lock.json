@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "git-cleanup": {
+      "source": "bryanus1/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/git/git-cleanup/SKILL.md",
+      "computedHash": "47b62d6ded49687a565de7979aa78e7bf375410688887122c21bd28936d81f23"
+    },
     "skill-creator": {
       "source": "anthropics/skills",
       "sourceType": "github",
