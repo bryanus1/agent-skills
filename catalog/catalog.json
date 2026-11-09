@@ -361,6 +361,41 @@
       "requires": []
     },
     {
+      "name": "issue-triage",
+      "version": "1.0.0",
+      "description": "Refina issues de Linear, GitHub o GitLab con solo título o notas desestructuradas. Explora el repo local, extrae restricciones y reglas, preserva estimaciones y fechas, y actualiza la descripción con una especificación estructurada lista para OpenSpec.",
+      "category": "project-management",
+      "path": "skills/project-management/issue-triage/SKILL.md",
+      "readme": "skills/project-management/issue-triage/README.md",
+      "tags": [
+        "project-management",
+        "issue-tracking",
+        "linear",
+        "github-issues",
+        "gitlab-issues",
+        "openspec",
+        "triage",
+        "specification"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "triage issue",
+        "refinar issue",
+        "refine issue",
+        "analizar ticket",
+        "preparar ticket para openspec",
+        "linear triage",
+        "github issue triage"
+      ],
+      "requires": []
+    },
+    {
       "name": "ts-import-organizer",
       "version": "1.1.1",
       "description": "Organiza imports en TypeScript/JavaScript (.ts, .tsx, .js, .jsx). Se aplica siempre DESPUÉS de formatear el código. Agrupa: builtins → externos → path aliases → side-effects. Ordena líneas y miembros ({ ... }) por longitud, elimina unused y convierte rutas relativas a aliases. Activa al ordenar imports o escribir código.",

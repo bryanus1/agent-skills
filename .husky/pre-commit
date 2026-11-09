@@ -1,1 +1,2 @@
-pnpm test
+env -u GIT_DIR -u GIT_WORK_TREE -u GIT_INDEX_FILE -u GIT_PREFIX pnpm test
+

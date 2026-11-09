@@ -1,0 +1,23 @@
+{
+  "skill_name": "issue-triage",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Haz triage del issue ENG-104 en Linear. El ticket solo dice 'Soporte de exportación a CSV'.",
+      "expected_output": "El agente consulta el issue vía Linear MCP (get_issue), identifica que no tiene descripción, explora el codebase local de forma read-only para encontrar los módulos de facturación o reportes existentes, formula el borrador estructurado en 7 secciones (Objetivo, Restricciones, Reglas, Contexto, Alcance, Metadatos, Preguntas) y pide confirmación explícita al usuario antes de llamar a save_issue.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Revisa el issue #89 de GitHub. Tiene estas notas: 'Vive en backend (Edge Function Deno o Postgres), nunca cliente. Días hábiles vs calendario (1 mes no son 30 días). Estimación: 16 h · Fase F4 · Ventana: 16-19 nov 2026. /opsx:propose calc-fechas'.",
+      "expected_output": "El agente lee el issue con gh issue view, extrae las restricciones arquitectónicas (backend obligatorio, cliente solo consumidor), las reglas de negocio (días hábiles vs calendario) y preserva íntegramente las estimaciones (16 h), ventana de entrega (16-19 nov) y fase (F4) en la sección de Metadatos. Inspecciona el repo local y solicita confirmación antes de actualizar el issue en GitHub.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Tengo un requerimiento para Jira pero no tengo integración directa configurada. Ayúdame a refinar el cálculo de métricas de retención.",
+      "expected_output": "El agente activa el adaptador manual/fallback, explora el código local para ubicar los modelos analíticos o de usuarios, genera la ficha Markdown estructurada de 7 secciones directamente en el chat y le indica al usuario que está lista para copiar y pegar en Jira.",
+      "files": []
+    }
+  ]
+}
