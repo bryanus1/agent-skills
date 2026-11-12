@@ -1,6 +1,6 @@
 # Flujo de Datos: Server Actions vs TanStack Query
 
-Esta guía define las directrices y patrones de implementación para la capa de datos en Next.js (App Router), equilibrando Server Actions y TanStack Query.
+Esta guía define las directrices y patrones de implementación para la capa de datos en Next.js (App Router), equilibrando **Server Actions** (con validación Zod en servidor) y **TanStack Query** (respetando la capa `services/` y la política de barrels en hojas).
 
 ---
 
@@ -8,18 +8,18 @@ Esta guía define las directrices y patrones de implementación para la capa de 
 
 ```text
 [ Componente UI / Screen ]
-            │
-            ├─────────────────────────────────────────┐
-            ▼                                         ▼
-   [ Modo React Query Hook ]              [ Modo Server Action Hook ]
-(Client-side caching, polling)           (useTransition / useActionState)
-            │                                         │
-            ▼                                         ▼
-   [ api-client / fetch ]                [ Service ('use server') ]
-            │                                         │
-            ▼                                         ▼
-   [ Backend REST API ]                  [ Backend / DB nativo ]
+             │
+             ├────────────────────────────────────────────┐
+             ▼                                            ▼
+    [ Modo TanStack Query Hook ]               [ Modo Server Action Hook ]
+ (hooks/use-<noun> → useQuery/useMutation)    (hooks/use-<verb>-<noun> → useTransition)
+             │                                            │
+             ▼                                            ▼
+ [ services/<verb>-<noun>.service.ts ]        [ services/<verb>-<noun>.service.ts ]
+       (fetch / API Client)                   ('use server' + Zod safeParse + fetch/DB)
 ```
+
+> **Regla Crítica**: Los componentes y los hooks **nunca** invocan `fetch` directamente. Toda llamada HTTP o acceso a datos reside en `src/features/<feature>/services/<verb>-<noun>/`.
 
 ---
 
@@ -27,29 +27,38 @@ Esta guía define las directrices y patrones de implementación para la capa de 
 
 | Escenario | Enfoque Recomendado | Razón Técnica |
 | :--- | :--- | :--- |
-| **Páginas Iniciales / SEO** | **Server Components (RSC)** | Renderizado en servidor con streaming y sin JavaScript del cliente para la carga inicial. |
-| **Mutaciones de Formularios / CRUD** | **Server Actions (`'use server'`)** | Integración nativa con Progressive Enhancement, `useActionState`, validación del lado del servidor y revalidación de caché de Next.js (`revalidatePath` / `revalidateTag`). |
-| **Dashboards Interactivos / Tablas** | **TanStack Query (`useQuery`)** | Caching en cliente, paginación reactiva, polling en segundo plano, debounce en tiempo real y deduplicación de peticiones. |
-| **Mutaciones con Caché Optimista Local** | **TanStack Query (`useMutation`)** | Capacidad nativa de actualización optimista de caché en cliente y rollback en caso de error. |
-| **Transacciones Seguras / Cookies** | **Server Actions (`'use server'`)** | Acceso seguro a `cookies()` de Next.js y headers de autenticación sin exponer tokens al bundle del cliente. |
+| **Páginas Iniciales / SEO** | **Server Components (RSC)** | Renderizado en servidor con streaming y cero JavaScript de cliente para la carga inicial. |
+| **Mutaciones de Formularios / CRUD** | **Server Actions (`'use server'`)** | Validación con Zod en servidor, acceso seguro a `cookies()` y revalidación nativa (`revalidatePath` / `revalidateTag`). |
+| **Dashboards Interactivos / Tablas** | **TanStack Query (`useQuery`)** | Caching en cliente, paginación reactiva, polling en segundo plano y deduplicación de peticiones. |
+| **Mutaciones con Caché Optimista Local** | **TanStack Query (`useMutation`)** | Invalidación automática de query keys o actualización optimista de caché en cliente. |
 
 ---
 
-## 3. Patrón 1: Server Actions con Native `fetch`
+## 3. Patrón 1: Server Actions con Validación Zod en Servidor
 
-### 3.1 Estructura del Servicio (`src/features/<feature>/services/`)
-El archivo vive en su propia subcarpeta: `create-invoice/create-invoice.service.ts` con `'use server'`:
+Las Server Actions son endpoints HTTP `POST` públicos: **siempre** deben validar sus argumentos en el servidor con un esquema de `schemas/` antes de ejecutar lógica o llamadas externas.
 
+### 3.1 Esquema Zod (`src/features/billing/schemas/create-invoice.schema.ts`)
+```typescript
+import { z } from 'zod';
+
+export const createInvoiceSchema = z.object({
+  customerId: z.string().uuid('Cliente inválido'),
+  amount: z.coerce.number().positive('El monto debe ser mayor a 0'),
+  currency: z.enum(['USD', 'EUR', 'COP']),
+});
+
+export type TCreateInvoiceInput = z.infer<typeof createInvoiceSchema>;
+```
+*(Reexportado en `src/features/billing/schemas/index.ts`)*
+
+### 3.2 Servicio Server Action (`src/features/billing/services/create-invoice/create-invoice.service.ts`)
 ```typescript
 'use server';
 
-import { IInvoice } from '../models/invoice';
-
-export interface ICreateInvoiceInput {
-  readonly customerId: string;
-  readonly amount: number;
-  readonly currency: string;
-}
+import { revalidatePath } from 'next/cache';
+import type { IInvoice } from '@/features/billing/models';
+import { createInvoiceSchema, type TCreateInvoiceInput } from '@/features/billing/schemas';
 
 export interface IServiceResponse<T> {
   readonly success: boolean;
@@ -58,19 +67,25 @@ export interface IServiceResponse<T> {
 }
 
 /**
- * Server Action para crear una nueva factura en el backend.
+ * Server Action para validar y crear una nueva factura.
  */
 export async function createInvoice(
-  input: ICreateInvoiceInput
+  input: TCreateInvoiceInput,
 ): Promise<IServiceResponse<IInvoice>> {
+  const parsed = createInvoiceSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      success: false,
+      error: parsed.error.issues[0]?.message ?? 'Datos de factura inválidos',
+    };
+  }
+
   try {
     const response = await fetch(`${process.env.API_BASE_URL}/invoices`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(input),
-      cache: 'no-store', // Política explícita de caché
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(parsed.data),
+      cache: 'no-store',
     });
 
     if (!response.ok) {
@@ -82,6 +97,7 @@ export async function createInvoice(
     }
 
     const data: IInvoice = await response.json();
+    revalidatePath('/billing');
     return { success: true, data };
   } catch (error) {
     return {
@@ -92,20 +108,21 @@ export async function createInvoice(
 }
 ```
 
-### 3.2 Orquestación en Hook con `useTransition`
+### 3.3 Hook de Orquestación (`src/features/billing/hooks/use-create-invoice/use-create-invoice.hook.ts`)
 ```typescript
 'use client';
 
 import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
-import { createInvoice, ICreateInvoiceInput } from '../services/create-invoice';
-import { IInvoice } from '../models/invoice';
+import type { IInvoice } from '@/features/billing/models';
+import type { TCreateInvoiceInput } from '@/features/billing/schemas';
+import { createInvoice } from '@/features/billing/services/create-invoice';
 
 export function useCreateInvoice() {
   const [isPending, startTransition] = useTransition();
   const [createdInvoice, setCreatedInvoice] = useState<IInvoice | null>(null);
 
-  const execute = (input: ICreateInvoiceInput, onSuccess?: () => void) => {
+  const execute = (input: TCreateInvoiceInput, onSuccess?: () => void) => {
     startTransition(async () => {
       const result = await createInvoice(input);
       if (result.success && result.data) {
@@ -124,65 +141,75 @@ export function useCreateInvoice() {
 
 ---
 
-## 4. Patrón 2: Custom Hooks con TanStack Query
+## 4. Patrón 2: Servicios + Custom Hooks con TanStack Query
 
-### 4.1 Query Key Factory (`src/features/<feature>/hooks/query-keys.ts`)
-Centralizar las claves de caché para evitar typos e invalidaciones inconsistentes:
+Para respetar la **Regla de la Hoja Terminal**, `hooks/` solo contiene subcarpetas (`use-*/`) y **nunca** archivos sueltos como `hooks/query-keys.ts`. La *Query Key Factory* se exporta desde el hook principal de consulta (`hooks/use-invoices`) a través de su `index.ts`.
 
+### 4.1 Servicio de Lectura (`src/features/billing/services/get-invoices/get-invoices.service.ts`)
 ```typescript
-export const invoiceKeys = {
-  all: ['invoices'] as const,
-  lists: () => [...invoiceKeys.all, 'list'] as const,
-  list: (filters: { status?: string; page: number }) => [...invoiceKeys.lists(), filters] as const,
-  details: () => [...invoiceKeys.all, 'detail'] as const,
-  detail: (id: string) => [...invoiceKeys.details(), id] as const,
-};
-```
+import type { IInvoice } from '@/features/billing/models';
 
-### 4.2 Hook Encapsulado (`use-invoices.hook.ts`)
-```typescript
-'use client';
-
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { invoiceKeys } from './query-keys';
-import { IInvoice } from '../models/invoice';
-
-interface IUseInvoicesParams {
+export interface IGetInvoicesParams {
   readonly page?: number;
   readonly status?: string;
 }
 
-export function useInvoices(params: IUseInvoicesParams = {}) {
+export async function getInvoices(params: IGetInvoicesParams = {}): Promise<IInvoice[]> {
   const { page = 1, status } = params;
+  const searchParams = new URLSearchParams({ page: String(page) });
+  if (status) searchParams.append('status', status);
 
+  const res = await fetch(`/api/invoices?${searchParams.toString()}`);
+  if (!res.ok) throw new Error('Error al obtener el listado de facturas');
+  return res.json();
+}
+```
+
+### 4.2 Hook de Consulta + Key Factory (`src/features/billing/hooks/use-invoices/use-invoices.hook.ts`)
+```typescript
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
+import { getInvoices, type IGetInvoicesParams } from '@/features/billing/services/get-invoices';
+
+export const invoiceKeys = {
+  all: ['invoices'] as const,
+  lists: () => [...invoiceKeys.all, 'list'] as const,
+  list: (filters: IGetInvoicesParams) => [...invoiceKeys.lists(), filters] as const,
+  details: () => [...invoiceKeys.all, 'detail'] as const,
+  detail: (id: string) => [...invoiceKeys.details(), id] as const,
+};
+
+export function useInvoices(params: IGetInvoicesParams = {}) {
   return useQuery({
-    queryKey: invoiceKeys.list({ page, status }),
-    queryFn: async (): Promise<IInvoice[]> => {
-      const searchParams = new URLSearchParams({ page: String(page) });
-      if (status) searchParams.append('status', status);
-
-      const res = await fetch(`/api/invoices?${searchParams.toString()}`);
-      if (!res.ok) throw new Error('Error al obtener el listado de facturas');
-      return res.json();
-    },
-    staleTime: 1000 * 60 * 2, // 2 minutos de caché fresca
+    queryKey: invoiceKeys.list(params),
+    queryFn: () => getInvoices(params),
+    staleTime: 1000 * 60 * 2,
   });
 }
+```
+
+### 4.3 Hook de Mutación Encapsulado (`src/features/billing/hooks/use-delete-invoice/use-delete-invoice.hook.ts`)
+Cada hook adicional vive en su propia subcarpeta e importa `invoiceKeys` desde `@/features/billing/hooks/use-invoices`:
+
+```typescript
+'use client';
+
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { invoiceKeys } from '@/features/billing/hooks/use-invoices';
+import { deleteInvoice } from '@/features/billing/services/delete-invoice';
 
 export function useDeleteInvoice() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: string): Promise<void> => {
-      const res = await fetch(`/api/invoices/${id}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('No fue posible eliminar la factura');
-    },
+    mutationFn: (id: string) => deleteInvoice(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
       toast.success('Factura eliminada');
     },
-    onError: (err) => {
+    onError: (err: Error) => {
       toast.error(err.message || 'Error al eliminar');
     },
   });

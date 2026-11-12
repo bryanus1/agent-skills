@@ -15,7 +15,7 @@ const RN_COMPONENT = 'skills/architecture/react-native-architecture/scripts/scaf
 const scaffolds = [
   { name: 'flutter scaffold-feature', script: FLUTTER, args: ['billing', '--model', 'invoice'], probe: 'lib/features/billing/domain/entities/invoice.dart' },
   { name: 'nestjs scaffold-module', script: NEST, args: ['invoice'], probe: 'src/modules/invoices/invoice.module.ts' },
-  { name: 'nextjs scaffold-feature', script: NEXT_FEATURE, args: ['billing', '--with-starter'], probe: 'src/features/billing/models/billing.ts' },
+  { name: 'nextjs scaffold-feature', script: NEXT_FEATURE, args: ['billing', '--with-starter', '--with-route'], probe: 'src/features/billing/models/billing.ts' },
   { name: 'nextjs scaffold-component', script: NEXT_COMPONENT, args: ['user-card', '--type', 'dialog'], probe: 'src/components/common/user-card/user-card.tsx' },
   { name: 'react-native scaffold-feature', script: RN_FEATURE, args: ['billing', '--with-starter', '--with-route'], probe: 'src/features/billing/models/billing.ts' },
   { name: 'react-native scaffold-component', script: RN_COMPONENT, args: ['user-card', '--type', 'modal'], probe: 'src/components/common/user-card/user-card.tsx' },
@@ -120,7 +120,7 @@ test('nestjs scaffold-module: rejects names that are not kebab-case', (t) => {
   assert.deepEqual(listFiles(cwd), []);
 });
 
-test('nextjs scaffold-feature: creates the 7 feature folders, starter files only with --with-starter', (t) => {
+test('nextjs scaffold-feature: creates the 7 feature folders, starter and route only on request', (t) => {
   const cwd = makeTempDir(t);
   assert.equal(runScript(NEXT_FEATURE, ['billing'], cwd).code, 0);
   const featureRoot = path.join(cwd, 'src/features/billing');
@@ -130,8 +130,9 @@ test('nextjs scaffold-feature: creates the 7 feature folders, starter files only
   // Re-running without starter files is a no-op and must succeed.
   assert.equal(runScript(NEXT_FEATURE, ['billing'], cwd).code, 0);
 
-  assert.equal(runScript(NEXT_FEATURE, ['billing', '--with-starter'], cwd).code, 0);
+  assert.equal(runScript(NEXT_FEATURE, ['billing', '--with-starter', '--with-route'], cwd).code, 0);
   assert.deepEqual(listFiles(cwd), [
+    'src/app/billing/page.tsx',
     'src/features/billing/models/billing.ts',
     'src/features/billing/models/index.ts',
     'src/features/billing/screens/billing-home/billing-home.test.tsx',
@@ -139,9 +140,33 @@ test('nextjs scaffold-feature: creates the 7 feature folders, starter files only
     'src/features/billing/screens/billing-home/index.ts',
   ]);
   assert.ok(!fs.existsSync(path.join(featureRoot, 'index.ts')), 'feature root must not have a barrel');
+
+  const screenTest = fs.readFileSync(path.join(featureRoot, 'screens/billing-home/billing-home.test.tsx'), 'utf8');
+  assert.match(screenTest, /from 'vitest'/);
+  const route = fs.readFileSync(path.join(cwd, 'src/app/billing/page.tsx'), 'utf8');
+  assert.match(route, /@\/features\/billing\/screens\/billing-home/);
 });
 
-test('nextjs scaffold-component: generates component, test and barrel for each type', (t) => {
+test('nextjs scaffold-feature: --with-route requires --with-starter and honors --app-dir', (t) => {
+  const cwd = makeTempDir(t);
+  const result = runScript(NEXT_FEATURE, ['billing', '--with-route'], cwd);
+  assert.equal(result.code, 1);
+  assert.match(result.stderr, /--with-starter/);
+  assert.deepEqual(fs.readdirSync(cwd), []);
+
+  assert.equal(runScript(NEXT_FEATURE, ['billing', '--with-starter', '--with-route', '--app-dir', 'apps/web/src/app'], cwd).code, 0);
+  assert.ok(fs.existsSync(path.join(cwd, 'apps/web/src/app/billing/page.tsx')));
+});
+
+test('nextjs scaffold-feature: rejects names that are not kebab-case or unknown flags', (t) => {
+  const cwd = makeTempDir(t);
+  assert.equal(runScript(NEXT_FEATURE, ['Invoice_Item!'], cwd).code, 1);
+  assert.equal(runScript(NEXT_FEATURE, ['-bad-name'], cwd).code, 1);
+  assert.equal(runScript(NEXT_FEATURE, ['billing', '--unknown-flag'], cwd).code, 1);
+  assert.deepEqual(fs.readdirSync(cwd), []);
+});
+
+test('nextjs scaffold-component: generates component, Vitest test and barrel for each type', (t) => {
   const cwd = makeTempDir(t);
   for (const type of ['default', 'dialog', 'section']) {
     const name = `${type}-card`;
@@ -150,6 +175,14 @@ test('nextjs scaffold-component: generates component, test and barrel for each t
   }
   const dialog = fs.readFileSync(path.join(cwd, 'src/components/common/dialog-card/dialog-card.tsx'), 'utf8');
   assert.match(dialog, /FormDialog/);
+  assert.match(dialog, /'use client'/);
+  const dialogTest = fs.readFileSync(path.join(cwd, 'src/components/common/dialog-card/dialog-card.test.tsx'), 'utf8');
+  assert.match(dialogTest, /from 'vitest'/);
+  assert.match(dialogTest, /vi\.fn\(\)/);
+
+  const section = fs.readFileSync(path.join(cwd, 'src/components/common/section-card/section-card.tsx'), 'utf8');
+  assert.match(section, /<section/);
+  assert.match(section, /<h2/);
 });
 
 test('nextjs scaffold-component: rejects an unknown --type', (t) => {

@@ -1,12 +1,12 @@
 # ⚡ Next.js Screaming Architecture (`nextjs-architecture`)
 
-> **Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions, hooks con TanStack Query, componentes `FormDialog` y testing con cobertura $\ge 90\%$.**
+> **Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions con Zod, hooks con TanStack Query, `FormDialog`, linting con OXC y testing con Vitest + SWC ($\ge 90\%$) y Playwright E2E.**
 
 | Propiedad | Valor |
 | :--- | :--- |
 | **Nombre** | `nextjs-architecture` |
 | **Categoría** | `architecture` |
-| **Versión** | `1.1.1` |
+| **Versión** | `1.2.0` |
 | **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
 | **Requisitos** | `node` |
 
@@ -40,17 +40,17 @@ ln -s ../../.agents/skills/nextjs-architecture .claude/skills/nextjs-architectur
 
 ## 💡 Ejemplos de Uso con Agentes de IA
 
-* **Andamiar una feature completa**:
-  > *"Estructura la feature de facturación (billing) con Screaming Architecture y un modelo inicial"*
+* **Andamiar una feature completa con su ruta en App Router**:
+  > *"Estructura la feature de facturación (billing) con Screaming Architecture, archivos iniciales y su ruta en App Router"*
   >
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-feature.mjs billing --with-starter`  
-  > ➔ Genera las 7 subcarpetas (`components`, `hooks`, `models`, `schemas`, `screens`, `services`, `utils`), modelos planos `.ts` sin tests, screen encapsulada y barrel de hoja terminal.
+  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-feature.mjs billing --with-starter --with-route`  
+  > ➔ Genera las 7 subcarpetas (`components`, `hooks`, `models`, `schemas`, `screens`, `services`, `utils`), modelo plano `.ts` sin tests, screen encapsulada con test en **Vitest**, barrel de hoja terminal y ruta delgada `src/app/billing/page.tsx`.
 
 * **Crear componente modal desacoplado (`FormDialog`)**:
   > *"Crea un diálogo modal para crear facturas en billing con shadcn Dialog"*
   >
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-component.mjs create-invoice-dialog --target-dir src/features/billing/components --type dialog`  
-  > ➔ Genera el patrón `FormDialog` con TSDoc, validación y tests unitarios adyacentes.
+  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-component.mjs invoice-form-dialog --target-dir src/features/billing/components --type dialog`  
+  > ➔ Genera el patrón `FormDialog` (`'use client'`) con TSDoc, test unitario con Vitest (`vi.fn()`) e `index.ts`.
 
 ---
 
@@ -60,7 +60,7 @@ ln -s ../../.agents/skills/nextjs-architecture .claude/skills/nextjs-architectur
 
 - **[`scripts/scaffold-feature.mjs`](scripts/scaffold-feature.mjs)**:
   ```bash
-  node <skill-dir>/scripts/scaffold-feature.mjs <feature-name> [--target-dir <path>] [--with-starter] [--dry-run] [--force]
+  node <skill-dir>/scripts/scaffold-feature.mjs <feature-name> [--target-dir <path>] [--app-dir <path>] [--with-starter] [--with-route] [--dry-run] [--force]
   ```
 - **[`scripts/scaffold-component.mjs`](scripts/scaffold-component.mjs)**:
   ```bash
@@ -72,6 +72,7 @@ ln -s ../../.agents/skills/nextjs-architecture .claude/skills/nextjs-architectur
 ## 📚 Documentación y Referencias
 
 - **[`SKILL.md`](SKILL.md)**: Especificación operativa completa, regla de hoja terminal para barrels y reglas críticas para el agente.
-- **[Guía Detallada de Screaming Architecture](references/screaming-architecture-guide.md)**: Estructura de directorios, capas, sufijos y convenciones de nombres.
-- **[Patrones de Componentes y FormDialog](references/component-and-dialog-patterns.md)**: Protocolo de descubrimiento en 3 niveles, contenedor `FormDialog` y TSDoc.
-- **[Patrones de Datos: Server Actions & TanStack Query](references/tanstack-and-actions-pattern.md)**: Guía de selección y snippets de Server Actions y React Query hooks.
+- **[Guía Detallada de Screaming Architecture](references/screaming-architecture-guide.md)**: Estructura de directorios, frontera Server vs Client Components, capas, sufijos y convenciones de nombres.
+- **[Patrones de Componentes y FormDialog](references/component-and-dialog-patterns.md)**: Protocolo de descubrimiento en 3 niveles, contenedor `FormDialog` conectado con Zod y TSDoc.
+- **[Patrones de Datos: Server Actions & TanStack Query](references/tanstack-and-actions-pattern.md)**: Validación Zod en servidor, servicios encapsulados y key factories en hooks hoja.
+- **[Testing y Toolchain: Vitest, Playwright, OXC y SWC](references/testing-and-toolchain.md)**: Configuración de Vitest + SWC ($\ge 90\%$ coverage), Playwright E2E (`e2e/`) y `.oxlintrc.json`.
