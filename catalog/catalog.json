@@ -374,8 +374,8 @@
     },
     {
       "name": "issue-triage",
-      "version": "1.0.1",
-      "description": "Refina issues de Linear o GitHub con solo título o notas desestructuradas. Explora el repo local, extrae restricciones y reglas, preserva estimaciones y fechas, y actualiza la descripción con una especificación estructurada lista para OpenSpec.",
+      "version": "1.0.2",
+      "description": "Refina issues de Linear o GitHub con solo título o notas desestructuradas. Explora el repo local, extrae restricciones y reglas, preserva estimaciones y fechas, y actualiza la descripción con una especificación técnica estructurada.",
       "category": "workflow",
       "path": "skills/workflow/issue-triage/SKILL.md",
       "readme": "skills/workflow/issue-triage/README.md",
@@ -385,7 +385,6 @@
         "issue-tracking",
         "linear",
         "github-issues",
-        "openspec",
         "triage",
         "specification"
       ],
@@ -401,7 +400,7 @@
         "refinar issue",
         "refine issue",
         "analizar ticket",
-        "preparar ticket para openspec",
+        "preparar ticket",
         "linear triage",
         "github issue triage"
       ],

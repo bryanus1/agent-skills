@@ -40,28 +40,12 @@ Esta plantilla define la estructura canónica que genera la skill `issue-triage`
 - **Estimación:** 
 - **Ventana temporal / Hito:** 
 - **Fase / Epic:** 
-- **Comando OpenSpec sugerido:** `/opsx:propose <slug>`
+- **Prioridad / Etiquetas:** 
 
 ## ❓ Preguntas / Decisiones Abiertas
 <!-- Dudas pendientes para alinear con el equipo antes o durante la especificación. -->
 - 
 ```
-
----
-
-## 🗺️ Mapeo Directo hacia OpenSpec
-
-Cuando este issue se lleva a implementación con OpenSpec (`/openspec-propose`), los campos se transfieren directamente sin fricción:
-
-| Sección del Issue | Artefacto OpenSpec Destino | Sección OpenSpec |
-|---|---|---|
-| `🎯 Objetivo` | `proposal.md` | `## Why` |
-| `🛡️ Restricciones Arquitectónicas` | `design.md` | `## Context` & `## Decisions` |
-| `📋 Reglas de Negocio Clave` | `specs/<capability>/spec.md` | `### Requirement` & `#### Scenario` |
-| `🧭 Contexto Técnico en el Repo` | `proposal.md` / `design.md` | `## Impact` / `## Context` |
-| `📦 Alcance Propuesto` | `proposal.md` | `## What Changes` |
-| `🗓️ Metadatos & Planificación` | `proposal.md` / `tasks.md` | `## Context` / Estimaciones |
-| `❓ Preguntas Abiertas` | `design.md` | `## Open Questions` |
 
 ---
 
@@ -98,7 +82,7 @@ Calcular plazos y términos (días hábiles/calendario, horas, meses y años) co
 - **Estimación:** 16 h
 - **Ventana temporal:** 16 nov → 19 nov 2026
 - **Fase:** F4 · Términos y agenda
-- **Comando OpenSpec sugerido:** `/opsx:propose bs-521-calculo-terminos`
+- **Slug sugerido:** `bs-521-calculo-terminos`
 
 ## ❓ Preguntas / Decisiones Abiertas
 - ¿La lista de feriados nacionales se gestiona en tabla Postgres o archivo de configuración estático?

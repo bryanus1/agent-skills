@@ -9,7 +9,7 @@
     },
     {
       "id": 2,
-      "prompt": "Revisa el issue #89 de GitHub. Tiene estas notas: 'Vive en backend (Edge Function Deno o Postgres), nunca cliente. Días hábiles vs calendario (1 mes no son 30 días). Estimación: 16 h · Fase F4 · Ventana: 16-19 nov 2026. /opsx:propose calc-fechas'.",
+      "prompt": "Revisa el issue #89 de GitHub. Tiene estas notas: 'Vive en backend (Edge Function Deno o Postgres), nunca cliente. Días hábiles vs calendario (1 mes no son 30 días). Estimación: 16 h · Fase F4 · Ventana: 16-19 nov 2026'.",
       "expected_output": "El agente lee el issue con gh issue view, extrae las restricciones arquitectónicas (backend obligatorio, cliente solo consumidor), las reglas de negocio (días hábiles vs calendario) y preserva íntegramente las estimaciones (16 h), ventana de entrega (16-19 nov) y fase (F4) en la sección de Metadatos. Inspecciona el repo local y solicita confirmación antes de actualizar el issue en GitHub.",
       "files": []
     },
