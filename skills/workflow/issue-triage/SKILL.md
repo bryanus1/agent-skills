@@ -1,9 +1,9 @@
 ---
 name: issue-triage
-version: 1.0.0
+version: 1.0.1
 description: >-
-  Refina issues de Linear, GitHub o GitLab con solo título o notas desestructuradas. Explora el repo local, extrae restricciones y reglas, preserva estimaciones y fechas, y actualiza la descripción con una especificación estructurada lista para OpenSpec.
-tags: [project-management, issue-tracking, linear, github-issues, gitlab-issues, openspec, triage, specification]
+  Refina issues de Linear o GitHub con solo título o notas desestructuradas. Explora el repo local, extrae restricciones y reglas, preserva estimaciones y fechas, y actualiza la descripción con una especificación estructurada lista para OpenSpec.
+tags: [workflow, project-management, issue-tracking, linear, github-issues, openspec, triage, specification]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
   - triage issue
@@ -21,14 +21,14 @@ requirements:
 
 ## 🎯 Propósito
 
-La skill `issue-triage` transforma issues vagos, mínimos (solo título) o con notas informales ("brain dumps") en especificaciones técnicas estructuradas y listas para implementación. Opera de manera agnóstica frente a cualquier gestor de tareas (**Linear**, **GitHub Issues**, **GitLab Issues** o modo manual), cruzando el requerimiento con la realidad del repositorio local y preservando intactos todos los metadatos de estimación y calendario.
+La skill `issue-triage` transforma issues vagos, mínimos (solo título) o con notas informales ("brain dumps") en especificaciones técnicas estructuradas y listas para implementación. Opera de manera agnóstica frente a cualquier gestor de tareas (**Linear**, **GitHub Issues** o modo manual), cruzando el requerimiento con la realidad del repositorio local y preservando intactos todos los metadatos de estimación y calendario.
 
 ---
 
 ## ⚡ Cuándo Activar esta Skill
 
 Activa esta skill cuando el usuario:
-- Proporcione el identificador o enlace de un ticket (ej. `ENG-104`, `#42`, `GL-12`) solicitando refinarlo, analizarlo o prepararlo.
+- Proporcione el identificador o enlace de un ticket (ej. `ENG-104`, `#42`) solicitando refinarlo, analizarlo o prepararlo.
 - Diga frases como *"refina este issue"*, *"haz triage de ENG-104"*, *"mira qué hay que hacer en este ticket"*, o *"prepara el issue para OpenSpec"*.
 - Tenga un ticket con solo título o con un párrafo informal de notas técnicas y quiera dejarlo documentado en el tracker antes de implementarlo en el futuro.
 
@@ -42,7 +42,6 @@ El agente debe ejecutar determinísticamente los siguientes pasos:
 1. Analizar el identificador o URL proporcionado:
    - **Linear:** Formato tipo `ENG-104`, `PROJ-12` o URL de Linear. Invocar herramienta Linear MCP (`get_issue`) u Orca CLI.
    - **GitHub:** Formato `#42`, `owner/repo#42` o URL de GitHub. Ejecutar `gh issue view <id> --json number,title,body,state`.
-   - **GitLab:** Formato de GitLab o CLI `glab`. Ejecutar `glab issue view <id> -F json`.
    - **Manual:** Si el usuario pega texto directamente o no hay CLI/MCP disponible, usar el texto proporcionado.
 2. Extraer `title`, `body` (o `description`) y estado actual del ticket.
 3. Consultar [references/adapters.md](references/adapters.md) para ver los comandos y opciones exactas de cada proveedor.
@@ -84,7 +83,6 @@ Construir el borrador en Markdown siguiendo exactamente la estructura definida e
 Una vez confirmado por el usuario:
 - **Linear:** Ejecutar Linear MCP `save_issue({ id: "<id>", description: "<markdown>" })`.
 - **GitHub:** Ejecutar `gh issue edit <id> --body-file <temp-file>`.
-- **GitLab:** Ejecutar `glab issue update <id> --description "<markdown>"`.
 - **Manual:** Presentar el bloque de código Markdown listo para copiar y pegar en Jira, Notion u otro sistema.
 
 ### Paso 7: Continuidad hacia OpenSpec
@@ -109,4 +107,4 @@ Cuando estés listo para implementar este cambio, ejecuta:
 ## 📚 Referencias
 
 - [Plantilla Estándar de Issue Triage](references/issue-template.md): Definición canónica de las 7 secciones y mapeo 1:1 hacia artefactos de OpenSpec.
-- [Guía de Adaptadores de Proveedores](references/adapters.md): Comandos y llamadas MCP para Linear, GitHub, GitLab y modo manual.
+- [Guía de Adaptadores de Proveedores](references/adapters.md): Comandos y llamadas MCP para Linear, GitHub y modo manual.

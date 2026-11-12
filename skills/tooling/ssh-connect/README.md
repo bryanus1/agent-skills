@@ -5,7 +5,7 @@
 | Propiedad | Valor |
 | :--- | :--- |
 | **Nombre** | `ssh-connect` |
-| **Categoría** | `devops` |
+| **Categoría** | `tooling` |
 | **Versión** | `1.0.0` |
 | **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
 | **Requisitos** | `ssh-connect`, `ssh`, `bash` |
@@ -29,7 +29,7 @@ npx skills add bryanus1/agent-skills --skill ssh-connect -g
 ```bash
 # Google Antigravity:
 mkdir -p .agents/skills
-ln -s /ruta/a/agent-skills/skills/devops/ssh-connect .agents/skills/ssh-connect
+ln -s /ruta/a/agent-skills/skills/tooling/ssh-connect .agents/skills/ssh-connect
 
 # Claude Code:
 mkdir -p .claude/skills

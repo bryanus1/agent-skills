@@ -4,7 +4,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { makeTempDir, runScript, listFiles } from './helpers.mjs';
 
-const FLUTTER = 'skills/architecture/flutter-architecture/scripts/scaffold-feature.mjs';
 const NEST = 'skills/architecture/nestjs-architecture/scripts/scaffold-module.mjs';
 const NEXT_FEATURE = 'skills/architecture/nextjs-architecture/scripts/scaffold-feature.mjs';
 const NEXT_COMPONENT = 'skills/architecture/nextjs-architecture/scripts/scaffold-component.mjs';
@@ -15,7 +14,6 @@ const RN_SERVICE = 'skills/architecture/react-native-architecture/scripts/scaffo
 
 // Every scaffold must follow the same safety contract (docs/SPECIFICATION.md §5).
 const scaffolds = [
-  { name: 'flutter scaffold-feature', script: FLUTTER, args: ['billing', '--model', 'invoice'], probe: 'lib/features/billing/domain/entities/invoice.dart' },
   { name: 'nestjs scaffold-module', script: NEST, args: ['invoice'], probe: 'src/modules/invoices/invoice.module.ts' },
   { name: 'nextjs scaffold-feature', script: NEXT_FEATURE, args: ['billing', '--with-starter', '--with-route'], probe: 'src/features/billing/models/billing.ts' },
   { name: 'nextjs scaffold-component', script: NEXT_COMPONENT, args: ['user-card', '--type', 'dialog'], probe: 'src/components/common/user-card/user-card.tsx' },
@@ -67,41 +65,6 @@ for (const { name, script, args, probe } of scaffolds) {
     assert.equal(runScript(script, [], cwd).code, 1);
   });
 }
-
-test('flutter scaffold-feature: generates the 13 BLoC files', (t) => {
-  const cwd = makeTempDir(t);
-  fs.writeFileSync(path.join(cwd, 'pubspec.yaml'), 'name: shop_app\n');
-  assert.equal(runScript(FLUTTER, ['billing', '--model', 'invoice'], cwd).code, 0);
-
-  assert.deepEqual(listFiles(cwd), [
-    'lib/features/billing/data/datasources/invoice_remote_data_source.dart',
-    'lib/features/billing/data/models/invoice_model.dart',
-    'lib/features/billing/data/repositories/invoice_repository_impl.dart',
-    'lib/features/billing/domain/entities/invoice.dart',
-    'lib/features/billing/domain/repositories/invoice_repository.dart',
-    'lib/features/billing/domain/usecases/get_invoice.dart',
-    'lib/features/billing/presentation/bloc/invoice_bloc.dart',
-    'lib/features/billing/presentation/bloc/invoice_event.dart',
-    'lib/features/billing/presentation/bloc/invoice_state.dart',
-    'lib/features/billing/presentation/screens/invoice_screen.dart',
-    'lib/features/billing/presentation/widgets/invoice_item_widget.dart',
-    'pubspec.yaml',
-    'test/features/billing/domain/usecases/get_invoice_test.dart',
-    'test/features/billing/presentation/bloc/invoice_bloc_test.dart',
-  ]);
-  const entity = fs.readFileSync(path.join(cwd, 'lib/features/billing/domain/entities/invoice.dart'), 'utf8');
-  assert.match(entity, /class Invoice extends Equatable/);
-  const repositoryImpl = fs.readFileSync(path.join(cwd, 'lib/features/billing/data/repositories/invoice_repository_impl.dart'), 'utf8');
-  assert.match(repositoryImpl, /package:shop_app\//, 'uses the package name detected from pubspec.yaml');
-});
-
-test('flutter scaffold-feature: --cubit generates a cubit instead of a bloc', (t) => {
-  const cwd = makeTempDir(t);
-  assert.equal(runScript(FLUTTER, ['cart', '--model', 'cart_item', '--cubit'], cwd).code, 0);
-  const files = listFiles(cwd);
-  assert.ok(files.some((f) => f.startsWith('lib/features/cart/presentation/cubit/')), files.join('\n'));
-  assert.ok(!files.some((f) => f.includes('/bloc/')), files.join('\n'));
-});
 
 test('nestjs scaffold-module: generates 18 files under a plural folder', (t) => {
   const cwd = makeTempDir(t);

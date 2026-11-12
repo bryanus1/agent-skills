@@ -1,6 +1,6 @@
 ---
 name: nextjs-architecture
-version: 1.2.0
+version: 1.2.1
 description: >-
   Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions con Zod, hooks con TanStack Query, FormDialog, linting con OXC y testing con Vitest + SWC (>= 90%) y Playwright E2E.
 tags: [nextjs, react, screaming-architecture, frontend, app-router, tanstack-query, form-dialog, vitest, playwright, oxc, swc]
@@ -102,7 +102,7 @@ Construir los bloques de interfaz visual:
    - Si una carpeta agrupa **subcarpetas** (como la raíz de la feature `src/features/<feature>/`, agrupadores como `components/`, `hooks/`, `screens/`, `services/`, `sections/`), **NUNCA** lleva `index.ts` ni archivos sueltos.
    - Únicamente las subcarpetas finales (`components/invoice-card/`, `hooks/use-invoices/`, `services/create-invoice/`) o carpetas con archivos directos (`models/`, `schemas/`, `utils/`) tienen `index.ts`.
 2. **Importaciones Directas con Alias `@/*` a la Carpeta con `index.ts`**:
-   - Importar siempre con alias `@/*` apuntando a la carpeta hoja que posee el `index.ts` (y ordenar imports tras formatear con [`ts-import-organizer`](../../typescript/ts-import-organizer/SKILL.md)):
+   - Importar siempre con alias `@/*` apuntando a la carpeta hoja que posee el `index.ts` (y ordenar imports tras formatear con [`ts-import-organizer`](../../tooling/ts-import-organizer/SKILL.md)):
      ```typescript
      // ✅ CORRECTO: Importación desde la carpeta hoja que posee index.ts
      import { InvoiceCard } from '@/features/pets/components/invoice-card';

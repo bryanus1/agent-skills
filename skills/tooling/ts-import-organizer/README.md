@@ -5,7 +5,7 @@
 | Propiedad | Valor |
 | :--- | :--- |
 | **Nombre** | `ts-import-organizer` |
-| **Categoría** | `typescript` |
+| **Categoría** | `tooling` |
 | **Versión** | `1.1.1` |
 | **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
 
@@ -28,7 +28,7 @@ npx skills add bryanus1/agent-skills --skill ts-import-organizer -g
 ```bash
 # Google Antigravity:
 mkdir -p .agents/skills
-ln -s /ruta/a/agent-skills/skills/typescript/ts-import-organizer .agents/skills/ts-import-organizer
+ln -s /ruta/a/agent-skills/skills/tooling/ts-import-organizer .agents/skills/ts-import-organizer
 
 # Claude Code:
 mkdir -p .claude/skills

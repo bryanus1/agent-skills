@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { rootDir, makeTempDir, writeFiles } from './helpers.mjs';
 
-const SCRIPTS = path.join(rootDir, 'skills/github/gh-cli/scripts');
+const SCRIPTS = path.join(rootDir, 'skills/git/gh-cli/scripts');
 
 // Fake `gh`: records every call (calls separated by \x1e, args by \x1f, so
 // multi-line arguments survive) and answers from GH_STUB_* environment variables.
