@@ -1,12 +1,12 @@
 # 📋 Issue Triage (`issue-triage`)
 
-> **Refinamiento agnóstico y pre-especificación de tickets (Linear, GitHub Issues o notas locales). Transforma títulos vacíos o "brain dumps" en especificaciones estructuradas con contexto del codebase y preservación de metadatos de estimación, listas para OpenSpec.**
+> **Refinamiento agnóstico y pre-especificación de tickets (Linear, GitHub Issues o notas locales). Transforma títulos vacíos o "brain dumps" en especificaciones estructuradas con contexto del codebase y preservación de metadatos de estimación.**
 
 | Propiedad | Valor |
 | :--- | :--- |
 | **Nombre** | `issue-triage` |
 | **Categoría** | `workflow` |
-| **Versión** | `1.0.1` |
+| **Versión** | `1.0.2` |
 | **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
 | **Adaptadores Soportados** | Linear (MCP/CLI), GitHub CLI (`gh`), Manual Markdown |
 
@@ -79,24 +79,8 @@ ln -s ../../.agents/skills/issue-triage .claude/skills/issue-triage
 
 ---
 
-## 🔄 Conexión con OpenSpec
-
-La ficha generada en el issue mapea 1:1 con los artefactos de OpenSpec. Cuando decidas implementar la tarea en el futuro, simplemente ejecuta:
-
-```text
-/openspec-propose <slug-del-issue>
-```
-
-Y luego:
-
-```text
-/openspec-apply-change <slug-del-issue>
-```
-
----
-
 ## 📚 Documentación y Referencias
 
 - **[`SKILL.md`](SKILL.md)**: Especificación operativa completa y reglas críticas.
-- **[Plantilla Estándar de Issue Triage](references/issue-template.md)**: Estructura de las 7 secciones y mapeo detallado a OpenSpec.
+- **[Plantilla Estándar de Issue Triage](references/issue-template.md)**: Estructura de las 7 secciones y ejemplo completo.
 - **[Guía de Adaptadores](references/adapters.md)**: Comandos CLI y llamadas MCP paso a paso.

@@ -1,16 +1,16 @@
 ---
 name: issue-triage
-version: 1.0.1
+version: 1.0.2
 description: >-
-  Refina issues de Linear o GitHub con solo título o notas desestructuradas. Explora el repo local, extrae restricciones y reglas, preserva estimaciones y fechas, y actualiza la descripción con una especificación estructurada lista para OpenSpec.
-tags: [workflow, project-management, issue-tracking, linear, github-issues, openspec, triage, specification]
+  Refina issues de Linear o GitHub con solo título o notas desestructuradas. Explora el repo local, extrae restricciones y reglas, preserva estimaciones y fechas, y actualiza la descripción con una especificación técnica estructurada.
+tags: [workflow, project-management, issue-tracking, linear, github-issues, triage, specification]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
   - triage issue
   - refinar issue
   - refine issue
   - analizar ticket
-  - preparar ticket para openspec
+  - preparar ticket
   - linear triage
   - github issue triage
 requirements:
@@ -29,7 +29,7 @@ La skill `issue-triage` transforma issues vagos, mínimos (solo título) o con n
 
 Activa esta skill cuando el usuario:
 - Proporcione el identificador o enlace de un ticket (ej. `ENG-104`, `#42`) solicitando refinarlo, analizarlo o prepararlo.
-- Diga frases como *"refina este issue"*, *"haz triage de ENG-104"*, *"mira qué hay que hacer en este ticket"*, o *"prepara el issue para OpenSpec"*.
+- Diga frases como *"refina este issue"*, *"haz triage de ENG-104"*, *"mira qué hay que hacer en este ticket"*, o *"prepara el issue para implementación"*.
 - Tenga un ticket con solo título o con un párrafo informal de notas técnicas y quiera dejarlo documentado en el tracker antes de implementarlo en el futuro.
 
 ---
@@ -70,7 +70,7 @@ Construir el borrador en Markdown siguiendo exactamente la estructura definida e
 3. `## 📋 Reglas de Negocio Clave`: Reglas explícitas y casos de borde extraídos.
 4. `## 🧭 Contexto Técnico en el Repo`: Archivos y dependencias reales verificados en el codebase.
 5. `## 📦 Alcance Propuesto`: Checkboxes de entregables dentro del alcance (`In Scope`) y lista de exclusiones (`Out of Scope`).
-6. `## 🗓️ Metadatos & Planificación`: Estimación, ventana temporal, fase y comando OpenSpec sugerido.
+6. `## 🗓️ Metadatos & Planificación`: Estimación, ventana temporal, fase y notas de planificación.
 7. `## ❓ Preguntas / Decisiones Abiertas`: Dudas técnicas o de negocio no resueltas.
 
 ### Paso 5: Puerta de Revisión Interactiva (Safe Review Gate)
@@ -84,13 +84,6 @@ Una vez confirmado por el usuario:
 - **Linear:** Ejecutar Linear MCP `save_issue({ id: "<id>", description: "<markdown>" })`.
 - **GitHub:** Ejecutar `gh issue edit <id> --body-file <temp-file>`.
 - **Manual:** Presentar el bloque de código Markdown listo para copiar y pegar en Jira, Notion u otro sistema.
-
-### Paso 7: Continuidad hacia OpenSpec
-Indicar al usuario cómo proceder cuando decida implementar la tarea:
-```text
-Cuando estés listo para implementar este cambio, ejecuta:
-/openspec-propose <slug-del-issue>
-```
 
 ---
 
@@ -106,5 +99,5 @@ Cuando estés listo para implementar este cambio, ejecuta:
 
 ## 📚 Referencias
 
-- [Plantilla Estándar de Issue Triage](references/issue-template.md): Definición canónica de las 7 secciones y mapeo 1:1 hacia artefactos de OpenSpec.
+- [Plantilla Estándar de Issue Triage](references/issue-template.md): Definición canónica de las 7 secciones y ejemplo completo.
 - [Guía de Adaptadores de Proveedores](references/adapters.md): Comandos y llamadas MCP para Linear, GitHub y modo manual.
