@@ -130,8 +130,8 @@
     },
     {
       "name": "nextjs-architecture",
-      "version": "1.1.1",
-      "description": "Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions, hooks con TanStack Query, componentes FormDialog y testing con cobertura >= 90%.",
+      "version": "1.2.0",
+      "description": "Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions con Zod, hooks con TanStack Query, FormDialog, linting con OXC y testing con Vitest + SWC (>= 90%) y Playwright E2E.",
       "category": "architecture",
       "path": "skills/architecture/nextjs-architecture/SKILL.md",
       "readme": "skills/architecture/nextjs-architecture/README.md",
@@ -142,7 +142,11 @@
         "frontend",
         "app-router",
         "tanstack-query",
-        "form-dialog"
+        "form-dialog",
+        "vitest",
+        "playwright",
+        "oxc",
+        "swc"
       ],
       "agents": [
         "antigravity",
@@ -159,7 +163,8 @@
         "nextjs form dialog",
         "arquitectura nextjs",
         "crear feature nextjs",
-        "estructurar nextjs"
+        "estructurar nextjs",
+        "nextjs vitest playwright"
       ],
       "requires": []
     },

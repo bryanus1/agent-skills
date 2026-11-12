@@ -14,7 +14,7 @@ flowchart TD
     B -- "Sí" --> C["Reutilizar o Extender\nel Componente Existente"]
     B -- "No" --> D{"Nivel 2: ¿Existe en la\nlibrería base (shadcn/ui)?"}
     D -- "Sí" --> E["Instalar vía CLI:\npnpm dlx shadcn@latest add <name>\ny adaptar estilos de tokens"]
-    D -- "No" --> F["Nivel 3: Crear Componente Custom\ncon subcarpeta encapsulada,\nTSDoc y test colocated"]
+    D -- "No" --> F["Nivel 3: Crear Componente Custom\ncon subcarpeta encapsulada,\nTSDoc y test con Vitest"]
 ```
 
 1. **Nivel 1 — Comprobar componentes existentes**:
@@ -32,12 +32,71 @@ flowchart TD
 
 Todos los formularios modales de creación, edición, confirmación o envío de entidades deben estructurarse bajo el patrón **FormDialog**.
 
-### 2.1 Contenedor Base Reutilizable (`src/components/common/form-dialog/`)
-El contenedor `FormDialog` envuelve la primitiva modal de la aplicación (`Dialog` de `shadcn/ui`) y expone:
-- Soporte para estado controlado (`open`, `onOpenChange`) y no controlado.
-- Encabezado con título descriptivo, subtítulo/descripción e icono opcional (`icon?: React.ReactNode`).
-- Viewport scrollable y responsivo con altura máxima controlada (`max-h-[90vh] overflow-y-auto`).
-- Renderizado de disparador condicional (`trigger?: React.ReactNode | null`). Cuando se gestiona externamente desde tablas o botones padre, se pasa `trigger={null}`.
+### 2.1 Contenedor Base Reutilizable (`src/components/common/form-dialog/form-dialog.tsx`)
+El contenedor `FormDialog` envuelve la primitiva `Dialog` de `shadcn/ui`:
+
+```tsx
+'use client';
+
+import React from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+
+/**
+ * Propiedades para {@link FormDialog}.
+ */
+export interface IFormDialogProps {
+  /** Título principal del encabezado modal. */
+  readonly title: string;
+  /** Subtítulo o instrucciones opcionales del modal. */
+  readonly description?: string;
+  /** Icono decorativo opcional en el encabezado. */
+  readonly icon?: React.ReactNode;
+  /** Estado de apertura en modo controlado. */
+  readonly open?: boolean;
+  /** Callback al cambiar el estado de apertura. */
+  readonly onOpenChange?: (open: boolean) => void;
+  /** Elemento disparador opcional; pasar null cuando se controla desde el padre. */
+  readonly trigger?: React.ReactNode | null;
+  /** Contenido del formulario dentro del modal. */
+  readonly children: React.ReactNode;
+}
+
+/**
+ * Contenedor modal estandarizado para formularios de creación y edición.
+ */
+export function FormDialog({
+  title,
+  description,
+  icon,
+  open,
+  onOpenChange,
+  trigger,
+  children,
+}: Readonly<IFormDialogProps>): React.JSX.Element {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            {icon}
+            <span>{title}</span>
+          </DialogTitle>
+          {description ? <DialogDescription>{description}</DialogDescription> : null}
+        </DialogHeader>
+        {children}
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
 
 ### 2.2 Subcarpeta de Entidad `*-form-dialog`
 Cada formulario modal de entidad reside en su subcarpeta dedicada terminada en `-form-dialog` dentro de la feature:
@@ -49,22 +108,86 @@ src/features/billing/components/invoice-form-dialog/
 └── invoice-form-dialog.tsx
 ```
 
-### 2.3 Reglas del Patrón `*-form-dialog`:
-1. **Interface de Props**: Nombrada como `I<Entity>FormDialogProps`:
+### 2.3 Conexión Completa: `FormDialog` + Esquema Zod + Hook
+1. **Interface de Props (`I<Entity>FormDialogProps`)**:
    ```tsx
+   'use client';
+
+   import React, { useState } from 'react';
+   import { FormDialog } from '@/components/common/form-dialog';
+   import { useCreateInvoice } from '@/features/billing/hooks/use-create-invoice';
+   import type { IInvoice } from '@/features/billing/models';
+   import { createInvoiceSchema } from '@/features/billing/schemas';
+
    export interface IInvoiceFormDialogProps {
      /** Controla la visibilidad del modal en modo controlado. */
      readonly open?: boolean;
      /** Callback ejecutado al cambiar el estado de apertura. */
      readonly onOpenChange?: (open: boolean) => void;
+     /** Disparador opcional; null cuando se abre desde una tabla o estado padre. */
+     readonly trigger?: React.ReactNode | null;
      /** Entidad opcional para modo edición. Si es null/undefined, opera en modo creación. */
      readonly initialData?: IInvoice | null;
      /** Callback al completar exitosamente la operación. */
      readonly onSuccess?: () => void;
    }
+
+   export function InvoiceFormDialog({
+     open,
+     onOpenChange,
+     trigger,
+     initialData,
+     onSuccess,
+   }: Readonly<IInvoiceFormDialogProps>): React.JSX.Element {
+     const { execute, isPending } = useCreateInvoice();
+     const [error, setError] = useState<string | null>(null);
+
+     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+       event.preventDefault();
+       const formData = new FormData(event.currentTarget);
+       const parsed = createInvoiceSchema.safeParse({
+         customerId: formData.get('customerId'),
+         amount: formData.get('amount'),
+         currency: formData.get('currency') ?? 'USD',
+       });
+
+       if (!parsed.success) {
+         setError(parsed.error.issues[0]?.message ?? 'Datos inválidos');
+         return;
+       }
+
+       setError(null);
+       execute(parsed.data, () => {
+         onOpenChange?.(false);
+         onSuccess?.();
+       });
+     };
+
+     return (
+       <FormDialog
+         title={initialData ? 'Editar Factura' : 'Nueva Factura'}
+         description="Completa los datos fiscales de la factura."
+         open={open}
+         onOpenChange={onOpenChange}
+         trigger={trigger}
+       >
+         <form onSubmit={handleSubmit} className="space-y-4 py-2">
+           {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
+           {/* Campos del formulario o subcomponente presentacional */}
+           <div className="flex justify-end gap-2 pt-4">
+             <button type="button" onClick={() => onOpenChange?.(false)} className="px-4 py-2 text-sm border rounded-md">
+               Cancelar
+             </button>
+             <button type="submit" disabled={isPending} className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md">
+               Guardar
+             </button>
+           </div>
+         </form>
+       </FormDialog>
+     );
+   }
    ```
-2. **Desacoplamiento con Custom Hook**: La lógica del formulario (validación con Zod, estado reactivo, llamada al servicio y toasts) se extrae a un hook adyacente (`use-invoice-form.hook.ts`).
-3. **Subformularios Presentacionales**: Si el formulario es extenso o tiene múltiples pasos, el diálogo delega la vista a un componente de formulario puro (`invoice-form.tsx`), manteniendo el diálogo enfocado en el ciclo de vida del modal.
+2. **Subformularios Presentacionales**: Si el formulario es extenso o tiene múltiples pasos, el diálogo delega los campos a un componente presentacional puro (`invoice-form.tsx`), manteniendo el diálogo enfocado en el ciclo de vida del modal.
 
 ---
 

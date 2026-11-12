@@ -3,20 +3,32 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Estructura la feature de facturación (billing) en mi app Next.js con Screaming Architecture y archivos iniciales.",
-      "expected_output": "El agente ejecuta scaffold-feature.mjs billing --with-starter (primero con --dry-run). Crea src/features/billing/ con components, hooks, models, schemas, screens, services y utils, un modelo plano models/billing.ts con su barrel y la screen encapsulada screens/billing-home/ con test e index.ts. No crea index.ts en la raíz de la feature ni en components/.",
+      "prompt": "Estructura la feature de facturación (billing) en mi app Next.js con Screaming Architecture, archivos iniciales y su página en el App Router.",
+      "expected_output": "El agente ejecuta scaffold-feature.mjs billing --with-starter --with-route (primero con --dry-run). Crea src/features/billing/ con components, hooks, models, schemas, screens, services y utils, un modelo plano models/billing.ts con su barrel, la screen encapsulada screens/billing-home/ con test en Vitest e index.ts, y la página delgada src/app/billing/page.tsx. No crea index.ts en la raíz de la feature ni en components/.",
       "files": []
     },
     {
       "id": 2,
       "prompt": "Crea un diálogo modal para crear facturas dentro de la feature billing.",
-      "expected_output": "El agente usa scaffold-component.mjs create-invoice-dialog --target-dir src/features/billing/components --type dialog. Genera el componente basado en FormDialog con TSDoc, su test adyacente y un index.ts en la carpeta hoja.",
+      "expected_output": "El agente usa scaffold-component.mjs invoice-form-dialog --target-dir src/features/billing/components --type dialog. Genera el componente 'use client' basado en FormDialog con TSDoc, su test adyacente usando Vitest (vi.fn()) y un index.ts en la carpeta hoja.",
       "files": []
     },
     {
       "id": 3,
-      "prompt": "Revisa estos imports: `import { usePetSearch, IPet } from '@/features/pets';` y `import { InvoiceCard } from '@/features/pets/components';`",
-      "expected_output": "El agente señala que ambos importan desde carpetas contenedoras sin barrel (política de barrels solo en carpetas hoja) y los reescribe: '@/features/pets/hooks/use-pet-search', '@/features/pets/models' y '@/features/pets/components/invoice-card'. Indica eliminar cualquier index.ts de carpetas contenedoras.",
+      "prompt": "Revisa estos imports: `import { usePetSearch, IPet } from '@/features/pets';`, `import { InvoiceCard } from '@/features/pets/components';` y `import { parsePetFilters } from '@/features/pets/utils/parse-pet-filters';`",
+      "expected_output": "El agente señala que los dos primeros importan desde carpetas contenedoras sin barrel y el tercero salta el barrel de la carpeta hoja utils/. Los reescribe apuntando a las carpetas hoja con index.ts: '@/features/pets/hooks/use-pet-search', '@/features/pets/models', '@/features/pets/components/invoice-card' y '@/features/pets/utils'. Indica eliminar cualquier index.ts de carpetas contenedoras.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Implementa una Server Action para crear facturas en la feature billing junto con su esquema de validación y su hook para usarla desde un formulario.",
+      "expected_output": "El agente define el esquema plano en src/features/billing/schemas/create-invoice.schema.ts y lo reexporta en schemas/index.ts (sin test). Crea el servicio encapsulado en src/features/billing/services/create-invoice/create-invoice.service.ts con 'use server', validando con createInvoiceSchema.safeParse(input) en el servidor antes de llamar a fetch/DB y ejecutando revalidatePath, junto con create-invoice.service.test.ts (Vitest) e index.ts. Crea el hook en src/features/billing/hooks/use-create-invoice/ con useTransition, su test e index.ts, usando imports con alias '@/features/billing/...'.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Configura el entorno de testing y linting para nuestra app Next.js siguiendo la arquitectura del proyecto.",
+      "expected_output": "El agente configura Vitest con @vitejs/plugin-react-swc, entorno jsdom y @vitest/coverage-v8 con umbrales >= 90% y exclusiones explícitas para src/app/**, src/config/**, **/models/**, **/schemas/** e **/index.ts. Configura Playwright en e2e/<feature>.spec.ts para probar las rutas delgadas de src/app/** y OXC (.oxlintrc.json) con plugins typescript, react, nextjs, jsx-a11y, import y vitest.",
       "files": []
     }
   ]
