@@ -41,8 +41,8 @@
     },
     {
       "name": "monorepo-architecture",
-      "version": "1.0.1",
-      "description": "Estándar de monorepo con pnpm workspaces y Turborepo para una web Next.js y una API NestJS: estructura apps/ y packages/, paquetes internos compilados, contratos compartidos (Zod u OpenAPI), límites de dependencias verificables y scaffolding de features full-stack.",
+      "version": "2.0.0",
+      "description": "Estándar de monorepo con pnpm workspaces, Turborepo y OXC para apps web (Next.js), API (NestJS), mobile (Expo), landing (Astro), workers y servicios políglotas: paquetes compilados, design tokens, contratos Zod/OpenAPI, límites por plataforma y scaffolding multi-app.",
       "category": "architecture",
       "path": "skills/architecture/monorepo-architecture/SKILL.md",
       "readme": "skills/architecture/monorepo-architecture/README.md",
@@ -53,6 +53,10 @@
         "workspaces",
         "nextjs",
         "nestjs",
+        "expo",
+        "react-native",
+        "astro",
+        "oxc",
         "architecture",
         "fullstack"
       ],
@@ -73,11 +77,15 @@
         "shared package",
         "feature full-stack",
         "límites de módulos",
-        "module boundaries"
+        "module boundaries",
+        "monorepo mobile web api landing",
+        "agregar app al monorepo"
       ],
       "requires": [
+        "astro-architecture",
         "nestjs-architecture",
-        "nextjs-architecture"
+        "nextjs-architecture",
+        "react-native-architecture"
       ]
     },
     {

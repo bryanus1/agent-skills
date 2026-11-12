@@ -9,15 +9,32 @@
 packages:
   - "apps/*"
   - "packages/*"
+  - "services/*"   # opcional, cuando existen servicios políglotas
 ```
 
-- **Dependencias internas:** siempre con el protocolo `workspace:*`. pnpm enlaza la carpeta local y al publicar lo sustituye por la versión real.
+- **Dependencias internas:** siempre con el protocolo `workspace:*`.
   ```bash
   pnpm --filter web add @acme/contracts@workspace:*
+  pnpm --filter mobile add @acme/design-tokens@workspace:*
   ```
-- **Dependencias externas:** se añaden al workspace que las usa (`pnpm --filter api add @nestjs/swagger`), no a la raíz. La raíz solo tiene tooling global: `turbo` y `typescript`.
-- **Versión de pnpm:** `packageManager` en el `package.json` raíz la fija, y Corepack y Turborepo 2 la exigen. `engine-strict=true` en `.npmrc` hace cumplir `engines.node`.
-- **Scripts de build de dependencias:** pnpm 10 no ejecuta por defecto los scripts `postinstall` de las dependencias. Si alguna los necesita (p. ej. `esbuild`, `@prisma/client`), apruébalos con `pnpm approve-builds` y confírmalo con el usuario.
+- **Dependencias externas:** añádelas al workspace que las usa (`pnpm --filter api add @nestjs/swagger`, `pnpm --filter mobile add expo-secure-store`), no a la raíz. La raíz solo lleva tooling global (`turbo`, `typescript`, `oxlint`, `oxfmt`).
+- **Versión de pnpm:** `packageManager` en el `package.json` raíz la fija (`Corepack` y `Turborepo 2` la exigen). `engine-strict=true` en `.npmrc` hace cumplir `engines.node`.
+- **Scripts postinstall en pnpm 10:** pnpm 10 bloquea por defecto `postinstall` de dependencias (`esbuild`, `sharp`, `@prisma/client`). Si una app los necesita, apruébalos con `pnpm approve-builds` tras confirmar con el usuario.
+
+### Consideraciones Especiales para Expo / React Native (`apps/mobile`)
+
+Metro y pnpm requieren evitar copias duplicadas de `react` / `react-native` y habilitar resolución de `exports`:
+
+1. **`.npmrc` en la raíz** (generado automáticamente por `scaffold-monorepo.mjs --apps ...,mobile`):
+   ```ini
+   engine-strict=true
+   public-hoist-pattern[]=*react*
+   public-hoist-pattern[]=*expo*
+   ```
+2. **`apps/mobile/metro.config.js`** (generado por `scaffold-app.mjs mobile --type mobile`):
+   - `config.watchFolders = [monorepoRoot]` para vigilar cambios en `packages/*/dist`.
+   - `config.resolver.nodeModulesPaths` apuntando tanto a `apps/mobile/node_modules` como a `<root>/node_modules`.
+   - `config.resolver.unstable_enablePackageExports = true` para respetar `exports` de `@acme/contracts`, `@acme/api-client` y `@acme/design-tokens`.
 
 ---
 
@@ -27,41 +44,48 @@ packages:
 {
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
-    "build": { "dependsOn": ["^build"], "outputs": ["dist/**", ".next/**", "!.next/cache/**"] },
+    "build": {
+      "dependsOn": ["^build"],
+      "env": ["NEXT_PUBLIC_API_URL", "EXPO_PUBLIC_API_URL", "PUBLIC_API_URL", "PUBLIC_SITE_URL"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**", ".astro/**", ".expo/**"]
+    },
     "dev": { "dependsOn": ["^build"], "cache": false, "persistent": true },
     "lint": { "dependsOn": ["^build"] },
+    "format:check": {},
     "typecheck": { "dependsOn": ["^build"] },
     "test": { "dependsOn": ["^build"], "outputs": ["coverage/**"] }
   }
 }
 ```
 
-- **`^build`:** antes de la tarea de un workspace, compila sus dependencias internas. Es lo que permite consumir `dist/` de los paquetes.
-- **`outputs`:** lo que Turborepo guarda en caché y restaura. Si falta, los builds cacheados no restauran archivos.
-- **`dev`:** es persistente y no se cachea. `dependsOn: ["^build"]` compila los paquetes una vez; para recompilarlos en caliente, ejecuta también su `dev` (`tsc --watch`).
+- **`^build`:** compila los paquetes internos en `dist/` antes de ejecutar `build`, `lint`, `typecheck` o `test` de los consumidores.
+- **`outputs`:** incluye `.next/**` (Next.js), `dist/**` (paquetes, NestJS, Astro, Vite, Worker) y `.expo/**` (Expo).
+- **OXC en Turborepo:** `oxlint` y `oxfmt` corren en milisegundos por workspace; `lint` depende de `^build` para que los tipos compilados de `packages/*` estén listos al validar imports.
+- **`dev`:** ejecuta primero `^build`. Si editas paquetes internos en paralelo mientras corres Next.js, Astro o Expo, ejecuta también su watch (`pnpm --filter @acme/contracts dev`).
 
 ---
 
 ## 3. Filtros Útiles
 
 ```bash
-pnpm turbo run build --filter web             # solo la web
-pnpm turbo run build --filter web...          # la web y todo lo que necesita
-pnpm turbo run test --filter ...@acme/contracts   # contracts y todo lo que depende de él
-pnpm turbo run lint --filter '[origin/main]'  # solo workspaces cambiados desde main
-pnpm --filter @acme/contracts build           # script directo, sin turbo ni caché
+pnpm turbo run build --filter web                  # solo Next.js web
+pnpm turbo run build --filter landing...           # Astro landing y sus dependencias internas
+pnpm turbo run typecheck --filter mobile...        # Expo mobile y sus paquetes
+pnpm turbo run test --filter ...@acme/contracts    # contracts y todas las apps que dependen de él
+pnpm turbo run lint --filter '[origin/main]'       # solo workspaces modificados respecto a main
 ```
 
 ---
 
-## 4. Variables de Entorno
+## 4. Variables de Entorno por Plataforma
 
-- **Declaración:** las variables que afectan a un build se declaran en la tarea (`"env": ["NEXT_PUBLIC_API_URL"]`) o en `globalEnv`. Si no, la caché puede servir un build hecho con otro valor.
-- **Archivos:** cada app carga su propio `.env`: Next desde `apps/web/.env.local` y Nest con `@nestjs/config` desde `apps/api/.env`. Nunca pongas secretos en `packages/`.
-
-```json
-{ "tasks": { "build": { "dependsOn": ["^build"], "env": ["NEXT_PUBLIC_API_URL"], "outputs": ["dist/**", ".next/**", "!.next/cache/**"] } } }
-```
+| App | Prefijo público (cliente) | Archivo local | Regla en `turbo.json` |
+| :--- | :--- | :--- | :--- |
+| `apps/web` (Next.js) | `NEXT_PUBLIC_*` | `apps/web/.env.local` | Declarar en `tasks.build.env` |
+| `apps/mobile` (Expo) | `EXPO_PUBLIC_*` | `apps/mobile/.env` | Declarar en `tasks.build.env` |
+| `apps/landing` (Astro) | `PUBLIC_*` | `apps/landing/.env` | Declarar en `tasks.build.env` |
+| `apps/admin` (Vite SPA) | `VITE_*` | `apps/admin/.env` | Declarar en `tasks.build.env` |
+| `apps/api` / `worker` | Sin prefijo público | `apps/api/.env` | Secretos solo en servidor, nunca en `packages/` |
 
 ---
 
@@ -69,8 +93,9 @@ pnpm --filter @acme/contracts build           # script directo, sin turbo ni cac
 
 | Síntoma | Causa | Solución |
 | :--- | :--- | :--- |
-| `Cannot find module '@acme/contracts/invoices'` | El paquete no está compilado, o falta la entrada en `exports` | `pnpm turbo run build --filter @acme/contracts`; revisa `exports` |
-| El import funciona en la web y falla en la API | La API usa `moduleResolution: node10`, que ignora `exports` | Extiende `@acme/tsconfig/nestjs.json` (Node16) |
-| `Could not resolve workspace protocol` | La dependencia `workspace:*` apunta a un nombre que no existe | Comprueba el `name` del paquete |
-| Turborepo pide `packageManager` | Falta el campo en el `package.json` raíz | Añade `"packageManager": "pnpm@<versión>"` |
-| Caché con resultados obsoletos | Faltan `outputs` o `env` en la tarea | Decláralos y ejecuta `turbo run <task> --force` una vez |
+| `Cannot find module '@acme/contracts/invoices'` | Paquete sin compilar o falta entrada en `exports` | `pnpm turbo run build --filter @acme/contracts` y revisa `exports` |
+| Metro (Expo) no resuelve `@acme/contracts/invoices` | Falta `watchFolders` o `unstable_enablePackageExports` | Regenera `apps/mobile/metro.config.js` con `scaffold-app.mjs` |
+| `Invalid hook call` en Expo dentro del monorepo | Hay dos copias de `react` en `node_modules` | Añade `public-hoist-pattern[]=*react*` en `.npmrc` y re-instala |
+| Astro falla al importar un paquete interno en SSR | `exports` apunta a `src/` o Vite necesita pre-bundling | Compila a `dist/` y mantén `exports` estándar (`types` + `default`) |
+| La API falla resolviendo subpaths | `tsconfig` de la API usa `moduleResolution: node10` | Extiende `@acme/tsconfig/nestjs.json` (`Node16`) |
+| Caché con resultados obsoletos | Faltan `outputs` o `env` en `turbo.json` | Decláralos y ejecuta `turbo run <task> --force` una vez |
