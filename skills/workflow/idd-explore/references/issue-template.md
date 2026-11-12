@@ -1,6 +1,6 @@
-# Plantilla Estándar de Issue Triage
+# Plantilla de la Ficha (IDD Explore)
 
-Esta plantilla define la estructura canónica que genera la skill `issue-triage` para documentar issues en cualquier tracker (Linear, GitHub, GitLab, Jira) o notas locales.
+Esta plantilla define la estructura canónica que genera la skill `idd-explore` para documentar issues en cualquier tracker (Linear, GitHub, GitLab, Jira) o notas locales.
 
 ---
 

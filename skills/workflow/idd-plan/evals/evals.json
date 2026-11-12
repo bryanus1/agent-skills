@@ -1,0 +1,35 @@
+{
+  "skill_name": "idd-plan",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Planifica el issue #42 de GitHub. Ya tiene la ficha de triage: exportar facturas a CSV con los mismos filtros del listado.",
+      "expected_output": "El agente lee el issue con gh issue view, reutiliza la ficha existente, explora el repo en solo lectura para encontrar el controlador y los servicios de facturas, y redacta el plan con requisitos DEBE y escenarios Dado/Cuando/Entonces, diseño, archivos verificados, tareas enlazadas a requisitos y verificación con comandos reales. Muestra el plan, pide confirmación y solo entonces añade la sección 🛠️ Plan de Implementación al cuerpo del issue con gh issue edit --body-file, conservando la ficha. No edita código y termina sugiriendo idd-apply.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Haz el plan de implementación de esta página de Notion: https://www.notion.so/acme/Recordatorios-por-email-9f8e7d6c5b4a",
+      "expected_output": "El agente lee la página con notion-fetch, explora el repo sin modificarlo, pregunta solo dudas que cambian el alcance (por ejemplo, el proveedor de email si no está en el repo), genera el plan completo según la plantilla y, tras confirmación, lo escribe en la misma página con notion-update-page. No crea un .md local ni empieza a implementar.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "No uso ningún gestor de tareas. Planifica esto: añadir modo oscuro a la app respetando la preferencia del sistema.",
+      "expected_output": "El agente comprueba que no hay tracker disponible, explora el repo para localizar el sistema de estilos y temas, genera el plan con requisitos y escenarios verificables, lo muestra y, al confirmar, lo guarda en docs/specs/<YYYY-MM-DD>-modo-oscuro.md con la sección 🛠️ Plan de Implementación. Se detiene sin escribir código.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Planifica el issue #77: cambiar el texto del botón 'Enviar' a 'Guardar cambios' en el formulario de perfil.",
+      "expected_output": "El agente reconoce que es un cambio pequeño (un módulo, pocas tareas, sin cambios de datos ni API) y genera un plan corto: Contexto, un requisito con escenario, 1–3 tareas y Verificación, sin las secciones de diseño, fuera de alcance ni supuestos. Lo muestra, pide confirmación y lo guarda en el issue. No edita código.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Planifica ENG-300: migrar toda la autenticación a OAuth, añadir 2FA, rehacer la pantalla de login y el panel de sesiones activas.",
+      "expected_output": "El agente detecta que el cambio contiene varios entregables independientes y que superaría unas 12 tareas, y propone dividirlo en varios ítems (uno por entregable) antes de redactar un plan único. No crea los ítems ni escribe en Linear sin la confirmación del usuario.",
+      "files": []
+    }
+  ]
+}

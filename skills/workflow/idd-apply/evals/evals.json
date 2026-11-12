@@ -1,0 +1,29 @@
+{
+  "skill_name": "idd-apply",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Aplica el plan. No uso tracker; el plan está en docs/specs/2026-11-12-exportar-csv.md.",
+      "expected_output": "El agente lee la sección 🛠️ Plan de Implementación del archivo, valida que tenga requisitos con escenarios, tareas y verificación, muestra las tareas pendientes, cambia el estado a en progreso y ejecuta las tareas en orden con cambios mínimos, verificando cada una y marcando - [x] en el mismo archivo. Al final ejecuta la sección Verificación, muestra el resumen y, con confirmación, deja Estado: implementado. No hace commit.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Implementa el plan del issue #42. Ojo: creo que el helper toCsv ya no existe.",
+      "expected_output": "El agente lee el plan y los comentarios del issue con gh issue view --comments, comprueba en el repo que toCsv no existe y se detiene antes de esa tarea para proponer un ajuste (crear el helper o usar otra utilidad). Tras la confirmación, registra la desviación en el siguiente comentario de progreso (gh issue comment --body-file) y continúa. Durante la implementación no edita el cuerpo del issue; solo al cerrar, con confirmación, consolida el plan (casillas, desviación y Estado: implementado). No cierra el issue.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Implementa ENG-210 en Linear.",
+      "expected_output": "El agente lee el issue con get_issue y detecta que no tiene una sección 🛠️ Plan de Implementación (o que le faltan tareas o verificación). No escribe código: explica qué falta y sugiere generar el plan con idd-plan primero.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Continúa con el plan de ENG-104, ayer dejé la mitad.",
+      "expected_output": "El agente lee la descripción con get_issue y los comentarios con list_comments; toma como hechas las tareas que aparecen en los comentarios 🔄 Progreso IDD aunque el cuerpo siga en - [ ], y continúa desde la primera tarea realmente pendiente. Publica el avance con save_comment y no reescribe la descripción hasta el cierre.",
+      "files": []
+    }
+  ]
+}

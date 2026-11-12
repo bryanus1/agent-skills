@@ -36,8 +36,18 @@ Diseñado bajo el principio de **Progressive Disclosure**:
 | **[`git-cleanup`](skills/git/git-cleanup/README.md)** | `git` | `1.0.0` | Todos | Limpieza segura de ramas locales de Git tras fusionar PRs (Squash/Merge). Protege ramas principales (main/master/develop), detecta ramas eliminadas en origin y elimina ramas obsoletas sin falsos negativos. |
 | **[`ssh-connect`](skills/tooling/ssh-connect/README.md)** | `tooling` | `1.0.0` | Todos | Gestión, conexión y ejecución remota en servidores SSH con ssh-connect. Soporta llaves .pem con permisos asegurados, contraseñas automatizadas (Keychain) y multiplexación persistente sin bloqueos de TTY. |
 | **[`ts-import-organizer`](skills/tooling/ts-import-organizer/README.md)** | `tooling` | `1.1.1` | Todos | Organiza imports en TypeScript/JavaScript (.ts, .tsx, .js, .jsx). Se aplica siempre DESPUÉS de formatear el código. Agrupa: builtins → externos → path aliases → side-effects. Ordena líneas y miembros ({ ... }) por longitud, elimina unused y convierte rutas relativas a aliases. Activa al ordenar imports o escribir código. |
-| **[`issue-triage`](skills/workflow/issue-triage/README.md)** | `workflow` | `1.0.2` | Todos | Refina issues de Linear o GitHub con solo título o notas desestructuradas. Explora el repo local, extrae restricciones y reglas, preserva estimaciones y fechas, y actualiza la descripción con una especificación técnica estructurada. |
+| **[`idd-apply`](skills/workflow/idd-apply/README.md)** | `workflow` | `1.0.0` | Todos | Fase Apply del flujo IDD (Issue-Driven Development). Implementa el plan guardado en Notion, Linear, GitHub Issues/Projects o un .md local: ejecuta las tareas en orden, marca cada casilla al verificarla, se detiene ante desviaciones y cierra con la verificación del plan. |
+| **[`idd-explore`](skills/workflow/idd-explore/README.md)** | `workflow` | `2.0.0` | Todos | Fase Explore del flujo IDD (Issue-Driven Development). Refina issues de Notion, Linear, GitHub Issues/Projects o notas locales con solo título o ideas sueltas: explora el repo, extrae restricciones y reglas, preserva estimaciones y deja una ficha lista para idd-plan. |
+| **[`idd-plan`](skills/workflow/idd-plan/README.md)** | `workflow` | `1.0.0` | Todos | Fase Plan del flujo IDD (Issue-Driven Development). Convierte un ítem de Notion, Linear, GitHub Issues/Projects o un .md local en un plan de implementación detallado: requisitos con escenarios, diseño, archivos verificados, tareas y verificación. No toca código. |
 <!-- catalog-table:end -->
+
+### 🧭 Flujo IDD (Issue-Driven Development)
+
+Tres skills ligeras, solo Markdown, inspiradas en Spec-Driven Development: **`idd-explore`** (refina el requerimiento) → **`idd-plan`** (plan detallado con requisitos, escenarios, tareas y verificación) → **`idd-apply`** (implementa y marca las tareas). Cada cambio vive en un solo lugar: el ítem de tu tracker (Notion, Linear, GitHub Issues/Projects) o, si no usas ninguno, `docs/specs/<YYYY-MM-DD>-<slug>.md`.
+
+```bash
+npx skills add bryanus1/agent-skills --skill idd-explore --skill idd-plan --skill idd-apply
+```
 
 ---
 
@@ -91,7 +101,7 @@ agent-skills/
 │   ├── architecture/            # monorepo, nestjs, nextjs, react-native
 │   ├── git/                     # git-cleanup, gh-cli
 │   ├── tooling/                 # ts-import-organizer, ssh-connect
-│   └── workflow/                # issue-triage
+│   └── workflow/                # idd-explore, idd-plan, idd-apply (flujo IDD)
 ├── catalog/
 │   └── catalog.json             # Índice de skills generado por `pnpm catalog`
 ├── scripts/                     # Herramientas de automatización y validación del hub

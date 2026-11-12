@@ -373,20 +373,58 @@
       "requires": []
     },
     {
-      "name": "issue-triage",
-      "version": "1.0.2",
-      "description": "Refina issues de Linear o GitHub con solo título o notas desestructuradas. Explora el repo local, extrae restricciones y reglas, preserva estimaciones y fechas, y actualiza la descripción con una especificación técnica estructurada.",
+      "name": "idd-apply",
+      "version": "1.0.0",
+      "description": "Fase Apply del flujo IDD (Issue-Driven Development). Implementa el plan guardado en Notion, Linear, GitHub Issues/Projects o un .md local: ejecuta las tareas en orden, marca cada casilla al verificarla, se detiene ante desviaciones y cierra con la verificación del plan.",
       "category": "workflow",
-      "path": "skills/workflow/issue-triage/SKILL.md",
-      "readme": "skills/workflow/issue-triage/README.md",
+      "path": "skills/workflow/idd-apply/SKILL.md",
+      "readme": "skills/workflow/idd-apply/README.md",
       "tags": [
         "workflow",
-        "project-management",
-        "issue-tracking",
+        "idd",
+        "sdd",
+        "implementation",
         "linear",
-        "github-issues",
+        "notion",
+        "github-issues"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "aplica el plan",
+        "implementa el plan",
+        "apply plan",
+        "implement the plan",
+        "continúa el plan",
+        "idd apply"
+      ],
+      "requires": [
+        "idd-explore",
+        "idd-plan"
+      ]
+    },
+    {
+      "name": "idd-explore",
+      "version": "2.0.0",
+      "description": "Fase Explore del flujo IDD (Issue-Driven Development). Refina issues de Notion, Linear, GitHub Issues/Projects o notas locales con solo título o ideas sueltas: explora el repo, extrae restricciones y reglas, preserva estimaciones y deja una ficha lista para idd-plan.",
+      "category": "workflow",
+      "path": "skills/workflow/idd-explore/SKILL.md",
+      "readme": "skills/workflow/idd-explore/README.md",
+      "tags": [
+        "workflow",
+        "idd",
+        "sdd",
+        "issue-tracking",
         "triage",
-        "specification"
+        "specification",
+        "linear",
+        "notion",
+        "github-issues"
       ],
       "agents": [
         "antigravity",
@@ -401,10 +439,47 @@
         "refine issue",
         "analizar ticket",
         "preparar ticket",
+        "explorar requerimiento",
         "linear triage",
-        "github issue triage"
+        "github issue triage",
+        "idd explore"
       ],
       "requires": []
+    },
+    {
+      "name": "idd-plan",
+      "version": "1.0.0",
+      "description": "Fase Plan del flujo IDD (Issue-Driven Development). Convierte un ítem de Notion, Linear, GitHub Issues/Projects o un .md local en un plan de implementación detallado: requisitos con escenarios, diseño, archivos verificados, tareas y verificación. No toca código.",
+      "category": "workflow",
+      "path": "skills/workflow/idd-plan/SKILL.md",
+      "readme": "skills/workflow/idd-plan/README.md",
+      "tags": [
+        "workflow",
+        "idd",
+        "sdd",
+        "planning",
+        "specification",
+        "linear",
+        "notion",
+        "github-issues"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "planifica el issue",
+        "crear plan de implementación",
+        "plan this issue",
+        "spec this",
+        "idd plan"
+      ],
+      "requires": [
+        "idd-explore"
+      ]
     }
   ]
 }
