@@ -1,5 +1,5 @@
 {
-  "skill_name": "issue-triage",
+  "skill_name": "idd-explore",
   "evals": [
     {
       "id": 1,
@@ -16,7 +16,13 @@
     {
       "id": 3,
       "prompt": "Tengo un requerimiento para Jira pero no tengo integración directa configurada. Ayúdame a refinar el cálculo de métricas de retención.",
-      "expected_output": "El agente activa el adaptador manual/fallback, explora el código local para ubicar los modelos analíticos o de usuarios, genera la ficha Markdown estructurada de 7 secciones directamente en el chat y le indica al usuario que está lista para copiar y pegar en Jira.",
+      "expected_output": "El agente detecta que no hay integración con Jira, explora el código local, genera la ficha de 7 secciones, pide confirmación y la guarda en docs/specs/<YYYY-MM-DD>-<slug>.md, mostrando además el bloque Markdown listo para copiar en Jira.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Explora este requerimiento de Notion y déjalo listo para planificar: https://www.notion.so/acme/Exportar-reportes-a-PDF-1a2b3c4d5e6f",
+      "expected_output": "El agente lee la página con notion-fetch, explora el repo en solo lectura, arma la ficha de 7 secciones, la muestra y pide confirmación antes de escribirla en la misma página con notion-update-page. No crea un .md local y termina sugiriendo idd-plan.",
       "files": []
     }
   ]
