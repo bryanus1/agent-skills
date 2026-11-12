@@ -1,6 +1,6 @@
 # Estrategia de RBAC y Validación de Ownership
 
-Este documento establece la estrategia de seguridad de **doble barrera** en NestJS: control de acceso basado en roles (RBAC) en los controladores y validación granular de propiedad (*ownership*) en los servicios.
+Este documento establece la estrategia de seguridad de **doble barrera** en NestJS 12: guards globales (`JwtAuthGuard` → `RolesGuard`) en el perímetro HTTP y validación granular de propiedad (*ownership*) en los servicios.
 
 ---
 
@@ -8,106 +8,94 @@ Este documento establece la estrategia de seguridad de **doble barrera** en Nest
 
 ```mermaid
 flowchart TD
-    A["Petición HTTP Entrante"] --> B["Barrera 1: HTTP Route Guard\n(@Roles(Role.ADMIN, Role.USER))"]
-    B -- "Rol no autorizado" --> C["403 Forbidden\n(@ApiForbiddenResponse)"]
-    B -- "Rol permitido" --> D["Controlador Despacha a Servicio\n(pasa requesterId y requesterRole)"]
-    D --> E["Barrera 2: Service Ownership Check\n(if role !== ADMIN && entity.ownerId !== requesterId)"]
-    E -- "No es dueño" --> F["throw new ForbiddenException(...)"]
-    E -- "Dueño legítimo o Admin" --> G["Ejecuta Operación de Negocio"]
+    A["Petición HTTP Entrante"] --> B["Barrera 1A: JwtAuthGuard (APP_GUARD)\n(omitido solo con @Public())"]
+    B -- "Sin token o inválido" --> C["401 Unauthorized"]
+    B -- "Token válido (req.user)" --> D["Barrera 1B: RolesGuard (APP_GUARD)\n(@Roles(Role.ADMIN, Role.USER))"]
+    D -- "Rol no autorizado" --> E["403 Forbidden"]
+    D -- "Rol permitido" --> F["Controlador extrae @CurrentUser() / req.user"]
+    F --> G["Barrera 2: Service Ownership Check\n(create: ownerId | findAll: scope | findOne: check)"]
+    G -- "No es dueño ni ADMIN" --> H["throw new ForbiddenException(...)"]
+    G -- "Dueño legítimo o ADMIN" --> I["Ejecuta Operación de Negocio"]
 ```
 
-1. **Barrera 1 (Perímetro HTTP)**:
-   - Evaluada por `JwtAuthGuard` y `RolesGuard` de manera global.
-   - El decorador `@Roles(Role.ADMIN, Role.USER)` define qué perfiles tienen permitido invocar el endpoint a nivel macro.
-   - Si la ruta es abierta al público (ej. login o catálogo geográfico), se marca explícitamente con `@Public()`.
-2. **Barrera 2 (Capa de Servicio de Dominio)**:
-   - El controlador extrae el ID y rol del usuario autenticado (`req.user.id`, `req.user.role`) y los envía al servicio.
-   - El servicio verifica la pertenencia del recurso: un usuario común solo puede ver o modificar recursos creados por él o asignados a su cuenta.
-   - El rol `ADMIN` típicamente realiza bypass de las reglas de propiedad.
-
----
-
-## 2. Firmas Estándar de Métodos de Servicio
-
-Para soportar la auditoría y la validación de propiedad, todos los métodos del servicio deben mantener firmas consistentes:
+### Orden obligatorio de `APP_GUARD` en `AppModule`
+`JwtAuthGuard` **DEBE** registrarse antes que `RolesGuard` para que `req.user` exista cuando `RolesGuard` evalúe el rol:
 
 ```typescript
-// services/<noun>.service.ts
-
-create(dto: CreateNounDto, requesterId: string, requesterRole: Role): Promise<Noun>;
-
-findAll(query: FindNounsQueryDto, requesterId: string, requesterRole: Role): Promise<PaginatedResult<Noun>>;
-
-findOne(id: string, requesterId: string, requesterRole: Role): Promise<Noun>;
-
-update(id: string, dto: UpdateNounDto, requesterId: string, requesterRole: Role): Promise<Noun>;
-
-remove(id: string, requesterId: string, requesterRole: Role): Promise<void>;
+// src/app.module.ts
+@Module({
+  providers: [
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
+    { provide: APP_GUARD, useClass: RolesGuard },
+  ],
+})
+export class AppModule {}
 ```
 
 ---
 
-## 3. Ejemplo de Implementación en Servicio
+## 2. Piezas Compartidas en `src/common/`
+
+No dupliques `enum Role` ni decoradores dentro de cada módulo:
+
+- **`src/common/enums/role.enum.ts`**:
+  ```typescript
+  export enum Role {
+    ADMIN = 'admin',
+    STAFF = 'staff',
+    USER = 'user',
+  }
+  ```
+- **`src/common/decorators/public.decorator.ts`**: `SetMetadata(IS_PUBLIC_KEY, true)` para rutas abiertas (login, healthcheck).
+- **`src/common/decorators/roles.decorator.ts`**: `SetMetadata(ROLES_KEY, roles)`.
+- **`src/common/decorators/current-user.decorator.ts`**: `createParamDecorator` compatible con `NodeAdapter` y `ExpressAdapter` que extrae `req.user` tipado como `AuthUser`.
+
+> **Prohibido:** usar fallbacks silenciosos como `req.user?.id || 'anonymous'`. Si un endpoint no tiene `@Public()`, `JwtAuthGuard` debe rechazar con `401` antes de llegar al controlador.
+
+---
+
+## 3. Ownership Completo en Servicios (`create`, `findAll`, `findOne`, `update`, `remove`)
 
 ```typescript
-import { Injectable, Inject, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
-import { IInvoiceRepository, INVOICE_REPOSITORY_TOKEN } from '../repositories';
-import { Invoice } from '../entities';
-import { CreateInvoiceDto, UpdateInvoiceDto, FindInvoicesQueryDto } from '../dto';
+import { Inject, Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 
-export enum Role {
-  ADMIN = 'admin',
-  STAFF = 'staff',
-  CUSTOMER = 'customer',
-}
+import { Role } from '@/common/enums/role.enum';
+
+import type { Invoice } from '../entities';
+import { INVOICE_REPOSITORY_TOKEN, type IInvoiceRepository } from '../repositories';
+import type { CreateInvoiceDto, UpdateInvoiceDto, FindInvoicesQueryDto } from '../dto';
 
 @Injectable()
 export class InvoiceService {
   constructor(
     @Inject(INVOICE_REPOSITORY_TOKEN)
-    private readonly invoiceRepository: IInvoiceRepository // Inyección de contrato abstracto
+    private readonly invoiceRepository: IInvoiceRepository,
   ) {}
 
-  async findOne(id: string, requesterId: string, requesterRole: Role): Promise<Invoice> {
-    const invoice = await this.invoiceRepository.findById(id);
+  async create(dto: CreateInvoiceDto, requesterId: string, _requesterRole: string): Promise<Invoice> {
+    // El ownerId siempre proviene del usuario autenticado, nunca del body
+    return this.invoiceRepository.create({ ...dto, ownerId: requesterId });
+  }
 
+  async findAll(query: FindInvoicesQueryDto, requesterId: string, requesterRole: string) {
+    const { page = 1, limit = 20, search } = query;
+    const skip = (page - 1) * limit;
+    // Usuarios comunes solo listan sus propios registros
+    const ownerId = requesterRole === Role.ADMIN ? undefined : requesterId;
+
+    const [items, total] = await this.invoiceRepository.findMany({ skip, take: limit, search, ownerId });
+    return { items, total, page, limit };
+  }
+
+  async findOne(id: string, requesterId: string, requesterRole: string): Promise<Invoice> {
+    const invoice = await this.invoiceRepository.findById(id);
     if (!invoice) {
       throw new NotFoundException('Factura no encontrada');
     }
-
-    // Validación de propiedad: Solo ADMIN/STAFF pueden ver cualquier factura; CUSTOMER solo las suyas
-    if (requesterRole === Role.CUSTOMER && invoice.customerId !== requesterId) {
-      throw new ForbiddenException('No tienes permisos para consultar esta factura');
+    if (requesterRole !== Role.ADMIN && invoice.ownerId !== requesterId) {
+      throw new ForbiddenException('No tienes permisos para acceder a esta factura');
     }
-
     return invoice;
-  }
-
-  async update(
-    id: string,
-    dto: UpdateInvoiceDto,
-    requesterId: string,
-    requesterRole: Role
-  ): Promise<Invoice> {
-    const invoice = await this.findOne(id, requesterId, requesterRole);
-
-    // Regla de negocio: Clientes no pueden modificar facturas emitidas
-    if (requesterRole === Role.CUSTOMER) {
-      throw new ForbiddenException('Los clientes no tienen autorización para modificar facturas');
-    }
-
-    return this.invoiceRepository.update(id, dto);
-  }
-
-  async remove(id: string, requesterId: string, requesterRole: Role): Promise<void> {
-    const invoice = await this.findOne(id, requesterId, requesterRole);
-
-    // Solo ADMIN puede eliminar facturas del sistema
-    if (requesterRole !== Role.ADMIN) {
-      throw new ForbiddenException('Solo los administradores pueden anular o eliminar registros contables');
-    }
-
-    await this.invoiceRepository.remove(id);
   }
 }
 ```
@@ -116,8 +104,10 @@ export class InvoiceService {
 
 ## 4. Respuestas y Excepciones HTTP Estándar
 
-| Excepción | Código HTTP | Mensaje Recomendado | Cuándo Lanzar |
-| :--- | :---: | :--- | :--- |
-| `NotFoundException` | `404` | `'<Recurso> no encontrado'` | Cuando el ID buscado no existe en la persistencia. |
-| `ForbiddenException` | `403` | `'No tienes permisos suficientes para realizar esta acción'` | Cuando el rol o la propiedad (*ownership*) fallan. |
-| `BadRequestException` | `400` | `'Operación inválida: <motivo específico>'` | Violación de regla de negocio o auto-eliminación prohibida. |
+| Excepción | Código | Cuándo Lanzar |
+| :--- | :---: | :--- |
+| `BadRequestException` | `400` | Validación de DTO (`ValidationPipe`), UUID inválido (`ParseUUIDPipe`) o regla de negocio inválida. |
+| `UnauthorizedException` | `401` | Token JWT ausente, expirado o inválido (`JwtAuthGuard`). |
+| `ForbiddenException` | `403` | Rol insuficiente (`RolesGuard`) o fallo de *ownership* en servicio. |
+| `NotFoundException` | `404` | El ID solicitado no existe en persistencia. |
+| `ConflictException` | `409` | Violación de unicidad (email duplicado, código único ya registrado). |

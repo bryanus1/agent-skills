@@ -1,6 +1,6 @@
 ---
 name: monorepo-architecture
-version: 1.0.0
+version: 1.0.1
 description: >-
   Estándar de monorepo con pnpm workspaces y Turborepo para una web Next.js y una API NestJS: estructura apps/ y packages/, paquetes internos compilados, contratos compartidos (Zod u OpenAPI), límites de dependencias verificables y scaffolding de features full-stack.
 tags: [monorepo, turborepo, pnpm, workspaces, nextjs, nestjs, architecture, fullstack]
