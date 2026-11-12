@@ -27,18 +27,15 @@ Diseñado bajo el principio de **Progressive Disclosure**:
 <!-- catalog-table:start -->
 | Skill | Categoría | Versión | Agentes | Descripción |
 | :--- | :--- | :--- | :--- | :--- |
-| **[`flutter-architecture`](skills/architecture/flutter-architecture/README.md)** | `architecture` | `1.1.0` | Todos | Clean Architecture Feature-First para Flutter. Guía el diseño modular en lib/features/&lt;feature&gt;/ (domain, data, presentation) con BLoC/Cubit, Inyección de Dependencias (GetIt/Injectable), manejo funcional de errores con Result sealed class y pruebas unitarias con mocktail y bloc_test. |
 | **[`monorepo-architecture`](skills/architecture/monorepo-architecture/README.md)** | `architecture` | `1.0.1` | Todos | Estándar de monorepo con pnpm workspaces y Turborepo para una web Next.js y una API NestJS: estructura apps/ y packages/, paquetes internos compilados, contratos compartidos (Zod u OpenAPI), límites de dependencias verificables y scaffolding de features full-stack. |
 | **[`nestjs-architecture`](skills/architecture/nestjs-architecture/README.md)** | `architecture` | `2.0.0` | Todos | Estándar de Modular Monolith para NestJS 12 (NodeAdapter, SWC, Vitest y OXC). Guía el andamiaje de módulos de dominio, contratos DTO/Zod, Swagger OpenAPI, repositorios ORM-agnósticos, doble barrera RBAC/ownership y testing &gt;= 90%. |
-| **[`nextjs-architecture`](skills/architecture/nextjs-architecture/README.md)** | `architecture` | `1.2.0` | Todos | Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions con Zod, hooks con TanStack Query, FormDialog, linting con OXC y testing con Vitest + SWC (&gt;= 90%) y Playwright E2E. |
+| **[`nextjs-architecture`](skills/architecture/nextjs-architecture/README.md)** | `architecture` | `1.2.1` | Todos | Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions con Zod, hooks con TanStack Query, FormDialog, linting con OXC y testing con Vitest + SWC (&gt;= 90%) y Playwright E2E. |
 | **[`react-native-architecture`](skills/architecture/react-native-architecture/README.md)** | `architecture` | `1.1.0` | Todos | Estándar Screaming Architecture para React Native y Expo Router. Guía estructuración por features, rutas delgadas en src/app, TanStack Query, NativeWind, tests Jest &gt;= 90%, análisis estático con Oxlint y formato Oxfmt. Incluye validador y scaffolds de feature, componente, hook y servicio. |
-| **[`dart-import-organizer`](skills/dart/dart-import-organizer/README.md)** | `dart` | `1.0.1` | Todos | Organiza y estandariza imports en Dart y Flutter (.dart). Se aplica DESPUÉS de formatear el código. Agrupa jerárquicamente en 6 bloques: dart:* → flutter/terceros → package de app → relativos → export → part, con orden alfabético y líneas en blanco entre grupos. |
-| **[`ssh-connect`](skills/devops/ssh-connect/README.md)** | `devops` | `1.0.0` | Todos | Gestión, conexión y ejecución remota en servidores SSH con ssh-connect. Soporta llaves .pem con permisos asegurados, contraseñas automatizadas (Keychain) y multiplexación persistente sin bloqueos de TTY. |
+| **[`gh-cli`](skills/git/gh-cli/README.md)** | `git` | `1.0.1` | Todos | Automatización de flujos de GitHub con gh CLI y scripts: Pull Requests con Conventional Commits, emojis y labels verificados, diagnóstico de GitHub Actions, issues y releases con notas generadas. Úsala al crear o revisar PRs, depurar workflows fallidos o publicar releases. |
 | **[`git-cleanup`](skills/git/git-cleanup/README.md)** | `git` | `1.0.0` | Todos | Limpieza segura de ramas locales de Git tras fusionar PRs (Squash/Merge). Protege ramas principales (main/master/develop), detecta ramas eliminadas en origin y elimina ramas obsoletas sin falsos negativos. |
-| **[`gh-cli`](skills/github/gh-cli/README.md)** | `github` | `1.0.0` | Todos | Automatización de flujos de GitHub con gh CLI y scripts: Pull Requests con Conventional Commits, emojis y labels verificados, diagnóstico de GitHub Actions, issues y releases con notas generadas. Úsala al crear o revisar PRs, depurar workflows fallidos o publicar releases. |
-| **[`glab-cli`](skills/gitlab/glab-cli/README.md)** | `gitlab` | `1.2.0` | Todos | Automatización de flujos de GitLab (MRs con Conventional Commits, emojis, Scoped Labels, diagnóstico de CI/CD y releases) usando glab CLI y scripts. |
-| **[`issue-triage`](skills/project-management/issue-triage/README.md)** | `project-management` | `1.0.0` | Todos | Refina issues de Linear, GitHub o GitLab con solo título o notas desestructuradas. Explora el repo local, extrae restricciones y reglas, preserva estimaciones y fechas, y actualiza la descripción con una especificación estructurada lista para OpenSpec. |
-| **[`ts-import-organizer`](skills/typescript/ts-import-organizer/README.md)** | `typescript` | `1.1.1` | Todos | Organiza imports en TypeScript/JavaScript (.ts, .tsx, .js, .jsx). Se aplica siempre DESPUÉS de formatear el código. Agrupa: builtins → externos → path aliases → side-effects. Ordena líneas y miembros ({ ... }) por longitud, elimina unused y convierte rutas relativas a aliases. Activa al ordenar imports o escribir código. |
+| **[`ssh-connect`](skills/tooling/ssh-connect/README.md)** | `tooling` | `1.0.0` | Todos | Gestión, conexión y ejecución remota en servidores SSH con ssh-connect. Soporta llaves .pem con permisos asegurados, contraseñas automatizadas (Keychain) y multiplexación persistente sin bloqueos de TTY. |
+| **[`ts-import-organizer`](skills/tooling/ts-import-organizer/README.md)** | `tooling` | `1.1.1` | Todos | Organiza imports en TypeScript/JavaScript (.ts, .tsx, .js, .jsx). Se aplica siempre DESPUÉS de formatear el código. Agrupa: builtins → externos → path aliases → side-effects. Ordena líneas y miembros ({ ... }) por longitud, elimina unused y convierte rutas relativas a aliases. Activa al ordenar imports o escribir código. |
+| **[`issue-triage`](skills/workflow/issue-triage/README.md)** | `workflow` | `1.0.1` | Todos | Refina issues de Linear o GitHub con solo título o notas desestructuradas. Explora el repo local, extrae restricciones y reglas, preserva estimaciones y fechas, y actualiza la descripción con una especificación estructurada lista para OpenSpec. |
 <!-- catalog-table:end -->
 
 ---
@@ -90,13 +87,10 @@ agent-skills/
 │   ├── basic-skill/             # Plantilla para flujos basados en Markdown puro
 │   └── tool-assisted-skill/     # Plantilla con scripts ejecutables y referencias
 ├── skills/                      # Catálogo organizado por categorías (<categoría>/<skill>/)
-│   ├── architecture/            # flutter, monorepo, nestjs, nextjs, react-native
-│   ├── dart/                    # dart-import-organizer
-│   ├── devops/                  # ssh-connect
-│   ├── git/                     # git-cleanup
-│   ├── github/                  # gh-cli
-│   ├── gitlab/                  # glab-cli
-│   └── typescript/              # ts-import-organizer
+│   ├── architecture/            # monorepo, nestjs, nextjs, react-native
+│   ├── git/                     # git-cleanup, gh-cli
+│   ├── tooling/                 # ts-import-organizer, ssh-connect
+│   └── workflow/                # issue-triage
 ├── catalog/
 │   └── catalog.json             # Índice de skills generado por `pnpm catalog`
 ├── scripts/                     # Herramientas de automatización y validación del hub

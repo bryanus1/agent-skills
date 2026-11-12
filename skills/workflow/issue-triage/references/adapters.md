@@ -12,7 +12,6 @@ El agente identifica el proveedor analizando el input del usuario:
 |---|---|---|
 | `ENG-104`, `ABC-12`, `https://linear.app/...` | **Linear** | Linear MCP (`linear_linear`) / Orca CLI |
 | `#42`, `owner/repo#42`, `https://github.com/...` | **GitHub** | `gh` CLI (`gh issue`) |
-| `https://gitlab.com/.../issues/12`, o repo GitLab | **GitLab** | `glab` CLI (`glab issue`) |
 | Texto pegado, "modo manual", Jira, etc. | **Manual Fallback** | Markdown en chat / archivo |
 
 ---
@@ -75,23 +74,7 @@ El agente identifica el proveedor analizando el input del usuario:
 
 ---
 
-## 3. Adaptador GitLab
-
-### Ingesta (Lectura)
-- **Comando `glab` CLI:**
-  ```bash
-  glab issue view <issue-id> -F json
-  ```
-
-### Persistencia (Escritura)
-- **Actualizar descripción con `glab issue update`:**
-  ```bash
-  glab issue update <issue-id> --description "<contenido>"
-  ```
-
----
-
-## 4. Adaptador Manual / Fallback
+## 3. Adaptador Manual / Fallback
 
 Si la herramienta remota no tiene CLI ni MCP autenticado (o el usuario usa Jira, Notion, Trello, o texto local):
 

@@ -130,7 +130,7 @@ Todos los commits deben seguir **Conventional Commits**:
 
 ```bash
 feat(docker): add docker-optimization skill with multi-stage scripts
-fix(glab): correct issue scope in mr title generation
+fix(gh-cli): correct issue scope in pr title generation
 docs(contributing): update step-by-step contribution guide
 ```
 

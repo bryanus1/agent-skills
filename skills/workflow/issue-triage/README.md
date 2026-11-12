@@ -1,14 +1,14 @@
 # 📋 Issue Triage (`issue-triage`)
 
-> **Refinamiento agnóstico y pre-especificación de tickets (Linear, GitHub Issues, GitLab o notas locales). Transforma títulos vacíos o "brain dumps" en especificaciones estructuradas con contexto del codebase y preservación de metadatos de estimación, listas para OpenSpec.**
+> **Refinamiento agnóstico y pre-especificación de tickets (Linear, GitHub Issues o notas locales). Transforma títulos vacíos o "brain dumps" en especificaciones estructuradas con contexto del codebase y preservación de metadatos de estimación, listas para OpenSpec.**
 
 | Propiedad | Valor |
 | :--- | :--- |
 | **Nombre** | `issue-triage` |
-| **Categoría** | `project-management` |
-| **Versión** | `1.0.0` |
+| **Categoría** | `workflow` |
+| **Versión** | `1.0.1` |
 | **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
-| **Adaptadores Soportados** | Linear (MCP/CLI), GitHub CLI (`gh`), GitLab CLI (`glab`), Manual Markdown |
+| **Adaptadores Soportados** | Linear (MCP/CLI), GitHub CLI (`gh`), Manual Markdown |
 
 ---
 
@@ -29,7 +29,7 @@ npx skills add bryanus1/agent-skills --skill issue-triage -g
 ```bash
 # Google Antigravity:
 mkdir -p .agents/skills
-ln -s /ruta/a/agent-skills/skills/project-management/issue-triage .agents/skills/issue-triage
+ln -s /ruta/a/agent-skills/skills/workflow/issue-triage .agents/skills/issue-triage
 
 # Claude Code:
 mkdir -p .claude/skills
@@ -44,7 +44,6 @@ ln -s ../../.agents/skills/issue-triage .claude/skills/issue-triage
 | :--- | :--- | :--- | :--- |
 | **Linear** | `ENG-104`, URL de Linear | Linear MCP (`get_issue`) o CLI | Linear MCP (`save_issue`) |
 | **GitHub** | `#42`, URL de GitHub | `gh issue view` | `gh issue edit --body-file` |
-| **GitLab** | `GL-12`, URL de GitLab | `glab issue view` | `glab issue update --description` |
 | **Manual** | Texto en chat, Jira, Notion | Texto del prompt | Bloque Markdown formateado |
 
 ---

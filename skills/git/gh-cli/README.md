@@ -5,8 +5,8 @@
 | Propiedad | Valor |
 | :--- | :--- |
 | **Nombre** | `gh-cli` |
-| **Categoría** | `github` |
-| **Versión** | `1.0.0` |
+| **Categoría** | `git` |
+| **Versión** | `1.0.1` |
 | **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
 | **Requisitos** | `gh`, `git`, `bash` |
 
@@ -29,7 +29,7 @@ npx skills add bryanus1/agent-skills --skill gh-cli -g
 ```bash
 # Google Antigravity:
 mkdir -p .agents/skills
-ln -s /ruta/a/agent-skills/skills/github/gh-cli .agents/skills/gh-cli
+ln -s /ruta/a/agent-skills/skills/git/gh-cli .agents/skills/gh-cli
 
 # Claude Code:
 mkdir -p .claude/skills

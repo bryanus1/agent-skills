@@ -1,6 +1,6 @@
 ---
 name: gh-cli
-version: 1.0.0
+version: 1.0.1
 description: >-
   Automatización de flujos de GitHub con gh CLI y scripts: Pull Requests con Conventional Commits, emojis y labels verificados, diagnóstico de GitHub Actions, issues y releases con notas generadas. Úsala al crear o revisar PRs, depurar workflows fallidos o publicar releases.
 tags: [github, gh, cli, devops, git, ci-cd, pull-requests, github-actions]
@@ -30,7 +30,7 @@ Guiar al asistente en la gestión de repositorios de **GitHub** con `gh` CLI y s
 - Al crear, revisar, aprobar o fusionar Pull Requests (`gh pr` o `scripts/create_pr.sh`).
 - Al diagnosticar workflows o checks fallidos de GitHub Actions (`gh run`, `gh pr checks` o `scripts/diagnose_run.sh`).
 - Al crear, listar o comentar issues, o al publicar releases y tags.
-- No aplica a repositorios de GitLab: usa la skill `glab-cli`.
+- No aplica a repositorios de GitLab.
 
 ## 📋 Flujo de Trabajo Paso a Paso
 

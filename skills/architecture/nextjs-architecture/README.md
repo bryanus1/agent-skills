@@ -6,7 +6,7 @@
 | :--- | :--- |
 | **Nombre** | `nextjs-architecture` |
 | **Categoría** | `architecture` |
-| **Versión** | `1.2.0` |
+| **Versión** | `1.2.1` |
 | **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
 | **Requisitos** | `node` |
 
