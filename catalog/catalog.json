@@ -2,6 +2,44 @@
   "repository": "bryanus1/agent-skills",
   "skills": [
     {
+      "name": "astro-architecture",
+      "version": "1.0.0",
+      "description": "Estándar de arquitectura para proyectos Astro (landing pages, marketing sites y sitios content-driven). Guía estructura modular, Islands Architecture (Zero-JS), Tailwind CSS, Content Collections con Zod, SEO técnico, astro:assets, linting con OXC y testing E2E con Playwright.",
+      "category": "architecture",
+      "path": "skills/architecture/astro-architecture/SKILL.md",
+      "readme": "skills/architecture/astro-architecture/README.md",
+      "tags": [
+        "astro",
+        "architecture",
+        "landing-page",
+        "tailwind",
+        "islands",
+        "seo",
+        "frontend",
+        "typescript",
+        "oxc",
+        "oxlint",
+        "playwright"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "astro architecture",
+        "astro landing page",
+        "crear landing page en astro",
+        "arquitectura astro",
+        "estructurar proyecto astro",
+        "astro islands",
+        "astro oxlint playwright"
+      ],
+      "requires": []
+    },
+    {
       "name": "monorepo-architecture",
       "version": "1.0.1",
       "description": "Estándar de monorepo con pnpm workspaces y Turborepo para una web Next.js y una API NestJS: estructura apps/ y packages/, paquetes internos compilados, contratos compartidos (Zod u OpenAPI), límites de dependencias verificables y scaffolding de features full-stack.",

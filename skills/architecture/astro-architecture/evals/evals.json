@@ -1,0 +1,23 @@
+{
+  "skill_name": "astro-architecture",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Crea la arquitectura base para una landing page de un SaaS llamado 'PulseMetrics' usando Astro y Tailwind CSS.",
+      "expected_output": "El agente previsualiza con `node <skill-dir>/scripts/scaffold-landing.mjs --dry-run --target-dir .` y luego genera la estructura modular: `src/layouts/BaseLayout.astro` con SEO técnico (title, description, canonical, Open Graph, Twitter Cards y skip-link), secciones Zero-JS en `src/components/sections/` (`HeroSection`, `FeaturesSection`, `FaqSection` con `<details>`/`<summary>` nativos sin JS, `CtaSection`), datos tipados en `src/data/site.ts`, `src/styles/global.css` con Tailwind y `src/pages/index.astro`.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Audita mi proyecto Astro y configura el linting con OXC y las pruebas E2E con Playwright antes de desplegar.",
+      "expected_output": "El agente ejecuta `node <skill-dir>/scripts/audit-astro.mjs --target-dir .`, configura `.oxlintrc.json` con plugins `typescript`, `unicorn` y `jsx-a11y`, configura `playwright.config.ts` ejecutando `webServer` sobre `npm run build && npm run preview -- --port 4321`, crea `e2e/landing.spec.ts` verificando metadatos SEO, un único `<h1>`, ausencia de overflow horizontal y cero errores de consola, y valida con `npx oxlint --deny-warnings src/`, `npx astro check` y `npx playwright test`.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Tengo una landing en Astro con `client:load` en el acordeón de FAQ y etiquetas `<img>` normales en el Hero y las features. ¿Cómo lo optimizo según el estándar?",
+      "expected_output": "El agente reemplaza el acordeón hidratado por HTML nativo `<details>`/`<summary>` (Zero-JS) o usa `client:visible` solo si hay interactividad compleja *below-the-fold*, y sustituye las etiquetas `<img>` por `<Image />` de `astro:assets` con `loading=\"eager\"` y `fetchpriority=\"high\"` en la imagen del Hero para proteger el LCP y evitar CLS.",
+      "files": []
+    }
+  ]
+}
