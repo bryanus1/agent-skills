@@ -6,7 +6,7 @@
 | :--- | :--- |
 | **Nombre** | `monorepo-architecture` |
 | **Categoría** | `architecture` |
-| **Versión** | `1.0.0` |
+| **Versión** | `1.0.1` |
 | **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
 | **Requisitos** | `node`, `pnpm` |
 | **Skills Requeridas** | [`nestjs-architecture`](../nestjs-architecture/README.md), [`nextjs-architecture`](../nextjs-architecture/README.md) |

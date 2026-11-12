@@ -40,7 +40,7 @@
     },
     {
       "name": "monorepo-architecture",
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Estándar de monorepo con pnpm workspaces y Turborepo para una web Next.js y una API NestJS: estructura apps/ y packages/, paquetes internos compilados, contratos compartidos (Zod u OpenAPI), límites de dependencias verificables y scaffolding de features full-stack.",
       "category": "architecture",
       "path": "skills/architecture/monorepo-architecture/SKILL.md",
@@ -81,8 +81,8 @@
     },
     {
       "name": "nestjs-architecture",
-      "version": "1.1.1",
-      "description": "Estándar de Modular Monolith para NestJS. Guía el andamiaje de módulos de dominio desacoplados, contratos DTO estrictos, documentación OpenAPI Swagger exhaustiva, persistencia agnóstica a cualquier ORM con Repository/Entity y doble barrera de seguridad (RBAC).",
+      "version": "2.0.0",
+      "description": "Estándar de Modular Monolith para NestJS 12 (NodeAdapter, SWC, Vitest y OXC). Guía el andamiaje de módulos de dominio, contratos DTO/Zod, Swagger OpenAPI, repositorios ORM-agnósticos, doble barrera RBAC/ownership y testing >= 90%.",
       "category": "architecture",
       "path": "skills/architecture/nestjs-architecture/SKILL.md",
       "readme": "skills/architecture/nestjs-architecture/README.md",
@@ -94,7 +94,10 @@
         "swagger",
         "rbac",
         "orm-agnostic",
-        "database"
+        "swc",
+        "vitest",
+        "oxc",
+        "node-adapter"
       ],
       "agents": [
         "antigravity",
@@ -109,9 +112,19 @@
         "nestjs module",
         "scaffold nestjs module",
         "nestjs clean architecture",
+        "nestjs controller",
+        "nestjs repository",
+        "nestjs dto",
+        "nestjs swagger",
+        "nestjs rbac",
+        "nestjs vitest",
+        "nestjs swc",
+        "nestjs node adapter",
+        "nestjs oxlint",
         "arquitectura nestjs",
         "crear modulo nestjs",
-        "estructurar nestjs"
+        "estructurar nestjs",
+        "revisar modulo nestjs"
       ],
       "requires": []
     },

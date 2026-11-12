@@ -155,7 +155,14 @@ function main() {
   const nestScript = siblingScript(SIBLINGS.nest);
   const nextScript = siblingScript(SIBLINGS.next);
   const passthrough = flags.force ? ['--force'] : [];
-  const nestArgs = [noun, '--target-dir', path.relative(root, path.join(apiDir, 'src', 'modules')), ...(flags.plural ? ['--plural', nouns] : []), ...passthrough];
+  const nestArgs = [
+    noun,
+    '--target-dir',
+    path.relative(root, path.join(apiDir, 'src', 'modules')),
+    ...(flags.plural ? ['--plural', nouns] : []),
+    ...(mode === 'zod' ? ['--contracts', 'zod', '--scope', scope] : []),
+    ...passthrough,
+  ];
   const nextArgs = [nouns, '--target-dir', path.relative(root, path.join(webDir, 'src', 'features')), '--with-starter', ...passthrough];
 
   // Shared files: contracts (zod) and workspace dependencies in the apps.
