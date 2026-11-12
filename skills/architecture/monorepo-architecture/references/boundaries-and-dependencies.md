@@ -1,6 +1,6 @@
-# Límites y Dependencias
+# Límites, Plataformas y Dependencias
 
-`check-boundaries.mjs` analiza los imports (`import`, `export ... from`, `require()`, `import()`) de todos los archivos `.ts/.tsx/.js/.mjs/.cjs` de cada workspace. Ignora `node_modules`, `dist`, `.next`, `.turbo` y `coverage`.
+`check-boundaries.mjs` analiza los imports (`import`, `export ... from`, `require()`, `import()`) de todos los archivos `.ts/.tsx/.mts/.cts/.js/.jsx/.mjs/.cjs` y de los bloques frontmatter (`--- ... ---`) y `<script>` de archivos **`.astro`** en cada workspace. Ignora `node_modules`, `dist`, `build`, `.next`, `.astro`, `.expo`, `.turbo`, `coverage` y `out`.
 
 ---
 
@@ -9,41 +9,81 @@
 | Regla | Ejemplo prohibido | Corrección |
 | :--- | :--- | :--- |
 | `app-import` | `apps/admin` → `import { x } from 'web'` | Mueve el código compartido a `packages/<lib>` e impórtalo desde ambas apps |
-| `package-imports-app` | `packages/ui` → `import { theme } from 'web/src/theme'` | Invierte la dependencia: `theme` vive en el paquete y la app lo importa |
-| `relative-escape` | `apps/web/src/a.ts` → `import '../../../packages/contracts/src/invoices'` | `import ... from '@acme/contracts/invoices'` y declara la dependencia |
-| `undeclared` | `apps/api` importa `@acme/contracts` sin tenerlo en su `package.json` | `pnpm --filter api add @acme/contracts@workspace:*` |
-| `deep-import` | `import ... from '@acme/contracts/src/invoices'` | Usa el subpath expuesto (`@acme/contracts/invoices`) o añade la entrada a `exports` |
+| `package-imports-app` | `packages/ui-web` → `import { theme } from 'web/src/theme'` | Invierte la dependencia: `theme` vive en `packages/design-tokens` |
+| `relative-escape` | `apps/mobile/src/a.ts` → `import '../../../packages/contracts/src/invoices'` | Usa `@acme/contracts/invoices` y decláralo en `package.json` |
+| `undeclared` | `apps/landing/src/pages/index.astro` importa `@acme/design-tokens` sin declararlo | `pnpm --filter landing add @acme/design-tokens@workspace:*` |
+| `deep-import` | `import ... from '@acme/contracts/src/invoices'` | Usa el subpath expuesto (`@acme/contracts/invoices`) o añádelo a `exports` |
 | `cycle` | `@acme/a` depende de `@acme/b` y `@acme/b` de `@acme/a` | Extrae lo común a un tercer paquete del que dependan ambos |
+| `platform-mismatch` | `apps/mobile` (`native`) importa `@acme/ui-web` (`web`), o `packages/contracts` (`universal`) importa `@acme/ui-web` | Respeta la matriz de compatibilidad o mueve la lógica agnóstica a un paquete `universal` |
 
 ---
 
-## 2. Uso
+## 2. Matriz de Compatibilidad de Plataformas (`platform-mismatch`)
 
-```bash
-pnpm check:boundaries                                  # script raíz generado por scaffold-monorepo
-node scripts/check-boundaries.mjs --json               # salida para herramientas
-node scripts/check-boundaries.mjs --apps-dir services  # si las apps no viven en apps/
+Cada workspace declara su plataforma en `package.json`:
+
+```json
+{
+  "name": "@acme/ui-web",
+  "monorepo": { "layer": "package", "platform": "web" }
+}
 ```
 
-La salida es `archivo:línea [regla] mensaje` y el script sale con código 1 si hay violaciones.
+Valores permitidos por defecto:
+
+| Plataforma origen | Plataformas que puede importar |
+| :--- | :--- |
+| `universal` | `universal` |
+| `web` | `universal`, `web` |
+| `astro` | `universal`, `web`, `astro` |
+| `native` | `universal`, `native` |
+| `node` | `universal`, `node` |
+
+### Personalización (`monorepo.boundaries.json`)
+
+Si tienes un repositorio con paquetes heredados sin campo `monorepo` o necesitas ampliar reglas, crea `monorepo.boundaries.json` en la raíz:
+
+```json
+{
+  "platforms": {
+    "@acme/legacy-web-kit": "web"
+  },
+  "allow": {
+    "web": ["universal", "web"]
+  }
+}
+```
 
 ---
 
-## 3. Integración en CI
+## 3. Uso
+
+```bash
+pnpm check:boundaries                                         # valida apps/*, services/* y packages/*
+node scripts/check-boundaries.mjs --json                      # salida estructurada para CI/agentes
+node scripts/check-boundaries.mjs --apps-dir apps,services    # carpetas tratadas como hojas desplegables
+```
+
+La salida es `archivo:línea [regla] mensaje` y el script termina con código `1` si encuentra al menos una violación.
+
+---
+
+## 4. Integración en CI
 
 ```yaml
 # .github/workflows/ci.yml (fragmento)
 - run: pnpm install --frozen-lockfile
 - run: pnpm check:boundaries
-- run: pnpm turbo run lint typecheck test build
+- run: pnpm turbo run lint format:check typecheck test build
 ```
 
-Ejecútalo antes de `turbo run`: es instantáneo y no necesita builds.
+Ejecuta `pnpm check:boundaries` antes de `turbo run`: es instantáneo, no requiere builds previos y falla temprano ante cruces ilegales entre plataformas o apps.
 
 ---
 
-## 4. Límites del Análisis
+## 5. Límites del Análisis
 
-- **Solo detecta specifiers literales.** `import(variable)` y los `require` construidos dinámicamente no se analizan.
-- **Paquetes internos:** solo valida los que declara `pnpm-workspace.yaml`. Las dependencias externas no declaradas las detectan pnpm (modo estricto) y el typecheck.
-- **Alias `@/`:** los de cada app no se validan. Mientras apunten al `src/` de la propia app, no pueden cruzar workspaces. Nunca configures `paths` hacia otro workspace.
+- **Specifiers literales:** `import(variable)` y `require` dinámicos no se analizan.
+- **Workspaces declarados:** solo valida paquetes descubiertos por `pnpm-workspace.yaml`.
+- **Servicios políglotas (`services/*`):** sus archivos `.py`/`.go`/`.rs` no se parsean por AST JS; su aislamiento se garantiza por diseño de carpetas y contrato OpenAPI.
+- **Alias `@/`:** los alias internos de cada app no pueden apuntar fuera de su propio `src/`.

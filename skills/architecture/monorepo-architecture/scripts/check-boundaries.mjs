@@ -3,34 +3,43 @@
 // Standalone and dependency-free: scaffold-monorepo copies it into the repo for CI.
 //
 // Rules (each violation is reported as file:line and makes the script exit 1):
-//   app-import         an app imports another app
+//   app-import          an app imports another app
 //   package-imports-app a package imports an app
-//   relative-escape    a relative import leaves its own workspace
-//   undeclared         a workspace package is imported but not declared in package.json
-//   deep-import        an import path is not exposed by the target's "exports"
-//   cycle              packages depend on each other in a cycle
+//   relative-escape     a relative import leaves its own workspace
+//   undeclared          a workspace package is imported but not declared in package.json
+//   deep-import         an import path is not exposed by the target's "exports"
+//   cycle               packages depend on each other in a cycle
+//   platform-mismatch   a workspace imports a package built for an incompatible platform
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.mts', '.cts', '.js', '.jsx', '.mjs', '.cjs']);
-const IGNORED_DIRS = new Set(['node_modules', 'dist', 'build', '.next', '.turbo', 'coverage', '.git', 'out']);
+const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.mts', '.cts', '.js', '.jsx', '.mjs', '.cjs', '.astro']);
+const IGNORED_DIRS = new Set(['node_modules', 'dist', 'build', '.next', '.astro', '.expo', '.turbo', 'coverage', '.git', 'out']);
 const IMPORT_PATTERNS = [
   /\b(?:import|export)\s+(?:type\s+)?(?:[\w*{}\s,$]+\s+from\s+)?['"]([^'"\n]+)['"]/g,
   /\brequire\(\s*['"]([^'"\n]+)['"]\s*\)/g,
   /\bimport\(\s*['"]([^'"\n]+)['"]\s*\)/g,
 ];
 
+const DEFAULT_PLATFORM_ALLOW = {
+  universal: ['universal'],
+  web: ['universal', 'web'],
+  astro: ['universal', 'web', 'astro'],
+  native: ['universal', 'native'],
+  node: ['universal', 'node'],
+};
+
 function printHelp() {
   console.log(`
 Usage: node check-boundaries.mjs [options]
 
 Options:
-  --root <dir>       Monorepo root containing pnpm-workspace.yaml (default: current directory)
-  --apps-dir <dir>   Directory whose workspaces are apps (default: apps)
-  --json             Print violations as JSON
-  --help, -h         Show this help message
+  --root <dir>         Monorepo root containing pnpm-workspace.yaml (default: current directory)
+  --apps-dir <dirs>    Comma-separated directories whose workspaces are apps/services (default: apps,services)
+  --json               Print violations as JSON
+  --help, -h           Show this help message
 `);
 }
 
@@ -72,19 +81,34 @@ function expandGlob(root, glob) {
   return found;
 }
 
-/** Discovers workspaces: { name, dir, rel, isApp, deps: Set, exports }. */
-export function loadWorkspaces(root, appsDir = 'apps') {
+function loadBoundaryConfig(root) {
+  const file = path.join(root, 'monorepo.boundaries.json');
+  if (!fs.existsSync(file)) return { allow: DEFAULT_PLATFORM_ALLOW, platforms: {} };
+  const parsed = JSON.parse(fs.readFileSync(file, 'utf8'));
+  return {
+    allow: { ...DEFAULT_PLATFORM_ALLOW, ...(parsed.allow ?? {}) },
+    platforms: parsed.platforms ?? {},
+  };
+}
+
+/** Discovers workspaces: { name, dir, rel, isApp, platform, deps: Set, exports }. */
+export function loadWorkspaces(root, appsDir = 'apps,services', platformOverrides = {}) {
+  const appsDirs = (Array.isArray(appsDir) ? appsDir : String(appsDir).split(','))
+    .map((d) => d.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
   const globs = readWorkspaceGlobs(root);
   const excluded = new Set(globs.filter((g) => g.startsWith('!')).flatMap((g) => expandGlob(root, g.slice(1))));
   const dirs = [...new Set(globs.filter((g) => !g.startsWith('!')).flatMap((g) => expandGlob(root, g)))].filter((d) => !excluded.has(d));
   return dirs.sort().map((dir) => {
     const pkg = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));
     const rel = path.relative(root, dir).split(path.sep).join('/');
+    const isApp = appsDirs.some((base) => rel === base || rel.startsWith(`${base}/`));
     return {
       name: pkg.name,
       dir,
       rel,
-      isApp: rel === appsDir || rel.startsWith(`${appsDir}/`),
+      isApp,
+      platform: platformOverrides[pkg.name] ?? pkg.monorepo?.platform ?? null,
       deps: new Set([...Object.keys(pkg.dependencies ?? {}), ...Object.keys(pkg.devDependencies ?? {}), ...Object.keys(pkg.peerDependencies ?? {})]),
       exports: pkg.exports,
     };
@@ -109,10 +133,35 @@ function listSourceFiles(dir) {
   return results;
 }
 
+/** Extracts only frontmatter (`--- ... ---`) and `<script>` code from `.astro` files while keeping line numbers. */
+export function extractAstroCode(rawSource) {
+  const source = rawSource.replace(/\r\n/g, '\n');
+  const lines = source.split('\n');
+  const out = lines.map((line) => ' '.repeat(line.length));
+
+  let start = 0;
+  while (start < lines.length && lines[start].trim() === '') start++;
+  if (start < lines.length && lines[start].trim() === '---') {
+    for (let j = start + 1; j < lines.length; j++) {
+      if (lines[j].trim() === '---') break;
+      out[j] = lines[j];
+    }
+  }
+
+  let result = out.join('\n');
+  for (const match of source.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) {
+    const bodyStart = match.index + match[0].indexOf('>') + 1;
+    const body = match[1];
+    result = result.slice(0, bodyStart) + body + result.slice(bodyStart + body.length);
+  }
+  return result;
+}
+
 /** Returns [{ specifier, line }] for every static/dynamic import, export-from and require. */
-export function extractImports(source) {
+export function extractImports(source, ext = '.ts') {
+  const effectiveSource = ext === '.astro' ? extractAstroCode(source) : source;
   // Blank out comments while keeping line numbers.
-  const code = source.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' ')).replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
+  const code = effectiveSource.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' ')).replace(/(^|[^:'"`])\/\/.*$/gm, '$1');
   const found = [];
   for (const pattern of IMPORT_PATTERNS) {
     for (const match of code.matchAll(pattern)) {
@@ -172,16 +221,18 @@ function findCycles(workspaces) {
 }
 
 /** Runs every rule and returns violations: { rule, file, line, message }. */
-export function checkBoundaries(root, { appsDir = 'apps' } = {}) {
+export function checkBoundaries(root, { appsDir = 'apps,services' } = {}) {
   const absRoot = path.resolve(root);
-  const workspaces = loadWorkspaces(absRoot, appsDir);
+  const boundaryConfig = loadBoundaryConfig(absRoot);
+  const workspaces = loadWorkspaces(absRoot, appsDir, boundaryConfig.platforms);
   const byName = new Map(workspaces.map((w) => [w.name, w]));
   const violations = [];
   const rel = (file) => path.relative(absRoot, file).split(path.sep).join('/');
 
   for (const ws of workspaces) {
     for (const file of listSourceFiles(ws.dir)) {
-      for (const { specifier, line } of extractImports(fs.readFileSync(file, 'utf8'))) {
+      const ext = path.extname(file);
+      for (const { specifier, line } of extractImports(fs.readFileSync(file, 'utf8'), ext)) {
         const report = (rule, message) => violations.push({ rule, file: rel(file), line, message });
 
         if (specifier.startsWith('.')) {
@@ -207,6 +258,15 @@ export function checkBoundaries(root, { appsDir = 'apps' } = {}) {
         if (!isExported(target.exports, subpath)) {
           report('deep-import', `'${specifier}' is not exposed by the "exports" of ${target.name}.`);
         }
+        if (ws.platform && target.platform) {
+          const allowed = boundaryConfig.allow[ws.platform] ?? ['universal', ws.platform];
+          if (!allowed.includes(target.platform)) {
+            report(
+              'platform-mismatch',
+              `${ws.name} (platform: ${ws.platform}) cannot import ${target.name} (platform: ${target.platform}); allowed: ${allowed.join(', ')}.`,
+            );
+          }
+        }
       }
     }
   }
@@ -231,7 +291,7 @@ function main() {
 
   let violations;
   try {
-    violations = checkBoundaries(valueOf('--root', process.cwd()), { appsDir: valueOf('--apps-dir', 'apps') });
+    violations = checkBoundaries(valueOf('--root', process.cwd()), { appsDir: valueOf('--apps-dir', 'apps,services') });
   } catch (err) {
     console.error(`❌ Error: ${err.message}`);
     process.exit(1);
