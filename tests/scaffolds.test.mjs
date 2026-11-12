@@ -10,6 +10,8 @@ const NEXT_FEATURE = 'skills/architecture/nextjs-architecture/scripts/scaffold-f
 const NEXT_COMPONENT = 'skills/architecture/nextjs-architecture/scripts/scaffold-component.mjs';
 const RN_FEATURE = 'skills/architecture/react-native-architecture/scripts/scaffold-feature.mjs';
 const RN_COMPONENT = 'skills/architecture/react-native-architecture/scripts/scaffold-component.mjs';
+const RN_HOOK = 'skills/architecture/react-native-architecture/scripts/scaffold-hook.mjs';
+const RN_SERVICE = 'skills/architecture/react-native-architecture/scripts/scaffold-service.mjs';
 
 // Every scaffold must follow the same safety contract (docs/SPECIFICATION.md §5).
 const scaffolds = [
@@ -19,6 +21,8 @@ const scaffolds = [
   { name: 'nextjs scaffold-component', script: NEXT_COMPONENT, args: ['user-card', '--type', 'dialog'], probe: 'src/components/common/user-card/user-card.tsx' },
   { name: 'react-native scaffold-feature', script: RN_FEATURE, args: ['billing', '--with-starter', '--with-route'], probe: 'src/features/billing/models/billing.ts' },
   { name: 'react-native scaffold-component', script: RN_COMPONENT, args: ['user-card', '--type', 'modal'], probe: 'src/components/common/user-card/user-card.tsx' },
+  { name: 'react-native scaffold-hook', script: RN_HOOK, args: ['use-invoices', '--feature', 'billing'], probe: 'src/features/billing/hooks/use-invoices/use-invoices.hook.ts' },
+  { name: 'react-native scaffold-service', script: RN_SERVICE, args: ['get-invoices', '--feature', 'billing'], probe: 'src/features/billing/services/get-invoices/get-invoices.service.ts' },
 ];
 
 for (const { name, script, args, probe } of scaffolds) {
@@ -230,10 +234,33 @@ test('react-native scaffold-feature: --with-route requires --with-starter and ho
   assert.ok(fs.existsSync(path.join(cwd, 'apps/mobile/src/app/billing/index.tsx')));
 });
 
+test('react-native scaffold-feature: supports --route-path and --with-layout', (t) => {
+  const cwd = makeTempDir(t);
+  const result = runScript(RN_FEATURE, ['billing', '--with-starter', '--with-route', '--route-path', '(tabs)/billing', '--with-layout'], cwd);
+  assert.equal(result.code, 0, result.stderr);
+  assert.ok(fs.existsSync(path.join(cwd, 'src/app/(tabs)/billing/index.tsx')));
+  assert.ok(fs.existsSync(path.join(cwd, 'src/app/(tabs)/billing/_layout.tsx')));
+
+  const layout = fs.readFileSync(path.join(cwd, 'src/app/(tabs)/billing/_layout.tsx'), 'utf8');
+  assert.match(layout, /Stack/);
+  assert.match(layout, /options=\{\{ title: 'Billing' \}\}/);
+});
+
 test('react-native scaffold-feature: rejects names that are not kebab-case', (t) => {
   const cwd = makeTempDir(t);
   assert.equal(runScript(RN_FEATURE, ['Invoice_Item!'], cwd).code, 1);
   assert.deepEqual(fs.readdirSync(cwd), []);
+});
+
+test('react-native scaffold-feature: --minimal does not create empty subfolders', (t) => {
+  const cwd = makeTempDir(t);
+  assert.equal(runScript(RN_FEATURE, ['billing', '--minimal'], cwd).code, 0);
+  assert.deepEqual(listFiles(cwd), []);
+  assert.deepEqual(fs.readdirSync(cwd), []);
+
+  assert.equal(runScript(RN_FEATURE, ['billing', '--minimal', '--with-starter'], cwd).code, 0);
+  const featureRoot = path.join(cwd, 'src/features/billing');
+  assert.deepEqual(fs.readdirSync(featureRoot).sort(), ['models', 'screens']);
 });
 
 test('react-native scaffold-component: generates component, test and barrel for each type', (t) => {
@@ -246,6 +273,12 @@ test('react-native scaffold-component: generates component, test and barrel for 
   const modal = fs.readFileSync(path.join(cwd, 'src/components/common/modal-card/modal-card.tsx'), 'utf8');
   assert.match(modal, /Modal/);
   assert.match(modal, /from 'react-native'/);
+  assert.match(modal, /confirmLabel = 'Confirm'/);
+  assert.match(modal, /dark:bg-zinc-900/);
+  assert.match(modal, /\{onConfirm && \(/);
+
+  const modalTest = fs.readFileSync(path.join(cwd, 'src/components/common/modal-card/modal-card.test.tsx'), 'utf8');
+  assert.match(modalTest, /cancelLabel="Dismiss"/);
 });
 
 test('react-native scaffold-component: rejects an unknown --type', (t) => {

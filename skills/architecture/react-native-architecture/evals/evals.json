@@ -18,6 +18,48 @@
       "prompt": "Revisa estos imports: `import { usePetSearch, IPet } from '@/features/pets';` y `import { InvoiceCard } from '@/features/pets/components';`",
       "expected_output": "El agente señala que ambos importan desde carpetas contenedoras sin barrel (política de barrels solo en carpetas hoja) y los reescribe: '@/features/pets/hooks/use-pet-search', '@/features/pets/models' y '@/features/pets/components/invoice-card'. Indica eliminar cualquier index.ts de carpetas contenedoras.",
       "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Tengo esta ruta en Expo Router con lógica de negocio: `// src/app/invoices/index.tsx\nexport default function InvoicesRoute() {\n  const { data } = useQuery({ queryKey: ['invoices'], queryFn: fetchInvoices });\n  return <FlatList data={data} renderItem={...} />;\n}`. ¿Cómo la refactorizo según Screaming Architecture?",
+      "expected_output": "El agente indica que las rutas en src/app/** deben ser estrictamente delgadas y sin useQuery ni FlatList directo. Extrae la lógica a src/features/billing/ (un hook useInvoices en hooks/use-invoices, un servicio en services/get-invoices y una screen InvoicesHome en screens/invoices-home) y deja la ruta como un adaptador de una línea: export { InvoicesHome as default } from '@/features/billing/screens/invoices-home'.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Un compañero escribió esto en un componente móvil: `localStorage.setItem('auth_token', token); const w = window.innerWidth; return <div><button onClick={...}>Guardar</button></div>;`",
+      "expected_output": "El agente señala las violaciones críticas de móvil: localStorage no existe en React Native y nunca debe usarse para tokens (usar expo-secure-store), window.innerWidth no existe (usar useWindowDimensions o Dimensions de RN), y los elementos DOM div/button no existen (usar View y Pressable con accessibilityRole='button').",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "Crea un hook de mutación para registrar una factura en la feature billing que invalide la lista de facturas.",
+      "expected_output": "El agente usa scaffold-hook.mjs use-create-invoice --feature billing --kind mutation --entity invoice. Genera la key factory jerárquica invoiceKeys en hooks/invoice-keys con all, lists(), list(filters), details(), detail(id) y el hook useCreateInvoice con useMutation invalidando invoiceKeys.lists().",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "Estoy en un monorepo Turborepo + pnpm con la app móvil en `apps/mobile`. Estructura la feature orders con screen inicial y su ruta.",
+      "expected_output": "El agente ejecuta scaffold-feature.mjs orders --target-dir apps/mobile/src/features --app-dir apps/mobile/src/app --with-starter --with-route (usando primero --dry-run) respetando la arquitectura móvil dentro del workspace del monorepo.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "¿Cómo protejo el grupo de rutas `(app)` en Expo Router para que requiera sesión activa?",
+      "expected_output": "El agente explica el uso de Stack.Protected (SDK 53+) o redirección en src/app/(app)/_layout.tsx consumiendo el estado de sesión desde src/features/auth/hooks/use-auth-session, esperando a la hidratación segura de tokens desde expo-secure-store antes de redirigir a /(auth)/login.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "Configura el tooling estándar de lint y formato para mi app Expo con NativeWind y Expo Router.",
+      "expected_output": "El agente ejecuta o recomienda setup-tooling.mjs (con --dry-run previo) para generar .oxlintrc.json con reglas arquitectónicas (no-restricted-imports para barrels y rutas delgadas), .oxfmtrc.json con sortTailwindcss: true y jest.config.js con preset jest-expo y umbral de cobertura del 90%.",
+      "files": []
+    },
+    {
+      "id": 10,
+      "prompt": "Estructura la feature de facturación en mi app Next.js con App Router y Server Actions.",
+      "expected_output": "El agente detecta que la solicitud es para Next.js con Server Actions (web) y no para React Native móvil / Expo Router, por lo que NO activa react-native-architecture y deriva a nextjs-architecture.",
+      "files": []
     }
   ]
 }

@@ -170,8 +170,8 @@
     },
     {
       "name": "react-native-architecture",
-      "version": "1.0.0",
-      "description": "Estándar de Screaming Architecture para React Native con Expo Router. Guía la estructuración por features, rutas delgadas en src/app, hooks con TanStack Query, estilos NativeWind y tests con cobertura >= 90%. Incluye scaffolds de feature y componente.",
+      "version": "1.1.0",
+      "description": "Estándar Screaming Architecture para React Native y Expo Router. Guía estructuración por features, rutas delgadas en src/app, TanStack Query, NativeWind, tests Jest >= 90%, análisis estático con Oxlint y formato Oxfmt. Incluye validador y scaffolds de feature, componente, hook y servicio.",
       "category": "architecture",
       "path": "skills/architecture/react-native-architecture/SKILL.md",
       "readme": "skills/architecture/react-native-architecture/README.md",
@@ -182,7 +182,10 @@
         "screaming-architecture",
         "mobile",
         "tanstack-query",
-        "nativewind"
+        "nativewind",
+        "oxlint",
+        "oxc",
+        "jest"
       ],
       "agents": [
         "antigravity",
@@ -199,7 +202,14 @@
         "screaming architecture react native",
         "arquitectura react native",
         "crear feature react native",
-        "estructurar expo"
+        "estructurar expo",
+        "expo app structure",
+        "expo router tabs",
+        "proteger rutas expo",
+        "crear pantalla react native",
+        "react native tanstack hook",
+        "oxlint expo",
+        "configurar lint react native"
       ],
       "requires": []
     },

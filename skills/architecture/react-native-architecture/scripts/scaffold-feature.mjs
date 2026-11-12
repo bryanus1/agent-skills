@@ -2,7 +2,7 @@
 
 import path from 'node:path';
 import { KEBAB_REGEX, applyFiles, fail, parseArgs, toPascalCase } from './lib/scaffold.mjs';
-import { barrel, modelTemplate, routeTemplate, screenTemplate, screenTestTemplate } from './lib/templates.mjs';
+import { barrel, layoutTemplate, modelTemplate, routeTemplate, screenTemplate, screenTestTemplate } from './lib/templates.mjs';
 
 function printHelp() {
   console.log(`
@@ -14,8 +14,11 @@ Arguments:
 Options:
   --target-dir <dir>  Base directory for features (default: src/features)
   --app-dir <dir>     Expo Router directory used by --with-route (default: src/app)
+  --route-path <path> Relative route subpath under app-dir (default: feature-name)
   --with-starter      Generate starter model and screen files
   --with-route        Also generate a thin Expo Router route (requires --with-starter)
+  --with-layout       Generate a thin _layout.tsx in the route folder
+  --minimal           Do not create empty subfolders; generate only active directories
   --dry-run           List what would be generated without writing anything
   --force             Overwrite files that already exist (default: abort on conflict)
   --help, -h          Show this help message
@@ -30,8 +33,8 @@ function main() {
   }
 
   const { positional, flags } = parseArgs(argv, {
-    booleans: ['--with-starter', '--with-route', '--dry-run', '--force'],
-    strings: ['--target-dir', '--app-dir'],
+    booleans: ['--with-starter', '--with-route', '--with-layout', '--minimal', '--dry-run', '--force'],
+    strings: ['--target-dir', '--app-dir', '--route-path'],
   });
   const [name] = positional;
   if (!name || !KEBAB_REGEX.test(name)) {
@@ -40,9 +43,14 @@ function main() {
   if (flags['with-route'] && !flags['with-starter']) {
     fail('--with-route requires --with-starter (the route re-exports the starter screen).');
   }
+  if (flags['with-layout'] && !flags['with-route']) {
+    fail('--with-layout requires --with-route.');
+  }
 
   const featureRoot = path.resolve(process.cwd(), flags['target-dir'] ?? 'src/features', name);
-  const dirs = ['components', 'hooks', 'models', 'schemas', 'screens', 'services', 'utils'].map((d) => path.join(featureRoot, d));
+  const dirs = flags.minimal
+    ? []
+    : ['components', 'hooks', 'models', 'schemas', 'screens', 'services', 'utils'].map((d) => path.join(featureRoot, d));
   const files = [];
 
   if (flags['with-starter']) {
@@ -56,8 +64,12 @@ function main() {
       { path: path.join(screenDir, 'index.ts'), content: barrel(`${name}-home`) },
     );
     if (flags['with-route']) {
-      const routePath = path.resolve(process.cwd(), flags['app-dir'] ?? 'src/app', name, 'index.tsx');
-      files.push({ path: routePath, content: routeTemplate(pascal, name) });
+      const relRoute = flags['route-path'] ?? name;
+      const routeFolder = path.resolve(process.cwd(), flags['app-dir'] ?? 'src/app', relRoute);
+      files.push({ path: path.join(routeFolder, 'index.tsx'), content: routeTemplate(pascal, name) });
+      if (flags['with-layout']) {
+        files.push({ path: path.join(routeFolder, '_layout.tsx'), content: layoutTemplate(pascal) });
+      }
     }
   }
 
