@@ -328,6 +328,83 @@
       "requires": []
     },
     {
+      "name": "design-patterns",
+      "version": "1.0.0",
+      "description": "Elige y aplica patrones de diseño (GoF y modernos: Strategy, Adapter, Factory, Repository, Result, Compound Components, hooks) a partir del problema, no del catálogo, y decide cuándo NO usar ninguno. Úsala al pedir un patrón, al ver ifs/switch repetidos, SDKs acoplados o lógica de UI duplicada, en frontend o backend.",
+      "category": "practices",
+      "path": "skills/practices/design-patterns/SKILL.md",
+      "readme": "skills/practices/design-patterns/README.md",
+      "tags": [
+        "design-patterns",
+        "gof",
+        "strategy",
+        "adapter",
+        "factory",
+        "repository",
+        "refactoring",
+        "best-practices"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "patrón de diseño",
+        "patrones de diseño",
+        "design pattern",
+        "qué patrón uso",
+        "aplica el patrón strategy",
+        "patrón repository",
+        "patrón adapter",
+        "factory pattern",
+        "strategy pattern",
+        "observer pattern"
+      ],
+      "requires": []
+    },
+    {
+      "name": "solid-principles",
+      "version": "1.0.0",
+      "description": "Aplica y revisa los principios SOLID (SRP, OCP, LSP, ISP, DIP) a nivel de clase, módulo y componente, en backend y frontend: detecta violaciones, refactoriza con tests y decide cuándo NO aplicarlos. Úsala al diseñar o revisar clases, servicios, hooks o componentes con demasiadas responsabilidades o acoplamiento.",
+      "category": "practices",
+      "path": "skills/practices/solid-principles/SKILL.md",
+      "readme": "skills/practices/solid-principles/README.md",
+      "tags": [
+        "solid",
+        "srp",
+        "ocp",
+        "lsp",
+        "isp",
+        "dip",
+        "design",
+        "refactoring",
+        "best-practices"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "solid",
+        "principios solid",
+        "single responsibility",
+        "responsabilidad única",
+        "open closed",
+        "inversión de dependencias",
+        "dependency inversion",
+        "esta clase hace demasiado",
+        "este servicio tiene demasiadas responsabilidades",
+        "refactor to solid"
+      ],
+      "requires": []
+    },
+    {
       "name": "tdd-workflow",
       "version": "1.0.0",
       "description": "Desarrollo guiado por tests (TDD): ciclo Red → Green → Refactor con lista de tests, triangulación y test doubles, para frontend y backend. Úsala al implementar una feature o corregir un bug \"con TDD\", \"test first\" o \"escribiendo los tests primero\", o al reproducir un bug con un test que falle antes de arreglarlo.",
