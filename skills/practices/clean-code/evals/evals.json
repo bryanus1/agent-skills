@@ -1,0 +1,108 @@
+{
+  "skill_name": "clean-code",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Refactoriza evals/inputs/order-report/src/order-report.ts, está horrible y nadie lo entiende. Tiene tests en evals/inputs/order-report/test, que deben seguir pasando. No cambies lo que hace.",
+      "expected_output": "Se ejecutan los tests antes y después (4/4 en verde) y se muestra la salida. La función queda dividida en funciones con nombres de dominio (filtrado por mes, total por pedido, impuestos, etiqueta de estado), con guard clauses o pipeline en lugar de 6 niveles de anidamiento, constantes con nombre para 1.04/1.21/1.2/4 y una tabla para las etiquetas de estado. El export `report` y su comportamiento observable se conservan. El reporte final incluye hallazgos y cambios aplicados, y menciona en 'fuera de alcance' cosas como el argumento bandera o el catch que oculta errores en vez de cambiarlas en silencio.",
+      "files": [
+        "evals/inputs/order-report/package.json",
+        "evals/inputs/order-report/README.md",
+        "evals/inputs/order-report/src/order-report.ts",
+        "evals/inputs/order-report/test/order-report.test.ts"
+      ],
+      "assertions": [
+        "Los 4 tests originales pasan al final",
+        "El archivo de test no se modificó",
+        "`report` sigue exportado con los mismos 5 parámetros",
+        "El anidamiento máximo de report baja a 3 o menos (detect-smells sin deep-nesting)",
+        "Las tasas de impuestos (1.04/1.21/1.2) están en constantes con nombre",
+        "La respuesta indica haber ejecutado los tests antes y después"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Revisa evals/inputs/UserList.tsx y dime qué mejorarías para que sea más limpio y mantenible. Solo la revisión, no lo cambies todavía.",
+      "expected_output": "No se modifica el archivo. El reporte prioriza por impacto: primero problemas de corrección (el click en el botón borrar se propaga al onClick del li y también selecciona; error de fetch tragado con catch vacío; dependencias faltantes en useEffect como props.team y showInactive; borrado sin manejo de error) y después legibilidad (any, nombres de una letra l/f/x, estado derivado `filtered` con useEffect, argumento bandera en handle, ternarios anidados, números mágicos de status). Cada hallazgo tiene ubicación con línea y un refactor concreto.",
+      "files": [
+        "evals/inputs/UserList.tsx"
+      ],
+      "assertions": [
+        "UserList.tsx no se modificó",
+        "Señala que el click del botón borrar se propaga al onClick del li",
+        "Señala el error de fetch tragado (catch vacío)",
+        "Señala dependencias faltantes en useEffect (props.team / showInactive)",
+        "Los hallazgos incluyen referencias de línea",
+        "Prioriza problemas de corrección antes que estilo"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Limpia el código de evals/inputs/legacy-pricing/src/pricing.ts, quiero que quede legible. Ojo que se usa en checkout.",
+      "expected_output": "Como no hay tests, antes de refactorizar se escriben tests de caracterización que fijan el comportamiento actual (tipos de usuario vip/emp/normal con más de 10 pedidos, descuentos por cantidad 5 y 10, recargo de fin de semana excepto food, usuario null, redondeo) y se ejecutan en verde. Luego se refactoriza con nombres claros, constantes con nombre y funciones pequeñas, conservando la firma exportada `calc` (o avisando si se propone cambiarla). Los tests siguen en verde al final. Se señalan sin corregir en silencio rarezas como la dependencia de la zona horaria en getDay o el comentario 'DO NOT TOUCH'.",
+      "files": [
+        "evals/inputs/legacy-pricing/package.json",
+        "evals/inputs/legacy-pricing/README.md",
+        "evals/inputs/legacy-pricing/src/pricing.ts"
+      ],
+      "assertions": [
+        "Existe un archivo de tests nuevo y la suite pasa con `npm test`",
+        "`calc` sigue exportado con la misma firma (4 parámetros)",
+        "Los tests de caracterización se escribieron y ejecutaron antes del refactor (según la respuesta)",
+        "Los tests cubren vip/emp, tramos de cantidad y recargo de fin de semana excepto food",
+        "Se señala la dependencia de la zona horaria de getDay u otra rareza sin cambiar el comportamiento en silencio"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Refactoriza evals/inputs/pagination/src/paginate.ts para que se entienda mejor. No quiero cambios de comportamiento, esto lo consume el frontend.",
+      "expected_output": "Se refactoriza (nombres, tipos, guard clauses, constantes MAX/DEFAULT page size) conservando exactamente el comportamiento, incluido el off-by-one de hasNext (p*s < total-1), que se reporta como bug fuera de alcance en vez de corregirse en silencio. Antes de refactorizar se añaden tests de caracterización para los casos no cubiertos.",
+      "files": [
+        "evals/inputs/pagination/package.json",
+        "evals/inputs/pagination/README.md",
+        "evals/inputs/pagination/src/paginate.ts",
+        "evals/inputs/pagination/test/paginate.test.ts"
+      ],
+      "assertions": [
+        "La suite pasa y el test original no se modificó",
+        "`paginate` sigue exportado con 3 parámetros",
+        "No corrige el bug en silencio: hasNext sigue siendo false para 11 elementos en la página 1 de 10, o la respuesta declara explícitamente el cambio",
+        "La respuesta reporta el off-by-one de hasNext"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Limpia formatInvoiceLine en evals/inputs/invoice/src/invoice.ts, es la que me cuesta leer.",
+      "expected_output": "Solo cambia formatInvoiceLine (y helpers nuevos que extraiga). calcTotals e invoiceNumber quedan intactas aunque también sean mejorables (como mucho se mencionan como fuera de alcance). Los 5 tests pasan y la firma pública no cambia.",
+      "files": [
+        "evals/inputs/invoice/package.json",
+        "evals/inputs/invoice/README.md",
+        "evals/inputs/invoice/src/invoice.ts",
+        "evals/inputs/invoice/test/invoice.test.ts"
+      ],
+      "assertions": [
+        "La suite pasa y el test original no se modificó",
+        "calcTotals e invoiceNumber quedan byte a byte iguales",
+        "formatInvoiceLine sigue exportada con 4 parámetros",
+        "formatInvoiceLine ya no rellena con bucles while"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Mejora evals/inputs/notify/src/notify.ts aplicando buenas prácticas y patrones de diseño.",
+      "expected_output": "Mejora proporcionada: template literals, extracción del helper/plantilla común o de la URL base a configuración, sin introducir jerarquías de clases, factorías o Strategy para dos funciones. Explica por qué no hace falta un patrón más pesado (regla de tres / YAGNI). Exports y tests intactos.",
+      "files": [
+        "evals/inputs/notify/package.json",
+        "evals/inputs/notify/README.md",
+        "evals/inputs/notify/src/notify.ts",
+        "evals/inputs/notify/test/notify.test.ts"
+      ],
+      "assertions": [
+        "La suite pasa y el test original no se modificó",
+        "No introduce clases nuevas y el código fuente no supera el doble de líneas del original",
+        "sendWelcomeEmail y sendPasswordResetEmail siguen exportadas con la misma firma",
+        "La respuesta justifica no aplicar un patrón más pesado (regla de tres, YAGNI o sobre-ingeniería)"
+      ]
+    }
+  ]
+}
