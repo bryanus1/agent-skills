@@ -1,0 +1,47 @@
+{
+  "skill_name": "backend-best-practices",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Revisa evals/inputs/orders-api/src/orders-api.ts y aplica buenas prácticas de backend. Corrige lo que haga falta.",
+      "expected_output": "Tabla de hallazgos priorizada con archivo:línea. Críticos: inyección SQL por interpolación en listOrders (status e id), getOrder sin comprobar propiedad del pedido (IDOR) y createOrder que copia req.body (mass assignment, user_id/status del cliente). Importantes: createOrder devuelve 200 con err.stack, N+1 de items, listado sin límite. Corrige con consultas parametrizadas (= ANY($1) para items), comprobación de propiedad y construcción explícita del pedido con user.id de la sesión. Avisa de que cambiar códigos de estado/límite modifica el contrato y lo declara o pide confirmación. No añade capas, caché ni dependencias. Los tests siguen pasando.",
+      "files": [
+        "evals/inputs/orders-api/package.json",
+        "evals/inputs/orders-api/README.md",
+        "evals/inputs/orders-api/src/db.ts",
+        "evals/inputs/orders-api/src/orders-api.ts",
+        "evals/inputs/orders-api/test/orders-api.test.ts"
+      ],
+      "assertions": [
+        "La suite pasa con `npm test`",
+        "Las consultas de listOrders ya no interpolan valores (parámetros $1)",
+        "Elimina el N+1 de items (una consulta para todos los pedidos o equivalente)",
+        "getOrder comprueba que el pedido pertenece al usuario autenticado",
+        "createOrder no copia req.body entero ni toma user_id del cuerpo",
+        "El error de createOrder ya no devuelve 200 ni err.stack",
+        "Avisa explícitamente de qué cambios modifican el contrato HTTP",
+        "No añade dependencias ni capas de repositorio/DTO generales",
+        "Cita archivo:línea en los hallazgos",
+        "Declara qué no pudo verificar (rendimiento con datos reales o índices)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Aplica buenas prácticas de backend a evals/inputs/health-handler/src/get-user.ts, quiero que quede perfecto.",
+      "expected_output": "Revisa las áreas y concluye que el handler ya cumple (autenticación, validación del id, autorización por recurso, 404, almacén inyectado, respuesta con campos explícitos). No añade capas, caché, logging innecesario ni dependencias; las sugerencias opcionales (por ejemplo log estructurado en el middleware) se marcan como tales con su condición. El archivo queda sin cambios o con cambios mínimos justificados y los tests pasan.",
+      "files": [
+        "evals/inputs/health-handler/package.json",
+        "evals/inputs/health-handler/README.md",
+        "evals/inputs/health-handler/src/get-user.ts",
+        "evals/inputs/health-handler/test/get-user.test.ts"
+      ],
+      "assertions": [
+        "La suite pasa con `npm test`",
+        "Declara explícitamente que no hay hallazgos relevantes o que el handler ya cumple",
+        "No añade capas (repositorio, servicio, DTO), caché ni dependencias",
+        "Cualquier mejora sugerida se presenta como opcional con su condición",
+        "El archivo queda sin cambios o con un cambio mínimo justificado"
+      ]
+    }
+  ]
+}
