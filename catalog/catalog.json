@@ -293,6 +293,77 @@
       "requires": []
     },
     {
+      "name": "clean-code",
+      "version": "1.0.0",
+      "description": "Clean Code a nivel de función y archivo: nombres, funciones pequeñas, manejo de errores, comentarios y catálogo de code smells → refactor, con detector heurístico. Úsala al limpiar, refactorizar o revisar la legibilidad de código frontend o backend, o al escribir código nuevo que deba quedar mantenible.",
+      "category": "practices",
+      "path": "skills/practices/clean-code/SKILL.md",
+      "readme": "skills/practices/clean-code/README.md",
+      "tags": [
+        "clean-code",
+        "refactoring",
+        "code-smells",
+        "readability",
+        "code-review",
+        "best-practices"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "clean code",
+        "código limpio",
+        "limpia este código",
+        "refactoriza esta función",
+        "code smells",
+        "mejorar legibilidad",
+        "revisar legibilidad",
+        "este código es difícil de leer",
+        "refactor for readability"
+      ],
+      "requires": []
+    },
+    {
+      "name": "tdd-workflow",
+      "version": "1.0.0",
+      "description": "Desarrollo guiado por tests (TDD): ciclo Red → Green → Refactor con lista de tests, triangulación y test doubles, para frontend y backend. Úsala al implementar una feature o corregir un bug \"con TDD\", \"test first\" o \"escribiendo los tests primero\", o al reproducir un bug con un test que falle antes de arreglarlo.",
+      "category": "practices",
+      "path": "skills/practices/tdd-workflow/SKILL.md",
+      "readme": "skills/practices/tdd-workflow/README.md",
+      "tags": [
+        "tdd",
+        "testing",
+        "unit-tests",
+        "red-green-refactor",
+        "vitest",
+        "jest",
+        "best-practices"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "tdd",
+        "test driven development",
+        "desarrollo guiado por tests",
+        "test first",
+        "escribe los tests primero",
+        "red green refactor",
+        "reproducir bug con un test",
+        "test que falle primero",
+        "implementa con tdd"
+      ],
+      "requires": []
+    },
+    {
       "name": "ssh-connect",
       "version": "1.0.0",
       "description": "Gestión, conexión y ejecución remota en servidores SSH con ssh-connect. Soporta llaves .pem con permisos asegurados, contraseñas automatizadas (Keychain) y multiplexación persistente sin bloqueos de TTY.",

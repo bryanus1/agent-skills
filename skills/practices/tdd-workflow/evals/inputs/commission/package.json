@@ -1,0 +1,8 @@
+{
+  "name": "commission",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}

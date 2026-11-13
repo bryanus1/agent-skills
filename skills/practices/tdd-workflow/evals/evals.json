@@ -1,0 +1,108 @@
+{
+  "skill_name": "tdd-workflow",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Con TDD, implementa calculateShipping(order) en el proyecto evals/inputs/shipping (los tipos están en src/order.ts). Reglas: carrito vacío no paga envío; subtotal (price*qty) desde 50 € tiene envío gratis; si no, 4.99 €; la zona 'remote' paga 10 € extra siempre que haya envío; los pedidos con algún ítem de peso negativo lanzan un error de validación. Usa node:test, ya está configurado.",
+      "expected_output": "Existe una lista de tests explícita antes del código. Se crea un archivo de test antes de la implementación y se muestra al menos un rojo real (salida de ejecución) antes del verde. Los ciclos avanzan de uno en uno. La suite final pasa con `npm test`. Se cubren el límite exacto de 50 €, el recargo remoto con envío gratis y el error de peso negativo. El reporte final enumera los ciclos (test, motivo del rojo, estrategia de verde, refactor).",
+      "files": [
+        "evals/inputs/shipping/package.json",
+        "evals/inputs/shipping/src/order.ts",
+        "evals/inputs/shipping/README.md"
+      ],
+      "assertions": [
+        "La suite final pasa con `npm test` y tiene al menos 5 tests",
+        "Hay un test para el límite exacto de 50 € (envío gratis)",
+        "Hay un test para zona remota con envío gratis (solo 10 €) o se documenta la interpretación",
+        "Hay un test que verifica el error por peso negativo",
+        "La respuesta muestra evidencia de un rojo real (salida de un test fallando) antes del verde",
+        "La respuesta incluye una lista de tests o tabla de ciclos Red/Green/Refactor"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Bug en evals/inputs/duration-bug: parseDuration('90s') devuelve 0 en vez de 90, y parseDuration('2x') también devuelve 0 cuando debería lanzar un error porque la unidad no existe. Arréglalo.",
+      "expected_output": "Antes de tocar src/parse-duration.ts se añaden tests que reproducen ambos bugs y se ejecutan mostrando que fallan. Luego se corrige el código (soporte de segundos y error ante unidades desconocidas o entrada vacía/sin coincidencias) y la suite completa pasa, incluidos los 2 tests previos. No se eliminan ni debilitan los tests existentes. Se reporta la evidencia rojo → verde.",
+      "files": [
+        "evals/inputs/duration-bug/package.json",
+        "evals/inputs/duration-bug/src/parse-duration.ts",
+        "evals/inputs/duration-bug/test/parse-duration.test.ts",
+        "evals/inputs/duration-bug/README.md"
+      ],
+      "assertions": [
+        "La suite final pasa con `npm test`",
+        "Los 2 tests originales siguen presentes y sin debilitar",
+        "Hay un test para parseDuration('90s') === 90",
+        "Hay un test que espera un error para una unidad desconocida ('2x')",
+        "La respuesta muestra que los tests nuevos fallaron antes de la corrección"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "En evals/inputs/cart-coupons quiero que CartService soporte cupones: applyCoupon(cartId, coupon) devuelve el total con descuento. Hay cupones de porcentaje y de importe fijo, el total nunca baja de 0 y un cupón caducado se rechaza con error. Hazlo con TDD, test first.",
+      "expected_output": "Los tests nuevos siguen la convención existente (archivo .spec.ts dentro de test/, InMemoryCartRepository como fake). La caducidad se prueba de forma determinista inyectando el reloj o la fecha actual, no con la fecha real del sistema. Hay al menos un rojo real mostrado antes de cada implementación relevante. Se cubren porcentaje, importe fijo, suelo de 0 y cupón caducado. La suite completa pasa con `npm test`.",
+      "files": [
+        "evals/inputs/cart-coupons/package.json",
+        "evals/inputs/cart-coupons/src/cart-service.ts",
+        "evals/inputs/cart-coupons/test/cart-service.spec.ts",
+        "evals/inputs/cart-coupons/README.md"
+      ],
+      "assertions": [
+        "La suite final pasa con `npm test`",
+        "Los tests nuevos siguen la convención: archivos .spec.ts dentro de test/",
+        "La caducidad se prueba de forma determinista (reloj/fecha inyectada, sin new Date() sin argumentos en los tests)",
+        "Se cubren porcentaje, importe fijo, suelo de 0 y cupón caducado",
+        "La respuesta muestra evidencia de un rojo real antes del verde"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Desde el mes que viene los vendedores premium cobran un 7% de comisión en lugar del 5%. Haz el cambio en evals/inputs/commission/src/commission.ts; esto se usa para pagar nóminas, así que no la líes.",
+      "expected_output": "Como no hay tests, primero se escriben tests de caracterización del comportamiento actual (basic 3%, standard 5%, bonus +1% por encima de 10000, reembolsos 0, redondeo) y un test para premium 7% que se ve fallar. Después se cambia solo la tasa premium. El bonus de +1% sigue aplicándose a premium (8%) o se pregunta explícitamente. La suite pasa.",
+      "files": [
+        "evals/inputs/commission/package.json",
+        "evals/inputs/commission/README.md",
+        "evals/inputs/commission/src/commission.ts"
+      ],
+      "assertions": [
+        "Existe un archivo de tests nuevo y la suite pasa con `npm test`",
+        "Hay tests de caracterización de los tiers no modificados (basic, standard, bonus >10000, reembolso)",
+        "La respuesta muestra que el test de premium 7% falló antes del cambio",
+        "Comportamiento final: premium 7% (8% con bonus) y el resto de tiers sin cambios"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Me escriben clientes: con el cupón BLACKFRIDAY y un carrito de exactamente 100 € no se aplica el 20%. Arréglalo rápido porfa, que está la campaña en marcha. El proyecto está en evals/inputs/coupon-bug.",
+      "expected_output": "Pese a la prisa, primero se añade un test que reproduce el bug (100 € con BLACKFRIDAY → 80) y se muestra fallando; luego se corrige el límite (>=) y la suite completa pasa sin tocar los 3 tests existentes. Se mencionan casos hermanos del límite (p. ej. 99.99).",
+      "files": [
+        "evals/inputs/coupon-bug/package.json",
+        "evals/inputs/coupon-bug/README.md",
+        "evals/inputs/coupon-bug/src/discounts.ts",
+        "evals/inputs/coupon-bug/test/discounts.test.ts"
+      ],
+      "assertions": [
+        "La suite pasa y los 3 tests originales siguen intactos",
+        "Hay un test nuevo para BLACKFRIDAY con total exactamente 100",
+        "La respuesta muestra que ese test falló antes de la corrección",
+        "Comportamiento final: applyCoupon(100,'BLACKFRIDAY') = 80 y applyCoupon(99.99,'BLACKFRIDAY') = 99.99"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Con TDD, implementa en evals/inputs/rate-limiter/src un RateLimiter: cada usuario puede hacer como máximo N peticiones en una ventana deslizante de 60 segundos; allow(userId) devuelve true o false. N se configura al crear el limiter.",
+      "expected_output": "Los tests controlan el tiempo (reloj inyectado o mock.timers), sin esperas reales, y la suite tarda menos de unos segundos. Se cubren el límite exacto (N permitidas, N+1 rechazada), aislamiento por usuario y el deslizamiento de la ventana (vuelve a permitir tras 60 s). Se muestran rojos reales.",
+      "files": [
+        "evals/inputs/rate-limiter/package.json",
+        "evals/inputs/rate-limiter/README.md",
+        "evals/inputs/rate-limiter/src/index.ts"
+      ],
+      "assertions": [
+        "La suite pasa con `npm test` en menos de 5 segundos",
+        "Los tests no esperan tiempo real (sin setTimeout/sleep reales ni Date.now() sin controlar)",
+        "Se cubren el límite N/N+1, el aislamiento por usuario y el deslizamiento de la ventana",
+        "La respuesta muestra evidencia de rojos reales"
+      ]
+    }
+  ]
+}
