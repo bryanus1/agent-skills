@@ -1,0 +1,41 @@
+{
+  "skill_name": "frontend-best-practices",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Revisa evals/inputs/user-list/src/UserList.tsx y aplica buenas prácticas de frontend. Corrige lo que haga falta.",
+      "expected_output": "Tabla de hallazgos priorizada con archivo:línea. Críticos: dangerouslySetInnerHTML con bio (XSS) y li con onClick no operable con teclado. Importantes: fetch en efecto sin cancelación ni manejo de error/carga, estado derivado en useEffect (visible), key={index}, img sin alt. Corrige con cambios mínimos (texto en lugar de HTML, button, AbortController, derivar en el render, key=id, alt), sin introducir librerías nuevas ni useMemo sin evidencia. Declara qué no pudo verificar sin navegador.",
+      "files": [
+        "evals/inputs/user-list/README.md",
+        "evals/inputs/user-list/src/UserList.tsx"
+      ],
+      "assertions": [
+        "Identifica dangerouslySetInnerHTML como riesgo de XSS y lo marca como crítico",
+        "Corrige el elemento clicable para que sea operable con teclado (button o equivalente)",
+        "El efecto de datos usa cancelación (AbortController o equivalente) y trata error o carga",
+        "El estado `visible` deja de ser un estado sincronizado con useEffect",
+        "key usa el id del usuario, no el índice",
+        "La imagen tiene atributo alt",
+        "No añade dependencias nuevas ni useMemo/memo injustificados",
+        "Indica qué no pudo verificar (lector de pantalla, navegador) o cómo comprobarlo",
+        "Cita archivo:línea en los hallazgos"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Aplica buenas prácticas de frontend a evals/inputs/search-box/src/SearchBox.tsx, quiero que quede perfecto.",
+      "expected_output": "Revisa las seis áreas y concluye que el componente ya cumple (label asociado con useId, type=search, role=search, botón submit, estado local mínimo, sin efectos). No añade memo, useCallback, debounce ni librerías; si propone algo, lo marca como opcional con su condición (p. ej. debounce solo si onSearch dispara peticiones por tecla, lo cual aquí no ocurre). El archivo queda sin cambios o con cambios mínimos justificados.",
+      "files": [
+        "evals/inputs/search-box/README.md",
+        "evals/inputs/search-box/src/SearchBox.tsx"
+      ],
+      "assertions": [
+        "Declara explícitamente que no hay hallazgos relevantes o que el componente ya cumple",
+        "No añade memo, useMemo ni useCallback",
+        "No añade debounce, librerías ni abstracciones",
+        "Cualquier mejora sugerida se presenta como opcional con su condición",
+        "El archivo queda sin cambios o con un cambio mínimo justificado"
+      ]
+    }
+  ]
+}

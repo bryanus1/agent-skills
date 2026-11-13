@@ -293,6 +293,41 @@
       "requires": []
     },
     {
+      "name": "backend-best-practices",
+      "version": "1.0.0",
+      "description": "Revisa y mejora código backend (APIs HTTP, servicios, acceso a datos) con buenas prácticas verificables: diseño de API, validación y errores, acceso a datos, seguridad, fiabilidad y observabilidad. Prioriza por impacto y corrige solo lo que duele. Úsala al revisar o escribir endpoints, servicios y consultas.",
+      "category": "practices",
+      "path": "skills/practices/backend-best-practices/SKILL.md",
+      "readme": "skills/practices/backend-best-practices/README.md",
+      "tags": [
+        "backend",
+        "api",
+        "rest",
+        "security",
+        "database",
+        "observability",
+        "best-practices"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "buenas prácticas backend",
+        "backend best practices",
+        "revisa este endpoint",
+        "review api",
+        "diseño de api",
+        "seguridad backend",
+        "n+1",
+        "revisión de backend"
+      ],
+      "requires": []
+    },
+    {
       "name": "clean-code",
       "version": "1.0.0",
       "description": "Clean Code a nivel de función y archivo: nombres, funciones pequeñas, manejo de errores, comentarios y catálogo de code smells → refactor, con detector heurístico. Úsala al limpiar, refactorizar o revisar la legibilidad de código frontend o backend, o al escribir código nuevo que deba quedar mantenible.",
@@ -362,6 +397,41 @@
         "factory pattern",
         "strategy pattern",
         "observer pattern"
+      ],
+      "requires": []
+    },
+    {
+      "name": "frontend-best-practices",
+      "version": "1.0.0",
+      "description": "Revisa y mejora código frontend (React/Next.js y afines) con buenas prácticas verificables: estado y efectos, datos remotos, formularios, accesibilidad, rendimiento y seguridad. Prioriza hallazgos por impacto y corrige solo lo que duele. Úsala al revisar o escribir componentes, hooks y páginas.",
+      "category": "practices",
+      "path": "skills/practices/frontend-best-practices/SKILL.md",
+      "readme": "skills/practices/frontend-best-practices/README.md",
+      "tags": [
+        "frontend",
+        "react",
+        "nextjs",
+        "accessibility",
+        "performance",
+        "security",
+        "best-practices"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "buenas prácticas frontend",
+        "frontend best practices",
+        "revisa este componente",
+        "review react component",
+        "accesibilidad",
+        "mejorar rendimiento react",
+        "useEffect",
+        "revisión de frontend"
       ],
       "requires": []
     },
