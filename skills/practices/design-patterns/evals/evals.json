@@ -1,0 +1,65 @@
+{
+  "skill_name": "design-patterns",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "En evals/inputs/carriers cada vez que añadimos un transportista tengo que tocar shipping.ts, eta.ts y labels.ts. Aplica el patrón Strategy.",
+      "expected_output": "Formula el problema (switch repetido en 3 archivos, 3 variantes sin estado) y elige la solución más simple que encaje: una tabla/registro de reglas por transportista (o Strategy ligera) en un único lugar. Los tres switch desaparecen y los tres archivos delegan o se consolidan; añadir un transportista pasa a ser una entrada. Tests originales en verde y API pública intacta. Justifica por qué tabla en vez de jerarquía de clases + factoría, y cuándo reevaluar.",
+      "files": [
+        "evals/inputs/carriers/package.json",
+        "evals/inputs/carriers/README.md",
+        "evals/inputs/carriers/src/order.ts",
+        "evals/inputs/carriers/src/shipping.ts",
+        "evals/inputs/carriers/src/eta.ts",
+        "evals/inputs/carriers/src/labels.ts",
+        "evals/inputs/carriers/test/carriers.test.ts"
+      ],
+      "assertions": [
+        "La suite pasa con `npm test`",
+        "Ya no queda ningún `switch` en src/",
+        "shippingCost, etaDays y carrierLabel siguen exportadas con su firma",
+        "Los nombres de transportista ('express', 'pickup') se definen en un único archivo de reglas, no en tres",
+        "No se crean jerarquías de clases ni factorías por transportista",
+        "La respuesta explica por qué elige tabla o Strategy ligera frente a clases + factoría"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Quiero un patrón serio para la configuración de evals/inputs/app-config: aplícale Singleton y Factory.",
+      "expected_output": "Cuestiona la petición con argumentos: loadConfig ya es una función pura con el entorno inyectable y testeable; un Singleton añade estado global y dificulta los tests, y una Factory no tiene variantes que crear. Deja el diseño como está o propone como mucho cargar la configuración una vez en la raíz de composición y pasarla como parámetro. No introduce getInstance ni clases Factory. Tests en verde.",
+      "files": [
+        "evals/inputs/app-config/package.json",
+        "evals/inputs/app-config/README.md",
+        "evals/inputs/app-config/src/config.ts",
+        "evals/inputs/app-config/test/config.test.ts"
+      ],
+      "assertions": [
+        "La suite pasa con `npm test`",
+        "No aparece Singleton (getInstance, static instance o similar) en el código",
+        "No se crean clases Factory",
+        "loadConfig sigue exportada con parámetro de entorno opcional",
+        "La respuesta explica por qué el Singleton y la Factory no encajan aquí y ofrece una alternativa"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "En evals/inputs/notifier quiero poder cambiar de proveedor de email y probar notifyShipped sin llamar al SDK real. ¿Qué patrón uso? Aplícalo.",
+      "expected_output": "Identifica Adapter (puerto y adaptador / DIP): define una interfaz del dominio (p. ej. EmailSender con to, subject, html) y un adaptador que envuelve MailClient; notifyShipped recibe el puerto como parámetro o por constructor y ya no importa el SDK. Un test usa un fake en memoria sin tocar vendor/mail-sdk. El único archivo que importa el SDK es el adaptador. La interfaz usa lenguaje del dominio, no copia los campos del SDK (recipient/title/htmlBody). Los errores del SDK no se filtran. Tests existentes en verde o adaptados declarándolo.",
+      "files": [
+        "evals/inputs/notifier/package.json",
+        "evals/inputs/notifier/README.md",
+        "evals/inputs/notifier/src/notifier.ts",
+        "evals/inputs/notifier/src/vendor/mail-sdk.ts",
+        "evals/inputs/notifier/test/notifier.test.ts"
+      ],
+      "assertions": [
+        "La suite pasa con `npm test`",
+        "notifier.ts ya no importa el SDK (vendor/mail-sdk.ts)",
+        "Existe un único archivo fuera de vendor/ que importa el SDK (el adaptador)",
+        "Hay un test de notifyShipped que usa un fake en memoria sin importar el SDK",
+        "La respuesta nombra el patrón Adapter o puerto y adaptador y lo justifica con el problema",
+        "src/vendor/mail-sdk.ts no se modificó"
+      ]
+    }
+  ]
+}

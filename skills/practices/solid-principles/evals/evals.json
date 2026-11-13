@@ -1,0 +1,62 @@
+{
+  "skill_name": "solid-principles",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Este OrderService (evals/inputs/order-service) es un monstruo: valida, calcula precios, guarda en BD y manda el email, y para probarlo dependo de db y mailer globales. Aplícale los principios SOLID que hagan falta.",
+      "expected_output": "Diagnostica con evidencia (SRP: precios, persistencia y notificación; DIP: db y mailer importados dentro del servicio). Extrae el cálculo de precio como lógica pura y hace que OrderService reciba por constructor interfaces pequeñas definidas desde el consumidor (repositorio y notificador), con adaptadores que envuelven db.ts y mailer.ts. Los 4 tests originales siguen pasando (adaptándose solo a la construcción si hace falta, declarándolo). Explica qué NO aplica (LSP/ISP) y no crea una jerarquía de clases para los cupones o impuestos.",
+      "files": [
+        "evals/inputs/order-service/package.json",
+        "evals/inputs/order-service/README.md",
+        "evals/inputs/order-service/src/db.ts",
+        "evals/inputs/order-service/src/mailer.ts",
+        "evals/inputs/order-service/src/order-service.ts",
+        "evals/inputs/order-service/test/order-service.test.ts"
+      ],
+      "assertions": [
+        "La suite pasa con `npm test`",
+        "order-service.ts ya no importa db.ts ni mailer.ts directamente (DIP)",
+        "OrderService se puede construir con dependencias sustitutas (constructor con parámetros)",
+        "El cálculo de precio queda fuera de la clase como función pura exportada o en otro módulo (SRP)",
+        "La respuesta incluye un diagnóstico por principio con decisión (Aplicar/Aplazar/No aplicar)",
+        "No se crean clases para cupones o impuestos (sin jerarquías por variante)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Aplica OCP y SOLID a evals/inputs/tiny-switch/src/status.ts, quiero que quede 'bien diseñado'.",
+      "expected_output": "Concluye que no hace falta: un único switch pequeño y estable en un solo sitio (3 casos) no duele hoy. No introduce interfaces, clases, factorías ni registros. Como mucho propone una tabla Record<Status,string> como mejora opcional y barata, o deja el archivo intacto, y lo justifica (regla de tres / sin segunda variante). Tests intactos y en verde.",
+      "files": [
+        "evals/inputs/tiny-switch/package.json",
+        "evals/inputs/tiny-switch/README.md",
+        "evals/inputs/tiny-switch/src/status.ts",
+        "evals/inputs/tiny-switch/test/status.test.ts"
+      ],
+      "assertions": [
+        "La suite pasa con `npm test`",
+        "No se añaden clases ni interfaces nuevas",
+        "El archivo no supera 1,5 veces las líneas del original",
+        "statusLabel sigue exportada con la misma firma",
+        "La respuesta justifica no aplicar una abstracción más pesada (sin dolor, un solo sitio, regla de tres o similar)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Revisa evals/inputs/storage-lsp/src/storage.ts y dime si hay problemas de diseño. Solo revisión, no cambies nada.",
+      "expected_output": "No modifica archivos. Identifica la violación de LSP/ISP: ArchiveStorage lanza en save/delete y devuelve '' en read de archivo inexistente (distinto contrato que MemoryStorage, que lanza), por lo que purgeTemp y backup fallan o se comportan distinto según la implementación. Propone separar la interfaz en lectura/escritura (FileReader/FileWriter) y que backup/purgeTemp dependan de la mínima necesaria, con evidencia archivo:línea. Indica la decisión de aplicar y qué tests de contrato añadir.",
+      "files": [
+        "evals/inputs/storage-lsp/package.json",
+        "evals/inputs/storage-lsp/README.md",
+        "evals/inputs/storage-lsp/src/storage.ts",
+        "evals/inputs/storage-lsp/test/storage.test.ts"
+      ],
+      "assertions": [
+        "storage.ts no se modificó",
+        "Identifica que ArchiveStorage rompe el contrato al lanzar en save o delete (LSP)",
+        "Señala la inconsistencia de read (devuelve '' en vez de lanzar como MemoryStorage)",
+        "Propone separar la interfaz en lectura y escritura (ISP)",
+        "Incluye referencias de línea o ubicación concreta"
+      ]
+    }
+  ]
+}
