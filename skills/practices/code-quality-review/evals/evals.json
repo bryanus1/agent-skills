@@ -1,0 +1,53 @@
+{
+  "skill_name": "code-quality-review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Haz una revisión de calidad completa de los cambios de esta rama (todo evals/inputs/branch-discounts/src: añade descuentos por cupón y fidelidad). Es un fixture sin git. Solo revisión: no modifiques nada.",
+      "expected_output": "Informe único con veredicto 'Requiere cambios'. Ejecuta los tests (3/3 pasan) y lo declara. Hallazgos priorizados con archivo:línea: Crítico: inyección SQL por interpolación en api/orders.ts (orderId y coupon). Importante: la lógica de cupones y fidelidad en pricing.ts no tiene tests (los 3 existentes pasan sin ejercitarla); useEffect que copia estado derivado en CartSummary.tsx; div onClick no operable con teclado. Menor: 0.15 y umbral 3 como números mágicos. Sin duplicar el mismo problema desde varias lentes, plan de correcciones agrupado por skill dueña, y sin modificar archivos. Omite design-patterns y solid-principles con justificación o los aplica con proporcionalidad.",
+      "files": [
+        "evals/inputs/branch-discounts/package.json",
+        "evals/inputs/branch-discounts/README.md",
+        "evals/inputs/branch-discounts/src/db.ts",
+        "evals/inputs/branch-discounts/src/services/pricing.ts",
+        "evals/inputs/branch-discounts/src/api/orders.ts",
+        "evals/inputs/branch-discounts/src/components/CartSummary.tsx",
+        "evals/inputs/branch-discounts/test/pricing.test.ts"
+      ],
+      "assertions": [
+        "Ejecuta los tests y reporta el resultado real (3/3)",
+        "Veredicto global explícito (Requiere cambios o equivalente)",
+        "Marca como crítica la inyección SQL de api/orders.ts",
+        "Señala que la lógica de cupones/fidelidad no tiene tests que la ejerciten",
+        "Señala el useEffect que copia estado derivado en CartSummary.tsx",
+        "Señala el div con onClick no accesible por teclado",
+        "Señala los números mágicos (0.15 / 3) como hallazgo menor",
+        "Cada hallazgo cita archivo:línea y está ordenado por severidad",
+        "No repite el mismo problema como hallazgos separados de varias lentes",
+        "Incluye plan de correcciones agrupado por skill y pregunta qué aplicar",
+        "No modifica ningún archivo del proyecto",
+        "Declara qué no pudo verificar (navegador, accesibilidad real) o el alcance preexistente"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Haz una revisión de calidad completa de esta rama (evals/inputs/tiny-change). El único cambio es corregir un typo en un mensaje de src/greeting.ts. Solo revisión.",
+      "expected_output": "Revisión proporcionada: ejecuta los tests (2/2), constata que el cambio es trivial y que el código ya es limpio, y concluye 'Listo para PR' sin hallazgos relevantes. No activa lentes de frontend/backend ni propone patrones, capas o refactors. Cualquier sugerencia es opcional y breve. No modifica archivos.",
+      "files": [
+        "evals/inputs/tiny-change/package.json",
+        "evals/inputs/tiny-change/README.md",
+        "evals/inputs/tiny-change/src/greeting.ts",
+        "evals/inputs/tiny-change/test/greeting.test.ts"
+      ],
+      "assertions": [
+        "Ejecuta los tests y reporta el resultado real (2/2)",
+        "Veredicto 'Listo para PR' o equivalente",
+        "Declara que no hay hallazgos relevantes",
+        "No propone patrones, capas, abstracciones ni refactors",
+        "Indica qué lentes se omiten y por qué (o que el cambio es trivial)",
+        "Cualquier mejora sugerida es opcional y menor",
+        "No modifica ningún archivo del proyecto"
+      ]
+    }
+  ]
+}

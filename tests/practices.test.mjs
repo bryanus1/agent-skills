@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { makeTempDir, runScript, writeFiles, listFiles } from './helpers.mjs';
@@ -195,4 +196,82 @@ test('detect-smells: --fail-on-findings exits 1 and thresholds are configurable'
   writeFiles(cwd, { 'src/f.js': 'export function f(a, b, c, d) { return a; }\n' });
   assert.equal(runScript(DETECT_SMELLS, ['--fail-on-findings'], cwd).code, 1);
   assert.equal(runScript(DETECT_SMELLS, ['--fail-on-findings', '--max-params', '4'], cwd).code, 0);
+});
+
+// ── code-quality-review: collect-scope ──────────────────────────────
+
+const COLLECT_SCOPE = 'skills/practices/code-quality-review/scripts/collect-scope.mjs';
+
+function gitIn(dir, ...args) {
+  return execFileSync('git', args, { cwd: dir, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+}
+
+function makeRepo(t) {
+  const dir = makeTempDir(t);
+  gitIn(dir, 'init', '-q', '-b', 'main');
+  gitIn(dir, 'config', 'user.email', 'test@example.com');
+  gitIn(dir, 'config', 'user.name', 'test');
+  gitIn(dir, 'config', 'commit.gpgsign', 'false');
+  writeFiles(dir, { 'src/api/users.ts': 'export const a = 1;\n' });
+  gitIn(dir, 'add', '-A');
+  gitIn(dir, 'commit', '-q', '-m', 'init');
+  gitIn(dir, 'checkout', '-q', '-b', 'feat/x');
+  return dir;
+}
+
+test('collect-scope: --help exits 0', () => {
+  const result = runScript(COLLECT_SCOPE, ['--help'], process.cwd());
+  assert.equal(result.code, 0);
+  assert.match(result.stdout, /--base/);
+});
+
+test('collect-scope: unknown option exits 2', (t) => {
+  const result = runScript(COLLECT_SCOPE, ['--nope'], makeTempDir(t));
+  assert.equal(result.code, 2);
+});
+
+test('collect-scope: outside a git repo without paths exits 2', (t) => {
+  const result = runScript(COLLECT_SCOPE, [], makeTempDir(t));
+  assert.equal(result.code, 2);
+  assert.match(result.stderr, /repositorio git/);
+});
+
+test('collect-scope: classifies the branch changes and recommends lenses', (t) => {
+  const dir = makeRepo(t);
+  writeFiles(dir, {
+    'src/components/Card.tsx': 'export const Card = () => null;\n',
+    'migrations/002_add.sql': 'ALTER TABLE users ADD COLUMN x text;\n',
+  });
+  gitIn(dir, 'add', '-A');
+  gitIn(dir, 'commit', '-q', '-m', 'change');
+  writeFiles(dir, { 'notes.md': 'x\n' });
+  const out = json(runScript(COLLECT_SCOPE, ['--json'], dir));
+  assert.equal(out.files, 3);
+  assert.deepEqual(out.areas.frontend.map((f) => f.file), ['src/components/Card.tsx']);
+  assert.deepEqual(out.areas.data.map((f) => f.file), ['migrations/002_add.sql']);
+  assert.deepEqual(out.areas['config-docs'].map((f) => f.file), ['notes.md']);
+  const lenses = out.lenses.map((l) => l.skill);
+  assert.ok(lenses.includes('frontend-best-practices'));
+  assert.ok(lenses.includes('backend-best-practices'));
+  assert.ok(out.warnings.some((w) => /sin tocar ningún test/.test(w)));
+});
+
+test('collect-scope: --working only reports uncommitted changes and does not modify the repo', (t) => {
+  const dir = makeRepo(t);
+  writeFiles(dir, { 'src/api/users.ts': 'export const a = 2;\n', 'test/users.test.ts': 'x\n' });
+  const before = gitIn(dir, 'status', '--porcelain');
+  const out = json(runScript(COLLECT_SCOPE, ['--working', '--json'], dir));
+  assert.equal(gitIn(dir, 'status', '--porcelain'), before);
+  assert.equal(out.files, 2);
+  assert.equal(out.areas.tests.length, 1);
+  assert.ok(!out.warnings.some((w) => /sin tocar ningún test/.test(w)));
+});
+
+test('collect-scope: without git, classifies the given paths', (t) => {
+  const dir = makeTempDir(t);
+  writeFiles(dir, { 'src/components/A.tsx': 'x\n', 'src/api/b.ts': 'y\n' });
+  const out = json(runScript(COLLECT_SCOPE, ['--json', '--', 'src'], dir));
+  assert.equal(out.files, 2);
+  assert.equal(out.areas.frontend.length, 1);
+  assert.equal(out.areas.backend.length, 1);
 });
