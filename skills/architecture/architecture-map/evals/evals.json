@@ -1,0 +1,42 @@
+{
+  "skill_name": "architecture-map",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "mapa-arquitectura: genera docs/ARCHITECTURE.md desde cero leyendo este repositorio full-stack (Next.js + Postgres/Supabase + Stripe + GitHub Actions).",
+      "expected_output": "El agente explora el repo por capas en solo lectura (manifiestos, módulos, migraciones SQL, .env.example y workflows) sin abrir archivos .env reales, redacta el borrador de docs/ARCHITECTURE.md siguiendo la plantilla con diagrama Mermaid válido, rutas verificadas, nombres de variables de entorno sin valores y commit actual, y muestra el borrador completo esperando confirmación explícita antes de escribir el archivo.",
+      "files": [],
+      "assertions": [
+        "Explora manifiestos, módulos, datos/auth y workflows sin inventar rutas",
+        "No lee archivos .env reales ni expone valores secretos (solo nombres desde .env.example/código)",
+        "Incluye diagrama Mermaid con sintaxis válida (etiquetas especiales entrecomilladas)",
+        "Muestra el borrador completo e indica docs/ARCHITECTURE.md como destino",
+        "Pide confirmación explícita antes de escribir el archivo en disco"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Actualiza la página de arquitectura en Notion leyendo el repo actual: https://www.notion.so/acme/Arquitectura-Sistema-9a8b7c6d5e4f",
+      "expected_output": "El agente lee la página con notion-fetch, identifica secciones manuales (ADRs y contexto de negocio del equipo), explora el repositorio real, resume la deriva detectada (p. ej. nuevo worker o cambio de stack), muestra los cambios propuestos conservando íntegras las notas manuales y espera confirmación explícita antes de re-leer con notion-fetch y actualizar con notion-update-page.",
+      "files": [],
+      "assertions": [
+        "Usa notion-fetch para leer la página existente de Notion",
+        "Resume la deriva detectada entre el repo actual y la página vigente",
+        "Preserva intactas las secciones manuales / ADRs existentes",
+        "Pide confirmación antes de ejecutar notion-update-page",
+        "No crea un docs/ARCHITECTURE.md local duplicado"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Actualiza el mapa de arquitectura de esta pequeña librería CLI en Node.js (sin base de datos ni despliegue cloud). Ya existe ARCHITECTURE.md en la raíz del repo.",
+      "expected_output": "El agente detecta ARCHITECTURE.md en la raíz y lo toma como único destino sin duplicarlo en docs/ARCHITECTURE.md, omite con proporcionalidad secciones inexistentes (BD, RLS, colas, cloud), actualiza comandos, flujos y módulos verificados preservando notas manuales y pide confirmación antes de editar.",
+      "files": [],
+      "assertions": [
+        "Detecta y reutiliza ARCHITECTURE.md existente sin crear un segundo archivo en docs/",
+        "Omite secciones que no aplican (base de datos, RLS, colas)",
+        "Preserva notas manuales previas si existen y pide confirmación antes de escribir"
+      ]
+    }
+  ]
+}
