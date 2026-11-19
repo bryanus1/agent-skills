@@ -1,0 +1,43 @@
+{
+  "skill_name": "pr-plain-review",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "revisar-pr #88 antes de aprobar. El PR dice 'Añade plan anual de suscripción', pero en el diff toca supabase/migrations/20261115_annual_plan.sql (incluye DROP COLUMN legacy_plan y ALTER POLICY con USING (true) en subscriptions), content/legal/terms.mdx y src/billing/checkout.ts.",
+      "expected_output": "El agente lee metadatos, checks y diff sin aprobar ni editar código. Entrega el informe en lenguaje llano explicando qué cambia y por qué, alerta de la desalineación (la descripción omite el DROP COLUMN y el cambio de RLS), lista los 4 archivos críticos con su reversibilidad, marca como riesgo bloqueante/crítico la política USING (true) y como riesgo alto el DROP COLUMN destructivo con archivo:línea, y pregunta qué acción seguir sin ejecutar approve ni merge.",
+      "files": [],
+      "assertions": [
+        "Explica en lenguaje llano qué cambia el PR y por qué",
+        "Detecta la desalineación entre la descripción del PR y los cambios silenciosos en RLS y migración",
+        "Lista en archivos críticos la migración SQL, la política RLS, terms.mdx y checkout.ts",
+        "Señala la irreversibilidad parcial/total del DROP COLUMN y el riesgo de exposición en USING (true)",
+        "Reporta estado real de checks o declara explícitamente lo que no se pudo verificar",
+        "No aprueba, no comenta en GitHub ni modifica archivos"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Revisa mi rama feat/copy-empty-state contra main antes de abrir PR. Solo cambia un texto de estado vacío y margen CSS en src/components/EmptyOrders.tsx.",
+      "expected_output": "El agente inspecciona el diff contra main con git, resume en lenguaje llano que solo cambia el mensaje y espaciado de la pantalla vacía sin afectar datos ni lógica, declara explícitamente que no se tocó ningún archivo crítico tras revisar las 6 categorías, asigna riesgo Bajo con veredicto Aprobar y reversibilidad fácil con git revert.",
+      "files": [],
+      "assertions": [
+        "Resume el cambio en lenguaje llano sin inventar problemas técnicos",
+        "Declara explícitamente que no se tocaron archivos críticos mencionando las categorías revisadas",
+        "Asigna riesgo Bajo y señala que es fácilmente reversible",
+        "No sugiere refactors innecesarios ni modifica código"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Quiero aprobar este PR grande (48 archivos, +1850 líneas) de limpieza de interfaz, pero vi que toca src/server/middleware/auth-guard.ts sin explicarlo en la descripción. Dime si es seguro aprobar.",
+      "expected_output": "El agente declara el alcance real revisado por tratarse de un PR grande, lee completo src/server/middleware/auth-guard.ts para comprobar cómo interactúa con las rutas protegidas, destaca la desalineación entre la descripción de 'limpieza de interfaz' y el cambio en auth/permisos, clasifica el riesgo en función del impacto real con archivo:línea y no aprueba ni publica comentarios sin confirmación.",
+      "files": [],
+      "assertions": [
+        "Declara explícitamente el alcance revisado y resumido al superar el umbral de PR grande",
+        "Lee completo el archivo crítico auth-guard.ts y no solo el fragmento del diff",
+        "Señala como cambio silencioso el toque a auth-guard.ts frente a la descripción de limpieza de UI",
+        "No ejecuta gh pr review --approve ni gh pr comment sin confirmación"
+      ]
+    }
+  ]
+}

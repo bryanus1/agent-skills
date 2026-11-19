@@ -1,0 +1,42 @@
+{
+  "skill_name": "explain-change",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Acabo de correr /opsx:apply sobre openspec/changes/export-invoices-csv/. Corre explicar-cambio para ver qué decisiones tomó la IA que no estaban en la propuesta.",
+      "expected_output": "El agente lee proposal.md, design.md, specs/ y tasks.md de openspec/changes/export-invoices-csv/ (ignorando archive/), recoge el diff real y archivos sin trackear con git, y entrega un informe enfocado únicamente en el delta no especificado: clasifica la nueva librería, el límite de filas y el refactor ajeno por prioridad (🔴/🟡/🟢) con archivo:línea, señala escenarios omitidos y pregunta qué decisiones aceptar o revertir sin modificar código.",
+      "files": [],
+      "assertions": [
+        "Localiza y lee los archivos de openspec/changes/export-invoices-csv/ excluyendo archive/",
+        "Inspecciona el diff real en disco (git diff y archivos nuevos sin trackear)",
+        "Se centra en las decisiones fuera de la propuesta sin repetir toda la spec",
+        "Cita archivo:línea y sección de la propuesta frente a la que diverge o añade algo",
+        "Prioriza con 🔴/🟡/🟢 y pregunta qué aceptar, documentar o revertir",
+        "No modifica archivos del proyecto ni design.md sin confirmación"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Terminó idd-apply en ENG-104 (Linear). ¿Qué decidió la IA fuera del plan y qué dejó sin hacer?",
+      "expected_output": "El agente lee ENG-104 y sus comentarios en Linear (get_issue y list_comments), compara la rama actual contra el plan en ## 🛠️ Plan de Implementación, distingue claramente una desviación ya registrada en comentarios 🔄 Progreso IDD de las decisiones silenciosas nuevas y las omisiones en el código real, y no edita ni comenta el issue sin permiso.",
+      "files": [],
+      "assertions": [
+        "Lee el issue y los comentarios de progreso/desviaciones del tracker",
+        "Distingue desviaciones ya registradas/acordadas de decisiones silenciosas nuevas",
+        "Identifica puntos del plan omitidos o completados parcialmente",
+        "No edita código ni publica cambios en Linear sin confirmación"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "explicar-cambio comparando el working tree actual contra docs/specs/2026-11-15-fix-typo.md (el cambio implementó exactamente lo pedido sin dependencias ni lógica extra).",
+      "expected_output": "El agente lee el .md y el git diff real, comprueba que cada cambio corresponde a la propuesta y concluye limpiamente 'Fiel a la propuesta' sin inventar decisiones ocultas ni tocar archivos.",
+      "files": [],
+      "assertions": [
+        "Lee tanto la propuesta local como el diff real con git",
+        "Declara 'Fiel a la propuesta' sin fabricar hallazgos artificiales",
+        "Mantiene modo solo lectura sin editar ningún archivo"
+      ]
+    }
+  ]
+}

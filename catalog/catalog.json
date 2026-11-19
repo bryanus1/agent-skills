@@ -2,6 +2,40 @@
   "repository": "bryanus1/agent-skills",
   "skills": [
     {
+      "name": "architecture-map",
+      "version": "1.0.0",
+      "description": "Genera o actualiza la página de arquitectura leyendo el repositorio real: stack, diagrama Mermaid, módulos/apps, datos, auth, flujos clave, integraciones y despliegue. Soporta Notion (MCP) y docs/ARCHITECTURE.md local, preservando notas manuales tras confirmar.",
+      "category": "architecture",
+      "path": "skills/architecture/architecture-map/SKILL.md",
+      "readme": "skills/architecture/architecture-map/README.md",
+      "tags": [
+        "architecture",
+        "documentation",
+        "diagram",
+        "mermaid",
+        "notion",
+        "onboarding",
+        "repo-analysis"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "mapa-arquitectura",
+        "mapa de arquitectura",
+        "generar página de arquitectura",
+        "actualizar página de arquitectura",
+        "documentar arquitectura del repo",
+        "architecture map",
+        "update architecture docs"
+      ],
+      "requires": []
+    },
+    {
       "name": "astro-architecture",
       "version": "1.0.0",
       "description": "Estándar de arquitectura para proyectos Astro (landing pages, marketing sites y sitios content-driven). Guía estructura modular, Islands Architecture (Zero-JS), Tailwind CSS, Content Collections con Zod, SEO técnico, astro:assets, linting con OXC y testing E2E con Playwright.",
@@ -289,6 +323,40 @@
         "clean merged branches",
         "post-merge cleanup",
         "eliminar ramas viejas"
+      ],
+      "requires": []
+    },
+    {
+      "name": "pr-plain-review",
+      "version": "1.0.0",
+      "description": "Revisión previa a aprobar un PR o rama en lenguaje llano: explica qué cambió, por qué, qué archivos críticos tocó (migraciones, RLS, términos legales, auth, pagos, infra) y qué riesgo ve. Solo lectura; no modifica código ni aprueba sin confirmación.",
+      "category": "git",
+      "path": "skills/git/pr-plain-review/SKILL.md",
+      "readme": "skills/git/pr-plain-review/README.md",
+      "tags": [
+        "git",
+        "pull-request",
+        "code-review",
+        "risk-analysis",
+        "migrations",
+        "rls",
+        "pre-approval"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "revisar-pr",
+        "revisar pr antes de aprobar",
+        "resumen del pr en lenguaje llano",
+        "qué cambia este pr",
+        "archivos críticos del pr",
+        "pr plain review",
+        "review pr before approving"
       ],
       "requires": []
     },
@@ -627,6 +695,41 @@
         "post format imports",
         "ordenar named imports",
         "sort named imports"
+      ],
+      "requires": []
+    },
+    {
+      "name": "explain-change",
+      "version": "1.0.0",
+      "description": "Tras implementar un cambio con IA (/opsx:apply, idd-apply o cualquier plan), contrasta el diff real contra la propuesta original y resume qué decisiones tomó la IA que no estaban especificadas: supuestos, alcance extra, contratos, dependencias y atajos. Solo lectura.",
+      "category": "workflow",
+      "path": "skills/workflow/explain-change/SKILL.md",
+      "readme": "skills/workflow/explain-change/README.md",
+      "tags": [
+        "workflow",
+        "openspec",
+        "idd",
+        "sdd",
+        "ai-audit",
+        "diff-analysis",
+        "traceability"
+      ],
+      "agents": [
+        "antigravity",
+        "claude-code",
+        "codex",
+        "cursor",
+        "windsurf"
+      ],
+      "triggers": [
+        "explicar-cambio",
+        "explicar cambio",
+        "qué decidió la ia",
+        "decisiones fuera de la propuesta",
+        "después de /opsx:apply",
+        "auditar cambios contra la propuesta",
+        "explain change",
+        "undeclared decisions"
       ],
       "requires": []
     },
