@@ -1,45 +1,45 @@
 # 🛠️ Tool-Assisted Skill Template
 
-> **Plantilla avanzada para skills que combinan instrucciones paso a paso con scripts ejecutables (`scripts/`), referencias técnicas (`references/`) y ejemplos (`examples/`).**
+> **Advanced template for skills that combine step-by-step instructions with executable scripts (`scripts/`), technical references (`references/`) and examples (`examples/`).**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `tool-assisted-skill-template` |
-| **Versión** | `1.0.0` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
-| **Requisitos** | `bash` |
+| **Name** | `tool-assisted-skill-template` |
+| **Version** | `1.1.0` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Requirements** | `bash` |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
 ```bash
-# Instalar en el proyecto actual con skills.sh:
-npx skills add bryanus1/agent-skills --skill <nombre-de-tu-skill>
+# Install into the current project with skills.sh:
+npx skills add bryanus1/agent-skills --skill <your-skill-name>
 
-# Instalar globalmente en tu máquina:
-npx skills add bryanus1/agent-skills --skill <nombre-de-tu-skill> -g
+# Install globally on your machine:
+npx skills add bryanus1/agent-skills --skill <your-skill-name> -g
 ```
 
 ---
 
-## 💡 Ejemplos de Uso con Agentes de IA
+## 💡 Usage Examples with AI Agents
 
-* **Diagnóstico sin modificar archivos**:
-  > *"Ejecuta el diagnóstico de `<nombre-de-tu-skill>` en modo lectura"*
+* **Diagnose without changing files**:
+  > *"Run the `<your-skill-name>` diagnostic in read-only mode"*
   >
-  > 🤖 **El agente ejecutará**: `bash <skill-dir>/scripts/run.sh --check`
+  > 🤖 **The agent runs**: `bash <skill-dir>/scripts/run.sh --check`
 
 ---
 
-## 🛠️ Scripts y Opciones CLI
+## 🛠️ Scripts and CLI Options
 
-- **[`scripts/run.sh`](scripts/run.sh)**: Script principal de automatización (`--check` para diagnóstico, `--fix` para aplicar correcciones).
+- **[`scripts/run.sh`](scripts/run.sh)**: Main automation script (`--check` to diagnose, `--fix` to apply fixes).
 
 ---
 
-## 📚 Documentación y Referencias
+## 📚 Documentation and References
 
-- **[`SKILL.md`](SKILL.md)**: Instrucciones operativas y reglas críticas para el agente de IA.
-- **[Guía Técnica](references/guide.md)**: Documentación de referencia detallada.
-- **[Ejemplos de Entrada/Salida](examples/sample.md)**: Casos de uso de ejemplo.
+- **[`SKILL.md`](SKILL.md)**: Operating instructions and critical rules for the AI agent.
+- **[Technical Guide](references/guide.md)**: Detailed reference documentation.
+- **[Input/Output Examples](examples/sample.md)**: Example use cases.

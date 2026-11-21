@@ -1,49 +1,50 @@
 ---
 name: tool-assisted-skill-template
-version: 1.0.0
+version: 1.1.0
 description: >-
-  Plantilla avanzada para skills que combinan instrucciones paso a paso con scripts ejecutables y documentación complementaria.
+  Advanced template for skills that combine step-by-step instructions with executable scripts and supporting documentation.
 tags: [tools, scripts, template]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
   - tool assisted
-  - script execution
+  - ejecutar script
 requirements:
   tools: [run_command, view_file, replace_file_content]
   bins: [bash]
 ---
 
-# Skill Asistida por Herramientas y Scripts
+# Tool-Assisted Skill
 
-## 🎯 Propósito
-Descripción del flujo de trabajo automatizado que combina razonamiento del modelo y ejecución determinista de scripts.
+## 🎯 Purpose
+Describe the automated workflow, which combines the model's reasoning with deterministic script runs.
 
-## ⚡ Cuándo Activar esta Skill
-- Cuando se requiera ejecutar diagnósticos automáticos, validaciones o transformaciones con scripts incluidos.
+## ⚡ When to Trigger
+- When the task needs automatic diagnostics, validations or transformations through the bundled scripts.
 
-## 📋 Flujo de Trabajo Paso a Paso
+## 📋 Workflow
 
-1. **Paso 1: Diagnóstico y Preparación**:
-   - Ejecutar el script de diagnóstico inicial:
+1. **Step 1: Diagnose and prepare**:
+   - Run the initial diagnostic script:
      ```bash
      bash <skill-dir>/scripts/run.sh --check
      ```
-2. **Paso 2: Aplicación del Flujo**:
-   - Consultar la guía de referencia en [Guía Técnica](references/guide.md) para detalles sobre la arquitectura o reglas complejas.
-3. **Paso 3: Validación Final**:
-   - Re-ejecutar el script de verificación y confirmar salida exitosa.
+2. **Step 2: Apply the workflow**:
+   - Read the [Technical Guide](references/guide.md) for details on the architecture or the more complex rules.
+3. **Step 3: Final validation**:
+   - Run the check script again and confirm it succeeds.
 
-## 🛠️ Scripts Auxiliares
+## 🛠️ Helper Scripts
 
-> **Rutas:** `<skill-dir>` es el directorio que contiene este `SKILL.md` (p. ej. `.claude/skills/<name>/` o `.agents/skills/<name>/`). Ejecuta los scripts desde la raíz del proyecto del usuario, no desde `<skill-dir>`.
+> **Paths:** `<skill-dir>` is the directory that holds this `SKILL.md` (e.g. `.claude/skills/<name>/` or `.agents/skills/<name>/`). Run the scripts from the root of the user's project, not from `<skill-dir>`.
 
-* `scripts/run.sh`: Script principal de automatización y validación.
-  * Opciones: `--check` (solo diagnóstico), `--fix` (aplica correcciones automáticas).
+* `scripts/run.sh`: Main automation and validation script.
+  * Options: `--check` (diagnose only), `--fix` (apply automatic fixes).
 
-## ⚠️ Reglas Críticas
-- Ejecutar siempre `--check` antes de `--fix` y revisar su salida.
-- No aplicar `--fix` ni sobrescribir archivos sin confirmación explícita del usuario.
+## ⚠️ Critical Rules
+- Reply in the user's language, even though this skill is written in English.
+- Always run `--check` before `--fix` and review its output.
+- Do not run `--fix` or overwrite files without the user's explicit confirmation.
 
-## 📚 Referencias y Ejemplos
-* [Guía Técnica](references/guide.md)
-* [Ejemplos de Entrada/Salida](examples/sample.md)
+## 📚 References and Examples
+* [Technical Guide](references/guide.md)
+* [Input/Output Examples](examples/sample.md)

@@ -1,38 +1,38 @@
-# 🤝 Guía de Contribución: Agent Skills Hub
+# 🤝 Contributing Guide: Agent Skills Hub
 
-¡Gracias por tu interés en contribuir a **Agent Skills Hub**! Esta guía detalla el flujo de trabajo, las directrices de arquitectura, seguridad y buenas prácticas para diseñar, implementar y validar nuevas skills.
-
----
-
-## 🛠️ Requisitos Previos
-
-- **Node.js**: v18 o superior.
-- **pnpm**: v9 o v10 (`npm install -g pnpm` o `corepack enable`).
-- **Git**: Configurado en tu entorno local.
-- **Bash / POSIX Shell**: Para probar scripts ejecutables (en tool-assisted skills).
+Thanks for your interest in contributing to **Agent Skills Hub**! This guide covers the workflow and the architecture, safety and quality guidelines for designing, building and validating new skills.
 
 ---
 
-## 🚀 Flujo de Trabajo Paso a Paso
+## 🛠️ Prerequisites
 
-### 1. Clonar el repositorio y crear una rama de trabajo
+- **Node.js**: v18 or later.
+- **pnpm**: v9 or v10 (`npm install -g pnpm` or `corepack enable`).
+- **Git**: Set up in your local environment.
+- **Bash / POSIX shell**: To test executable scripts (in tool-assisted skills).
 
-Sigue la convención de ramas: `feat/<categoria>-<nombre>` o `fix/<nombre>`:
+---
+
+## 🚀 Workflow
+
+### 1. Clone the repository and create a branch
+
+Follow the branch convention: `feat/<category>-<name>` or `fix/<name>`:
 
 ```bash
 git checkout -b feat/docker-optimization
 ```
 
-### 2. Elegir el Tipo de Skill y Plantilla Base
+### 2. Pick the Skill Type and Base Template
 
-Elige una de las plantillas en `templates/`:
+Pick one of the templates in `templates/`:
 
-| Tipo | Directorio Plantilla | Cuándo Usar |
+| Type | Template Directory | When to Use |
 | :--- | :--- | :--- |
-| **Basic Skill (Solo Markdown)** | `templates/basic-skill/` | Para directrices de arquitectura, checklists, convenciones de código o flujos procedimentales sin scripts. |
-| **Tool-Assisted Skill** | `templates/tool-assisted-skill/` | Para flujos que requieren scripts ejecutables (`scripts/`), documentación técnica extendida (`references/`) o bancos de ejemplos (`examples/`). |
+| **Basic Skill (Markdown only)** | `templates/basic-skill/` | Architecture guidelines, checklists, code conventions or procedural workflows with no scripts. |
+| **Tool-Assisted Skill** | `templates/tool-assisted-skill/` | Workflows that need executable scripts (`scripts/`), extended technical docs (`references/`) or example sets (`examples/`). |
 
-Copia la plantilla dentro de la categoría adecuada en `skills/<categoría>/<nombre-de-skill>`:
+Copy the template into the right category under `skills/<category>/<skill-name>`:
 
 ```bash
 mkdir -p skills/docker/docker-optimization
@@ -41,21 +41,22 @@ cp -r templates/tool-assisted-skill/* skills/docker/docker-optimization/
 
 ---
 
-### 3. Redactar el Archivo `SKILL.md`
+### 3. Write the `SKILL.md` File
 
-Todo `SKILL.md` DEBE comenzar con un bloque Frontmatter YAML válido que cumpla con [`docs/SPECIFICATION.md`](SPECIFICATION.md):
+Every `SKILL.md` MUST start with a valid YAML frontmatter block that follows [`docs/SPECIFICATION.md`](SPECIFICATION.md):
 
 ```yaml
 ---
 name: docker-optimization
 version: 1.0.0
 description: >-
-  Optimización de Dockerfiles con builds multi-stage, reducción de tamaño de imágenes y caching eficiente.
+  Optimizes Dockerfiles with multi-stage builds, smaller images and efficient layer caching.
 tags: [docker, containers, devops, optimization]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
-  - optimizar dockerfile
+  - optimize dockerfile
   - docker multi-stage
+  - optimizar dockerfile
   - reducir tamaño de imagen
 requirements:
   tools: [run_command, view_file, replace_file_content]
@@ -63,70 +64,71 @@ requirements:
 ---
 ```
 
-#### ⚠️ Reglas Críticas para el Frontmatter:
-- **`name`**: Solo letras minúsculas, números y guiones (`^[a-z0-9-]+$`), máximo 40 caracteres.
-- **`description`**: **Máximo 350 caracteres**. Debe responder concisamente qué hace y cuándo activarse (Principio de Progressive Disclosure).
-- **`triggers`**: Mínimo 2 términos clave o intenciones desencadenantes (inglés / español).
+#### ⚠️ Critical Frontmatter Rules:
+- **`name`**: Lowercase letters, digits and hyphens only (`^[a-z0-9-]+$`), max 40 characters.
+- **`description`**: **Max 350 characters**, in English. It must say briefly what the skill does and when to activate it (Progressive Disclosure).
+- **`triggers`**: At least 2 keywords or triggering intents, bilingual (English / Spanish).
 
 ---
 
-### 4. Estructura del Cuerpo del Markdown (`SKILL.md` y `README.md`)
+### 4. Markdown Body Structure (`SKILL.md` and `README.md`)
 
-Asegúrate de incluir las secciones estándar en `SKILL.md`:
-1. `# Nombre de la Skill`
-2. `## 🎯 Propósito`: Objetivo claro y problema que resuelve.
-3. `## ⚡ Cuándo Activar esta Skill`: Disparadores inequívocos.
-4. `## 📋 Flujo de Trabajo Paso a Paso`: Pasos numerados y deterministas (con diagrama Mermaid si aporta valor).
-5. `## 🛠️ Scripts y Herramientas Auxiliares`: (Si aplica) explicación de cómo invocar los scripts en `scripts/`.
-6. `## ⚠️ Reglas Críticas`: Restricciones de seguridad y directrices no negociables.
-7. `## 📚 Referencias Adicionales`: Enlaces a archivos dentro de `references/` o `examples/`.
+Write the skill in **English** (agents follow English instructions most reliably) and use the terms in [GLOSSARY.md](GLOSSARY.md). Include the standard sections in `SKILL.md`:
+1. `# Skill Name`
+2. `## 🎯 Purpose`: Clear goal and the problem it solves.
+3. `## ⚡ When to Trigger`: Unambiguous triggers.
+4. `## 📋 Workflow`: Numbered, deterministic steps (with a Mermaid diagram if it helps).
+5. `## 🛠️ Helper Scripts`: (If any) how to run the scripts in `scripts/`.
+6. `## ⚠️ Critical Rules`: Safety constraints and non-negotiable guidelines. Always include: `Reply in the user's language, even though this skill is written in English.`
+7. `## 📚 References`: Links to files in `references/` or `examples/`.
 
-Además, cada skill debe contar con su propio **`README.md`** orientado a desarrolladores con:
-- Tabla de metadatos (nombre, categoría, versión, agentes compatibles, requisitos).
-- Comandos de instalación (`npx skills add bryanus1/agent-skills --skill <name>` y symlink).
-- Ejemplos de activación y uso con agentes de IA.
-- Resumen de scripts CLI (si aplica) y enlaces a `SKILL.md` y `references/`.
+Each skill also needs its own developer-facing **`README.md`** with:
+- A metadata table (name, category, version, compatible agents, requirements).
+- Installation commands (`npx skills add bryanus1/agent-skills --skill <name>` and symlink).
+- Activation and usage examples with AI agents.
+- A summary of the CLI scripts (if any) and links to `SKILL.md` and `references/`.
 
 ---
 
-### 5. Directrices para Scripts (`scripts/`)
+### 5. Script Guidelines (`scripts/`)
 
-- **Determinismo**: Scripts no interactivos (o que acepten flags como `--yes`, `--non-interactive`, `-y`).
-- **Códigos de Salida**: `0` para éxito, `>0` para errores con mensaje claro.
-- **Permisos de Ejecución**: Ejecutar siempre `chmod +x scripts/*.sh` antes de commitear.
-- **Seguridad**: Prohibido ejecutar comandos destructivos sin confirmación explícita (`rm -rf /`, `git push --force`).
-- **No Sobrescritura**: Los scripts que generan archivos deben abortar (código `1`, sin escribir nada) si algún archivo destino ya existe, ofrecer `--dry-run` para previsualizar y exigir `--force` para sobrescribir.
-- **Rutas Portables**: Las skills se instalan en otros proyectos (`.claude/skills/<name>/`, `.agents/skills/<name>/`…). En `SKILL.md` enlaza los archivos propios con rutas relativas a la skill (`references/guia.md`) y muestra los scripts como `node <skill-dir>/scripts/x.mjs`. Nunca uses rutas absolutas ni `file:///`.
-- **Tests**: Todo script nuevo o modificado debe tener tests en `tests/*.test.mjs` (`node:test`, sin dependencias) que ejecuten el script en un directorio temporal. Los scripts Bash deben pasar `shellcheck -S warning`.
+- **Determinism**: Non-interactive scripts (or scripts that accept flags such as `--yes`, `--non-interactive`, `-y`).
+- **Exit codes**: `0` on success, `>0` on errors with a clear message.
+- **Executable bit**: Always run `chmod +x scripts/*.sh` before committing.
+- **Safety**: Never run destructive commands without explicit confirmation (`rm -rf /`, `git push --force`).
+- **No overwrites**: Scripts that generate files must abort (exit code `1`, writing nothing) if any target file already exists, offer `--dry-run` to preview, and require `--force` to overwrite.
+- **Portable paths**: Skills are installed into other projects (`.claude/skills/<name>/`, `.agents/skills/<name>/`…). In `SKILL.md`, link the skill's own files with skill-relative paths (`references/guide.md`) and show scripts as `node <skill-dir>/scripts/x.mjs`. Never use absolute paths or `file:///`.
+- **Output language**: Help text, errors, warnings and comments in generated code are in English.
+- **Tests**: Every new or changed script needs tests in `tests/*.test.mjs` (`node:test`, no dependencies) that run the script in a temporary directory. Bash scripts must pass `shellcheck -S warning`.
 
 ### 5.1 Evals (`evals/evals.json`)
 
-Cada skill de `skills/` debe incluir al menos 2 evals con el formato de `skill-creator` (ver [SPECIFICATION.md](SPECIFICATION.md#2-estructura-de-directorios)). `pnpm test:unit` valida que el JSON sea correcto, que `skill_name` coincida y que los archivos de `files` existan. Guarda las ejecuciones de evals en `evals-workspace/`, que está ignorado por git.
+Every skill under `skills/` must include at least 2 evals in the `skill-creator` format (see [SPECIFICATION.md](SPECIFICATION.md#2-directory-structure)). `pnpm test:unit` checks that the JSON is valid, that `skill_name` matches and that the files in `files` exist. Write `expected_output` in English; keep some prompts in Spanish to check that the skill still triggers and replies in the user's language. Store eval runs in `evals-workspace/`, which git ignores.
 
 ---
 
-### 6. Validación Obligatoria con el Linter
+### 6. Required Linter Validation
 
-Antes de hacer commit o crear un PR, ejecuta el linter central:
+Before committing or opening a PR, run the linter:
 
 ```bash
-# Validar todo el repositorio (modo estricto, como en CI):
+# Validate the whole repository (strict mode, as in CI):
 pnpm lint:strict
 
-# Validar tu skill específica:
+# Validate your skill only:
 node scripts/lint-skills.mjs --strict skills/docker/docker-optimization
 
-# Regenerar catalog/catalog.json y la tabla/instalación del README:
+# Regenerate catalog/catalog.json and the README table/install blocks:
 pnpm catalog
 ```
 
-El linter debe finalizar con `0 errors, 0 warnings`. Además del frontmatter, valida que `name` coincida con la carpeta y sea único, que `agents` use valores permitidos, que los enlaces relativos existan, que no haya rutas absolutas de máquina y que estén las secciones obligatorias. CI también falla si el catálogo o el README no están regenerados.
+The linter must finish with `0 errors, 0 warnings`. Besides the frontmatter, it checks that `name` matches the folder and is unique, that `agents` uses allowed values, that relative links resolve, that there are no machine-specific absolute paths, and that the required sections are present. CI also fails if the catalog or the README are not regenerated.
 
 ---
 
-## 📝 Convención de Commits
+## 📝 Commit Convention
 
-Todos los commits deben seguir **Conventional Commits**:
+All commits follow **Conventional Commits**:
 
 ```bash
 feat(docker): add docker-optimization skill with multi-stage scripts
@@ -136,29 +138,31 @@ docs(contributing): update step-by-step contribution guide
 
 ---
 
-## 🔢 Versionado de Skills
+## 🔢 Skill Versioning
 
-Cada skill tiene su propia `version` (SemVer) en el frontmatter, independiente de la versión del repositorio que genera semantic-release. Cualquier cambio dentro de una skill (salvo en `README.md` o `evals/`) exige subirla:
+Each skill has its own `version` (SemVer) in the frontmatter, separate from the repository version that semantic-release produces. Any change inside a skill (except `README.md` or `evals/`) requires a bump:
 
-| Cambio | Incremento | Ejemplo |
+| Change | Bump | Example |
 | :--- | :--- | :--- |
-| Rompe el uso existente: flags eliminados o renombrados, estructura generada distinta, reglas que invalidan código previo | **major** | `1.4.2 → 2.0.0` |
-| Nueva capacidad compatible: flag nuevo, nueva sección o regla, nuevo script | **minor** | `1.4.2 → 1.5.0` |
-| Corrección de bugs, erratas o aclaraciones de documentación | **patch** | `1.4.2 → 1.4.3` |
+| Breaks existing usage: removed or renamed flags, different generated structure, rules that invalidate earlier code | **major** | `1.4.2 → 2.0.0` |
+| New compatible capability: new flag, new section or rule, new script | **minor** | `1.4.2 → 1.5.0` |
+| Bug fixes, typos or documentation clarifications | **patch** | `1.4.2 → 1.4.3` |
 
-CI lo verifica con `node scripts/check-skill-versions.mjs --base origin/main` (o `pnpm versions:check`). Después de subir versiones, ejecuta `pnpm catalog` para actualizar el catálogo y el README.
+Translating a skill into English is a **minor** bump: behavior stays the same, but what the agent reads and what the scripts print changes.
 
----
-
-## 📋 Criterios de Aceptación para Pull Requests
-
-1. ✅ **Linter en Verde**: `pnpm test` en verde (linter estricto, catálogo al día y tests unitarios) y versión de cada skill modificada incrementada.
-2. ✅ **Progressive Disclosure**: Frontmatter ligero y sin runbooks completos dentro de la descripción.
-3. ✅ **Agnosticismo**: Compatible con múltiples agentes de IA.
-4. ✅ **Seguridad**: Sin credenciales, tokens o scripts destructivos.
+CI checks this with `node scripts/check-skill-versions.mjs --base origin/main` (or `pnpm versions:check`). After bumping versions, run `pnpm catalog` to update the catalog and the README.
 
 ---
 
-## 📜 Licencia
+## 📋 Pull Request Acceptance Criteria
 
-Al contribuir a este repositorio, aceptas que tus contribuciones se licencien bajo los términos de la Licencia MIT.
+1. ✅ **Green checks**: `pnpm test` passes (strict linter, up-to-date catalog and unit tests) and every changed skill has a version bump.
+2. ✅ **Progressive Disclosure**: Light frontmatter, no full runbooks inside the description.
+3. ✅ **Agent-agnostic**: Works with multiple AI agents.
+4. ✅ **Safety**: No credentials, tokens or destructive scripts.
+
+---
+
+## 📜 License
+
+By contributing to this repository, you agree that your contributions are licensed under the MIT License.

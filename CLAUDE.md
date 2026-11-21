@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-A catalog of agent-agnostic **skills** (Markdown `SKILL.md` + optional `scripts/`, `references/`, `examples/`, `evals/`) meant to be installed into other projects via `npx skills add bryanus1/agent-skills --skill <name>` (skills.sh). There is no application code. The "build" is the skill linter plus the catalog generator. Docs and skill content are written mostly in Spanish, with some English.
+A catalog of agent-agnostic **skills** (Markdown `SKILL.md` + optional `scripts/`, `references/`, `examples/`, `evals/`) meant to be installed into other projects via `npx skills add bryanus1/agent-skills --skill <name>` (skills.sh). There is no application code. The "build" is the skill linter plus the catalog generator. Skills are being migrated from Spanish to English, one category per PR: new and edited skill content is written in English, with bilingual `triggers` and a Critical Rule telling the agent to reply in the user's language. Follow [docs/GLOSSARY.md](docs/GLOSSARY.md) for wording and the per-skill translation checklist.
 
 **Read [AGENTS.md](AGENTS.md) before creating or editing a skill.** It is the step-by-step authoring guide: template choice, directory placement, required frontmatter, and body sections. [docs/SPECIFICATION.md](docs/SPECIFICATION.md) is the authoritative format spec.
 

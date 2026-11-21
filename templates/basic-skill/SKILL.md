@@ -1,38 +1,39 @@
 ---
 name: basic-skill-template
-version: 1.0.0
+version: 1.1.0
 description: >-
-  Breve resumen (máx 350 caracteres) de lo que hace la skill y cuándo activarla.
-  Incluye palabras clave que orienten al agente de IA.
+  Short summary (max 350 characters) of what the skill does and when to use it.
+  Include keywords that help the AI agent decide when to activate it.
 tags: [workflow, template]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
   - trigger keyword 1
-  - trigger keyword 2
+  - palabra clave en español
 requirements:
   tools: [view_file, replace_file_content]
 ---
 
-# Nombre de la Skill
+# Skill Name
 
-## 🎯 Propósito
-Describe brevemente el problema específico que resuelve esta skill y el objetivo final esperado.
+## 🎯 Purpose
+Briefly describe the specific problem this skill solves and the expected end result.
 
-## ⚡ Cuándo Activar esta Skill
-- Cuando el usuario solicite...
-- Cuando se detecte el patrón o problema...
+## ⚡ When to Trigger
+- When the user asks to...
+- When the pattern or problem ... is detected.
 
-## 📋 Flujo de Trabajo Paso a Paso
+## 📋 Workflow
 
-1. **Paso 1: Análisis e Inspección**:
-   - Inspeccionar los archivos relevantes usando las herramientas de lectura.
-2. **Paso 2: Planificación**:
-   - Diseñar la solución respetando las restricciones del proyecto.
-3. **Paso 3: Ejecución**:
-   - Aplicar los cambios o generar el código correspondiente.
-4. **Paso 4: Verificación**:
-   - Comprobar que los cambios compilen o pasen las pruebas correspondientes.
+1. **Step 1: Analyze and inspect**:
+   - Inspect the relevant files with the read tools.
+2. **Step 2: Plan**:
+   - Design the solution within the project's constraints.
+3. **Step 3: Execute**:
+   - Apply the changes or generate the code.
+4. **Step 4: Verify**:
+   - Check that the changes build and the relevant tests pass.
 
-## ⚠️ Reglas Críticas
-- Mantener la consistencia del código existente.
-- No introducir dependencias no aprobadas.
+## ⚠️ Critical Rules
+- Reply in the user's language, even though this skill is written in English.
+- Keep the existing code style consistent.
+- Do not add dependencies the user has not approved.

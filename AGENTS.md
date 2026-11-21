@@ -41,7 +41,7 @@ agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
   - trigger phrase 1
   - trigger phrase 2
-  - palabra clave en español (si aplica)
+  - palabra clave en español
 requirements:
   tools: [view_file, replace_file_content, run_command] # As needed
 ---
@@ -49,17 +49,22 @@ requirements:
 
 #### Critical Frontmatter Rules:
 - **`description`**: Must be under **350 characters** (Progressive Disclosure rule). Do not put full runbooks inside the description.
-- **`triggers`**: Minimum 2 trigger phrases representing user intent in relevant languages (English / Spanish).
+- **`triggers`**: Minimum 2 trigger phrases representing user intent. Keep them bilingual (English and Spanish): users type in both.
+
+#### Language Rules:
+- Write the `description`, the `SKILL.md` body, `references/`, `examples/` and script output (help, errors, generated code comments) in **English**.
+- Add this line to the skill's Critical Rules: `Reply in the user's language, even though this skill is written in English.`
+- Use the terms in [`docs/GLOSSARY.md`](docs/GLOSSARY.md) so every skill names the same concept the same way.
 
 ### 4. Structure the `SKILL.md` Body and Per-Skill `README.md`
 Ensure `SKILL.md` has the following standard sections:
 1. `# Title of the Skill`
-2. `## 🎯 Propósito / Purpose`: Clear objective and problem it solves.
-3. `## ⚡ Cuándo Activar esta Skill / When to Trigger`: Unambiguous conditions for activation.
-4. `## 📋 Flujo de Trabajo Paso a Paso / Step-by-Step Workflow`: Deterministic, numbered steps.
-5. `## ⚠️ Reglas Críticas / Critical Rules`: Security constraints and non-negotiable guidelines.
-6. `## 📚 Referencias / References` (Optional): Links to markdown files in `references/`.
-7. `## 🛠️ Scripts` (Optional): Instructions on scripts in `scripts/`.
+2. `## 🎯 Purpose`: Clear objective and problem it solves.
+3. `## ⚡ When to Trigger`: Unambiguous conditions for activation.
+4. `## 📋 Workflow`: Deterministic, numbered steps.
+5. `## ⚠️ Critical Rules`: Security constraints and non-negotiable guidelines.
+6. `## 📚 References` (Optional): Links to markdown files in `references/`.
+7. `## 🛠️ Helper Scripts` (Optional): Instructions on scripts in `scripts/`.
 
 Every skill directory MUST also have its own `README.md` (human-facing documentation with metadata table, installation commands, prompt examples, CLI script usage, and relative links to `SKILL.md` and `references/`).
 
@@ -83,7 +88,7 @@ pnpm catalog
 This rewrites `catalog/catalog.json` and the generated `<!-- catalog-table -->` block in the root `README.md` (which links each skill to its own `README.md`). Never edit that block by hand; CI fails if it is out of date. Keep the root `README.md` focused strictly on repository-level information; put skill-specific examples and commands in each skill's own `README.md`.
 
 ### 7. Bump the Skill Version
-When **updating** an existing skill, bump its frontmatter `version` (major = breaking, minor = new capability, patch = fix or docs; see [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md#-versionado-de-skills)). Changes limited to `README.md` or `evals/` are exempt. Verify with `node scripts/check-skill-versions.mjs --base main`, then rerun `pnpm catalog`.
+When **updating** an existing skill, bump its frontmatter `version` (major = breaking, minor = new capability, patch = fix or docs; see [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md#-skill-versioning)). Changes limited to `README.md` or `evals/` are exempt. Verify with `node scripts/check-skill-versions.mjs --base main`, then rerun `pnpm catalog`.
 
 ---
 
