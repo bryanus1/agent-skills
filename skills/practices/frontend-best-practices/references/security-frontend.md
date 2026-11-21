@@ -1,35 +1,35 @@
-# Seguridad en el frontend
+# Frontend Security
 
-El frontend no es una frontera de confianza: todo lo que hace el cliente puede ser manipulado. La autorización real vive en el servidor; aquí se evita **exponer** y **ejecutar** contenido hostil.
+The frontend is not a trust boundary: everything the client does can be tampered with. Real authorization lives on the server; here the goal is to avoid **exposing** and **executing** hostile content.
 
-## XSS (lo más importante)
+## XSS (the most important)
 
-- React escapa por defecto el texto interpolado `{value}`. El peligro está en saltarse eso:
+- React escapes interpolated text `{value}` by default. The danger is in bypassing that:
   - `dangerouslySetInnerHTML`, `innerHTML`, `insertAdjacentHTML`, `document.write`.
-  - `href`/`src` con valores del usuario (`javascript:` URLs): valida el protocolo (`https:`/`http:`/`mailto:`).
+  - `href`/`src` with user values (`javascript:` URLs): validate the protocol (`https:`/`http:`/`mailto:`).
   - `eval`, `new Function`, `setTimeout("string")`.
-- Si se debe renderizar HTML de terceros (CMS, Markdown), **sanéalo** con una librería mantenida (DOMPurify o la que ya use el proyecto) y con una lista de etiquetas permitidas; mejor aún, convertir Markdown a elementos React (react-markdown) en lugar de HTML.
-- Una política **CSP** estricta reduce el daño de un XSS que se escape; configúrala en el servidor/framework.
+- If third-party HTML must be rendered (CMS, Markdown), **sanitize it** with a maintained library (DOMPurify or the one the project already uses) and an allowlist of tags; better still, convert Markdown to React elements (react-markdown) instead of HTML.
+- A strict **CSP** policy reduces the damage of an XSS that slips through; configure it on the server/framework.
 
-## Tokens y sesiones
+## Tokens and sessions
 
-- Evita guardar tokens de sesión en `localStorage`/`sessionStorage`: cualquier XSS los lee. Prefiere **cookies `HttpOnly; Secure; SameSite`** gestionadas por el servidor.
-- Si usas cookies para autenticar, protege las mutaciones contra CSRF (SameSite, tokens).
-- No registres tokens ni datos personales en consola, analítica ni mensajes de error.
+- Avoid storing session tokens in `localStorage`/`sessionStorage`: any XSS can read them. Prefer **`HttpOnly; Secure; SameSite` cookies** managed by the server.
+- If you use cookies to authenticate, protect mutations against CSRF (SameSite, tokens).
+- Don't log tokens or personal data to the console, analytics or error messages.
 
-## Secretos y configuración
+## Secrets and configuration
 
-- Todo lo que está en el bundle es público. Las variables con prefijo público (`NEXT_PUBLIC_`, `VITE_`) **no son secretos**; las claves privadas (Stripe secret, base de datos, tokens de servicio) solo en el servidor.
-- No incluyas URLs internas ni claves de administración en el código cliente.
+- Everything in the bundle is public. Variables with a public prefix (`NEXT_PUBLIC_`, `VITE_`) **are not secrets**; private keys (Stripe secret, database, service tokens) only on the server.
+- Don't include internal URLs or admin keys in client code.
 
-## Enlaces, iframes y terceros
+## Links, iframes and third parties
 
-- `target="_blank"` con `rel="noopener noreferrer"`.
-- `iframe` de terceros con `sandbox` y permisos mínimos.
-- Scripts externos con Subresource Integrity cuando sea posible; minimiza el número de terceros.
-- Valida y limita redirecciones (`?next=`) a rutas internas para evitar redirecciones abiertas.
+- `target="_blank"` with `rel="noopener noreferrer"`.
+- Third-party `iframe`s with `sandbox` and minimal permissions.
+- External scripts with Subresource Integrity when possible; keep the number of third parties low.
+- Validate and limit redirects (`?next=`) to internal routes to avoid open redirects.
 
-## Datos del usuario
+## User data
 
-- No confíes en `window.location`, `postMessage` ni `localStorage` como entrada: valida y tipa lo que lees (Zod).
-- Los mensajes de error al usuario no deben revelar detalles internos.
+- Don't trust `window.location`, `postMessage` or `localStorage` as input: validate and type what you read (Zod).
+- Error messages shown to the user must not reveal internal details.

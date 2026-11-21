@@ -1,46 +1,46 @@
-# Seguridad en el backend
+# Backend Security
 
-Basado en el OWASP Top 10 y ASVS. Lo más frecuente y de más impacto, en este orden.
+Based on the OWASP Top 10 and ASVS. The most frequent and highest-impact issues, in this order.
 
-## 1. Autorización por recurso (el fallo más común)
+## 1. Per-resource authorization (the most common failure)
 
-No basta con "está autenticado". En cada operación sobre un recurso, comprueba que **este usuario puede actuar sobre este recurso**:
+"Is authenticated" is not enough. On every operation on a resource, check that **this user can act on this resource**:
 
 ```ts
 const order = await orders.findById(id);
-if (!order || order.userId !== user.id) return notFound();   // IDOR: no devuelvas el pedido de otro
+if (!order || order.userId !== user.id) return notFound();   // IDOR: don't return someone else's order
 ```
 
-- Deniega por defecto; los permisos se comprueban en el servidor en cada petición (guards/middleware + comprobación de propiedad en el servicio).
-- No confíes en identificadores ni roles que envía el cliente (`userId` en el cuerpo): sácalos de la sesión o del token verificado.
+- Deny by default; permissions are checked on the server on every request (guards/middleware + an ownership check in the service).
+- Don't trust identifiers or roles sent by the client (`userId` in the body): take them from the session or the verified token.
 
-## 2. Inyección
+## 2. Injection
 
-- **SQL/NoSQL**: consultas parametrizadas; en MongoDB, no pases objetos del usuario directamente al filtro (`$ne`, `$gt`).
-- **Comandos del sistema**: evita `exec` con entrada del usuario; usa `execFile` con argumentos separados.
-- **Rutas de archivos**: normaliza y comprueba que queda dentro del directorio permitido (path traversal).
-- **SSRF**: si el servidor descarga URLs dadas por el usuario, valida el destino (lista permitida, bloquea rangos internos y metadatos de la nube).
+- **SQL/NoSQL**: parameterized queries; in MongoDB, don't pass user objects straight into the filter (`$ne`, `$gt`).
+- **System commands**: avoid `exec` with user input; use `execFile` with separate arguments.
+- **File paths**: normalize them and check they stay inside the allowed directory (path traversal).
+- **SSRF**: if the server downloads URLs given by the user, validate the destination (allowlist, block internal ranges and cloud metadata).
 
-## 3. Autenticación y sesiones
+## 3. Authentication and sessions
 
-- Contraseñas con **argon2id** o bcrypt (coste adecuado), nunca hash rápido ni cifrado reversible.
-- Tokens/JWT: verifica firma, expiración y audiencia; tiempos de vida cortos; rotación de refresh tokens; revocación posible.
-- Cookies de sesión `HttpOnly; Secure; SameSite`.
-- Limita intentos de inicio de sesión (límite de tasa y bloqueo progresivo); mensajes de error que no revelen si el usuario existe.
+- Passwords with **argon2id** or bcrypt (an adequate cost), never a fast hash or reversible encryption.
+- Tokens/JWT: verify signature, expiry and audience; short lifetimes; refresh token rotation; revocation possible.
+- Session cookies `HttpOnly; Secure; SameSite`.
+- Limit login attempts (rate limit and progressive lockout); error messages that don't reveal whether the user exists.
 
-## 4. Datos sensibles y secretos
+## 4. Sensitive data and secrets
 
-- Secretos **solo en variables de entorno o gestor de secretos**; nunca en el repositorio, en los logs ni en las respuestas. Si encuentras uno en el código, repórtalo como crítico y recomienda rotarlo (ya está comprometido).
-- Cifra en tránsito (TLS) y datos especialmente sensibles en reposo.
-- No devuelvas más campos de los necesarios; excluye `passwordHash`, tokens, notas internas.
-- No registres contraseñas, tokens, números de tarjeta ni datos personales completos.
+- Secrets **only in environment variables or a secrets manager**; never in the repository, logs or responses. If you find one in the code, report it as critical and recommend rotating it (it is already compromised).
+- Encrypt in transit (TLS), and especially sensitive data at rest.
+- Don't return more fields than needed; exclude `passwordHash`, tokens, internal notes.
+- Don't log passwords, tokens, card numbers or full personal data.
 
-## 5. Protección frente a abuso
+## 5. Abuse protection
 
-- **Límite de tasa** por IP/usuario en endpoints sensibles (login, registro, recuperación, envío de correos/SMS).
-- Límites de tamaño de cuerpo y de subida; tipos de archivo permitidos; analiza o aísla las subidas.
-- CORS con orígenes explícitos (no `*` con credenciales); cabeceras de seguridad (`helmet` o equivalente).
+- **Rate limiting** per IP/user on sensitive endpoints (login, sign-up, recovery, sending emails/SMS).
+- Body and upload size limits; allowed file types; scan or isolate uploads.
+- CORS with explicit origins (not `*` with credentials); security headers (`helmet` or equivalent).
 
-## 6. Dependencias
+## 6. Dependencies
 
-- Auditar (`npm audit`, Dependabot/Renovate), fijar versiones con lockfile, no ejecutar scripts de origen desconocido. No actualices masivamente sin confirmar.
+- Audit (`npm audit`, Dependabot/Renovate), pin versions with a lockfile, don't run scripts from unknown sources. Don't do mass upgrades without confirming.

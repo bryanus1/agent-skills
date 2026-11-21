@@ -1,18 +1,18 @@
-# Patrones creacionales
+# Creational Patterns
 
-## Contenido
+## Contents
 
 1. [Factory / Factory Method](#factory--factory-method)
 2. [Builder](#builder)
-3. [Singleton: por qué evitarlo](#singleton-por-qué-evitarlo)
+3. [Singleton: why to avoid it](#singleton-why-to-avoid-it)
 
 ## Factory / Factory Method
 
-**Problema:** el tipo concreto a crear depende de datos o configuración, y el código cliente no debería conocer las clases concretas ni la lógica de elección.
+**Problem:** the concrete type to create depends on data or configuration, and the client code should not know the concrete classes or the selection logic.
 
-**Cuándo sí:** hay varias implementaciones elegidas por configuración o entrada (`pdf`/`csv`/`xlsx`, `stripe`/`paypal`) y la elección se repetiría en varios sitios.
+**When yes:** there are several implementations chosen by configuration or input (`pdf`/`csv`/`xlsx`, `stripe`/`paypal`) and the choice would be repeated in several places.
 
-**Cuándo no:** un solo tipo, o una única creación en un punto. Un `new` directo es más claro.
+**When not:** a single type, or a single creation at one point. A direct `new` is clearer.
 
 ```ts
 interface Exporter { export(rows: Row[]): Buffer; }
@@ -30,22 +30,22 @@ export function createExporter(format: ExportFormat): Exporter {
 }
 ```
 
-Una función con un mapa de constructores **es** el patrón en TS; no necesita una jerarquía `ExporterFactory`/`CsvExporterFactory`. Úsala en la **raíz de composición** (donde se arma la app), no repartida por la lógica de negocio.
+A function with a map of constructors **is** the pattern in TS; it needs no `ExporterFactory`/`CsvExporterFactory` hierarchy. Use it at the **composition root** (where the app is wired), not scattered through the business logic.
 
-**Factory Method clásico** (una subclase decide qué crear) casi nunca compensa en código moderno; prefiere pasar la fábrica como parámetro.
+**The classic Factory Method** (a subclass decides what to create) is rarely worth it in modern code; prefer passing the factory as a parameter.
 
 ## Builder
 
-**Problema:** objetos con muchos parámetros opcionales o con pasos de construcción que deben respetar un orden o una validación.
+**Problem:** objects with many optional parameters or construction steps that must follow an order or a validation.
 
-**Alternativa más simple (úsala primero):** un objeto de opciones con valores por defecto.
+**Simpler alternative (use it first):** an options object with defaults.
 
 ```ts
-// Suficiente en la mayoría de casos
+// Enough in most cases
 function createClient({ baseUrl, timeoutMs = 5000, retries = 2, headers = {} }: ClientOptions) { /* ... */ }
 ```
 
-**Cuándo sí:** la construcción es genuinamente incremental o tiene reglas entre partes (consultas SQL/ORM, mensajes de correo, configuraciones validadas al final, objetos inmutables que se componen en pasos).
+**When yes:** construction is genuinely incremental or has rules between parts (SQL/ORM queries, email messages, configurations validated at the end, immutable objects composed in steps).
 
 ```ts
 class QueryBuilder {
@@ -53,27 +53,27 @@ class QueryBuilder {
   private limitValue?: number;
   where(clause: string) { this.filters.push(clause); return this; }
   limit(n: number) { this.limitValue = n; return this; }
-  build(): Query { return new Query(this.filters, this.limitValue); } // valida aquí
+  build(): Query { return new Query(this.filters, this.limitValue); } // validate here
 }
 ```
 
-También son útiles los **builders en tests** (`buildOrder({ total: 120 })`): valores por defecto válidos, sobrescribiendo solo lo relevante para el caso.
+**Test builders** are also useful (`buildOrder({ total: 120 })`): valid defaults, overriding only what matters for the case.
 
-## Singleton: por qué evitarlo
+## Singleton: why to avoid it
 
-**Problema que dice resolver:** una única instancia compartida.
+**The problem it claims to solve:** a single shared instance.
 
-**Por qué hace daño:** estado global oculto, dependencias invisibles en las firmas, tests que se contaminan entre sí, imposible sustituir en pruebas.
+**Why it hurts:** hidden global state, dependencies invisible in signatures, tests that contaminate each other, impossible to replace in tests.
 
-**Alternativa:** crea **una instancia en la raíz de composición** y pásala por constructor o por contexto. Obtienes una sola instancia sin acoplar el código a ella.
+**Alternative:** create **one instance at the composition root** and pass it through the constructor or a context. You get a single instance without coupling the code to it.
 
 ```ts
-// Evitar
+// Avoid
 export class Db { private static instance = new Db(); static get() { return Db.instance; } }
 
-// Preferir
-const db = new Db(config.databaseUrl);          // una vez, en main.ts
-const orders = new PgOrderRepository(db);       // se pasa, no se busca
+// Prefer
+const db = new Db(config.databaseUrl);          // once, in main.ts
+const orders = new PgOrderRepository(db);       // passed in, not looked up
 ```
 
-En Node, un módulo que exporta una instancia ya es un singleton por caché de módulos; si lo haces, que no tenga estado mutable que otras partes modifiquen.
+In Node, a module that exports an instance is already a singleton through the module cache; if you do that, make sure it has no mutable state that other parts modify.

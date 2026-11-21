@@ -1,53 +1,53 @@
 # 🧩 Design Patterns (`design-patterns`)
 
-> **Elige y aplica patrones de diseño (GoF y modernos: Strategy, Adapter, Factory, Repository, Result, Compound Components, hooks…) partiendo del problema y no del catálogo, contrastándolos siempre con la alternativa más simple y decidiendo cuándo no usar ninguno.**
+> **Choose and apply design patterns (GoF and modern: Strategy, Adapter, Factory, Repository, Result, Compound Components, hooks…) starting from the problem rather than the catalog, always comparing them with the simplest alternative and deciding when to use none.**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `design-patterns` |
-| **Categoría** | `practices` |
-| **Versión** | `1.0.0` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Name** | `design-patterns` |
+| **Category** | `practices` |
+| **Version** | `1.1.0` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
 ```bash
-# En el proyecto actual:
+# In the current project:
 npx skills add bryanus1/agent-skills --skill design-patterns
 
 # Global:
 npx skills add bryanus1/agent-skills --skill design-patterns -g
 
-# Recomendadas junto a esta:
+# Recommended together with this one:
 npx skills add bryanus1/agent-skills --skill solid-principles
 npx skills add bryanus1/agent-skills --skill tdd-workflow
 ```
 
 ---
 
-## 💡 Ejemplos de Uso con Agentes de IA
+## 💡 Usage Examples with AI Agents
 
-* **De `switch` repetido a una solución extensible**:
-  > *"Cada vez que añadimos un transportista tengo que tocar tres archivos. Aplica el patrón Strategy."*
+* **From a repeated `switch` to an extensible solution**:
+  > *"Every time we add a carrier I have to touch three files. Apply the Strategy pattern."*
   >
-  > 🤖 Formula el problema, contrasta con la alternativa simple (una tabla de reglas) y la aplica; explica cuándo pasaría a clases.
+  > 🤖 States the problem, compares it with the simple alternative (a rules table) and applies it; explains when it would move to classes.
 
-* **Aislar un SDK de terceros**:
-  > *"Quiero cambiar de proveedor de email y probar sin llamar al SDK. ¿Qué patrón uso?"*
+* **Isolating a third-party SDK**:
+  > *"I want to switch email providers and test without calling the SDK. Which pattern should I use?"*
   >
-  > 🤖 Puerto y adaptador (Adapter + DIP): interfaz del dominio, adaptador único que importa el SDK y tests con un fake.
+  > 🤖 Port and adapter (Adapter + DIP): a domain interface, a single adapter that imports the SDK, and tests with a fake.
 
-* **Frenar patrones innecesarios**:
-  > *"Aplica Singleton y Factory a mi configuración."*
+* **Stopping unnecessary patterns**:
+  > *"Apply Singleton and Factory to my configuration."*
   >
-  > 🤖 Cuestiona la petición con argumentos (estado global, sin variantes) y ofrece una alternativa por composición.
+  > 🤖 Challenges the request with arguments (global state, no variants) and offers an alternative through composition.
 
 ---
 
-## 📚 Documentación
+## 📚 Documentation
 
-- **[`SKILL.md`](SKILL.md)**: flujo, tabla problema → patrón y reglas para el agente.
-- Referencias: **[Creacionales](references/creational.md)**, **[Estructurales](references/structural.md)**, **[Comportamiento](references/behavioral.md)**, **[Frontend y backend](references/frontend-backend.md)**.
-- **[Ejemplo: de switch repetido a estrategias](examples/strategy-vs-table.md)**.
+- **[`SKILL.md`](SKILL.md)**: workflow, problem → pattern table and rules for the agent.
+- References: **[Creational](references/creational.md)**, **[Structural](references/structural.md)**, **[Behavioral](references/behavioral.md)**, **[Frontend and backend](references/frontend-backend.md)**.
+- **[Example: from a repeated switch to strategies](examples/strategy-vs-table.md)**.

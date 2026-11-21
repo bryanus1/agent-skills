@@ -1,26 +1,26 @@
 # 🛠️ Backend Best Practices (`backend-best-practices`)
 
-> **Revisa y mejora endpoints, servicios y acceso a datos con criterios verificables y priorizados: diseño de API y errores, consultas, seguridad, fiabilidad y observabilidad. Corrige lo que duele y avisa antes de cambiar el contrato público.**
+> **Review and improve endpoints, services and data access with verifiable, prioritized criteria: API design and errors, queries, security, reliability and observability. Fixes what hurts and warns before changing the public contract.**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `backend-best-practices` |
-| **Categoría** | `practices` |
-| **Versión** | `1.0.0` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Name** | `backend-best-practices` |
+| **Category** | `practices` |
+| **Version** | `1.1.0` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
 ```bash
-# En el proyecto actual:
+# In the current project:
 npx skills add bryanus1/agent-skills --skill backend-best-practices
 
 # Global:
 npx skills add bryanus1/agent-skills --skill backend-best-practices -g
 
-# Recomendadas junto a esta:
+# Recommended together with this one:
 npx skills add bryanus1/agent-skills --skill tdd-workflow
 npx skills add bryanus1/agent-skills --skill solid-principles
 npx skills add bryanus1/agent-skills --skill nestjs-architecture
@@ -28,44 +28,44 @@ npx skills add bryanus1/agent-skills --skill nestjs-architecture
 
 ---
 
-## 💡 Ejemplos de Uso con Agentes de IA
+## 💡 Usage Examples with AI Agents
 
-* **Revisión de un módulo de API**:
-  > *"Revisa `orders-api.ts` y aplica buenas prácticas de backend."*
+* **Reviewing an API module**:
+  > *"Review `orders-api.ts` and apply backend best practices."*
   >
-  > 🤖 Tabla de hallazgos por severidad con `archivo:línea` (inyección SQL, IDOR, mass assignment, N+1, errores con 200 y stack), correcciones mínimas, aviso explícito de los cambios de contrato y lo que no pudo verificar.
+  > 🤖 A findings table by severity with `file:line` (SQL injection, IDOR, mass assignment, N+1, errors with 200 and a stack), minimal fixes, an explicit warning about contract changes and what it could not verify.
 
-* **Endpoint nuevo**:
-  > *"Crea un endpoint para cancelar un pedido."*
+* **New endpoint**:
+  > *"Create an endpoint to cancel an order."*
   >
-  > 🤖 Validación en el borde, autorización por recurso, códigos de estado correctos, transacción si cambia varias tablas, idempotencia.
+  > 🤖 Validation at the edge, per-resource authorization, correct status codes, a transaction if it changes several tables, idempotency.
 
-* **Un handler que ya está bien**:
-  > *"Aplica buenas prácticas a este endpoint."*
+* **A handler that is already fine**:
+  > *"Apply good practices to this endpoint."*
   >
-  > 🤖 Informa que no hay hallazgos relevantes en lugar de inventar capas.
+  > 🤖 Reports that there are no relevant findings instead of inventing layers.
 
 ---
 
-## 🧭 Qué cubre
+## 🧭 What It Covers
 
-| Área | Referencia |
+| Area | Reference |
 |---|---|
-| API, validación y errores | [api-design](references/api-design.md) |
-| Acceso a datos y migraciones | [data-access](references/data-access.md) |
-| Seguridad (OWASP) | [security-backend](references/security-backend.md) |
-| Fiabilidad y observabilidad | [reliability-observability](references/reliability-observability.md) |
+| API, validation and errors | [api-design](references/api-design.md) |
+| Data access and migrations | [data-access](references/data-access.md) |
+| Security (OWASP) | [security-backend](references/security-backend.md) |
+| Reliability and observability | [reliability-observability](references/reliability-observability.md) |
 
-## 🚫 Qué NO hace
+## 🚫 What It Does NOT Do
 
-- No define la estructura de módulos (usa `nestjs-architecture`, `monorepo-architecture`).
-- No cambia códigos de estado, rutas ni formas de respuesta sin avisar.
-- No ejecuta migraciones ni toca datos reales sin confirmación.
-- No afirma mejoras de rendimiento sin medirlas.
+- It does not define the module structure (use `nestjs-architecture`, `monorepo-architecture`).
+- It does not change status codes, routes or response shapes without warning.
+- It does not run migrations or touch real data without confirmation.
+- It does not claim performance improvements without measuring them.
 
 ---
 
-## 📁 Estructura
+## 📁 Structure
 
 ```
 backend-best-practices/

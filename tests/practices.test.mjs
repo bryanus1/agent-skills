@@ -22,7 +22,7 @@ test('detect-test-runner: --help exits 0', () => {
 test('detect-test-runner: unknown option exits 2', (t) => {
   const result = runScript(DETECT_RUNNER, ['--nope'], makeTempDir(t));
   assert.equal(result.code, 2);
-  assert.match(result.stderr, /desconocida/);
+  assert.match(result.stderr, /Unknown option/);
 });
 
 test('detect-test-runner: empty directory reports no runners', (t) => {
@@ -233,7 +233,7 @@ test('collect-scope: unknown option exits 2', (t) => {
 test('collect-scope: outside a git repo without paths exits 2', (t) => {
   const result = runScript(COLLECT_SCOPE, [], makeTempDir(t));
   assert.equal(result.code, 2);
-  assert.match(result.stderr, /repositorio git/);
+  assert.match(result.stderr, /Not a git repository/);
 });
 
 test('collect-scope: classifies the branch changes and recommends lenses', (t) => {
@@ -253,7 +253,7 @@ test('collect-scope: classifies the branch changes and recommends lenses', (t) =
   const lenses = out.lenses.map((l) => l.skill);
   assert.ok(lenses.includes('frontend-best-practices'));
   assert.ok(lenses.includes('backend-best-practices'));
-  assert.ok(out.warnings.some((w) => /sin tocar ningún test/.test(w)));
+  assert.ok(out.warnings.some((w) => /without touching any test/.test(w)));
 });
 
 test('collect-scope: --working only reports uncommitted changes and does not modify the repo', (t) => {
@@ -264,7 +264,7 @@ test('collect-scope: --working only reports uncommitted changes and does not mod
   assert.equal(gitIn(dir, 'status', '--porcelain'), before);
   assert.equal(out.files, 2);
   assert.equal(out.areas.tests.length, 1);
-  assert.ok(!out.warnings.some((w) => /sin tocar ningún test/.test(w)));
+  assert.ok(!out.warnings.some((w) => /without touching any test/.test(w)));
 });
 
 test('collect-scope: without git, classifies the given paths', (t) => {

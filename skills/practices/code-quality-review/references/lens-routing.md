@@ -1,49 +1,49 @@
-# Enrutado de lentes y fusión
+# Lens Routing and Merging
 
-## Cómo decidir
+## How to decide
 
-`collect-scope.mjs` propone las lentes según rutas y extensiones. Es una heurística: **ajústala leyendo el código**. Un archivo en `utils/` puede ser backend; un `.ts` bajo `components/` puede ser pura lógica sin UI.
+`collect-scope.mjs` proposes lenses based on paths and extensions. It is a heuristic: **adjust it by reading the code**. A file in `utils/` can be backend; a `.ts` under `components/` can be pure logic with no UI.
 
-| Lente | Se activa cuando | Se omite cuando |
+| Lens | Applies when | Skipped when |
 |---|---|---|
-| `clean-code` | Hay código fuente cambiado | Solo docs, config o assets |
-| `frontend-best-practices` | Componentes, hooks, páginas, estilos, formularios | No hay UI |
-| `backend-best-practices` | Endpoints, servicios, consultas, migraciones, workers | No hay servidor ni datos |
-| `solid-principles` | Clases o módulos nuevos o muy modificados, dependencias creadas dentro de la lógica, `switch` repetidos | Cambios pequeños en funciones sueltas |
-| `design-patterns` | Se introduce un patrón, una variante nueva en un `switch`, una integración externa, o el usuario lo menciona | No hay variación ni integración |
-| `tdd-workflow` | Cambia comportamiento (siempre que haya código fuente) | Refactor puro con tests que ya lo cubren |
+| `clean-code` | Source code changed | Only docs, config or assets |
+| `frontend-best-practices` | Components, hooks, pages, styles, forms | There is no UI |
+| `backend-best-practices` | Endpoints, services, queries, migrations, workers | There is no server or data |
+| `solid-principles` | New or heavily modified classes or modules, dependencies created inside the logic, repeated `switch`es | Small changes to standalone functions |
+| `design-patterns` | A pattern is introduced, a new variant in a `switch`, an external integration, or the user mentions it | There is no variation or integration |
+| `tdd-workflow` | Behavior changes (whenever there is source code) | A pure refactor with tests that already cover it |
 
-## Qué mirar en cada lente durante una revisión
+## What to look at in each lens during a review
 
-Se usan sus propias comprobaciones, aquí solo el orden recomendado para ahorrar esfuerzo:
+Each lens uses its own checks; this is only the recommended order to save effort:
 
-1. **Backend/frontend (seguridad y datos primero)**: lo crítico condiciona el veredicto.
-2. **tdd-workflow**: ¿el cambio tiene tests que fallarían si el comportamiento se rompe? Un test que no puede fallar no cuenta.
-3. **solid-principles / design-patterns**: solo sobre código nuevo o modificado; pasan por su filtro de proporcionalidad.
-4. **clean-code**: lo último y lo más barato; no debe ahogar los hallazgos importantes.
+1. **Backend/frontend (security and data first)**: critical findings drive the verdict.
+2. **tdd-workflow**: does the change have tests that would fail if the behavior broke? A test that cannot fail does not count.
+3. **solid-principles / design-patterns**: only on new or modified code; they go through their proportionality filter.
+4. **clean-code**: last and cheapest; it must not drown out the important findings.
 
-## Propiedad de los hallazgos (deduplicación)
+## Finding ownership (deduplication)
 
-Cuando varias lentes señalan lo mismo, asigna un único dueño:
+When several lenses flag the same thing, assign a single owner:
 
-| Hallazgo | Dueño | Mencionar también como contexto |
+| Finding | Owner | Also mention as context |
 |---|---|---|
-| Función enorme que mezcla capas (HTTP + SQL + email) | `solid-principles` (SRP/DIP) | `clean-code` (long-function) |
-| `switch` repetido por tipo | `design-patterns` | `solid-principles` (OCP) |
-| Dependencia `new` dentro de la lógica que impide testear | `solid-principles` (DIP) | `tdd-workflow` |
-| Cambio de comportamiento sin test | `tdd-workflow` | — |
-| Inyección, XSS, secretos, autorización ausente | `backend`/`frontend` | — (siempre crítico) |
-| Nombres, números mágicos, comentarios obsoletos | `clean-code` | — |
-| `useEffect` que copia estado derivado | `frontend` | `clean-code` |
-| N+1, falta de transacción, índice ausente | `backend` | — |
+| Huge function mixing layers (HTTP + SQL + email) | `solid-principles` (SRP/DIP) | `clean-code` (long-function) |
+| `switch` repeated by type | `design-patterns` | `solid-principles` (OCP) |
+| A `new` dependency inside the logic that prevents testing | `solid-principles` (DIP) | `tdd-workflow` |
+| Behavior change without a test | `tdd-workflow` | — |
+| Injection, XSS, secrets, missing authorization | `backend`/`frontend` | — (always critical) |
+| Names, magic numbers, stale comments | `clean-code` | — |
+| `useEffect` copying derived state | `frontend` | `clean-code` |
+| N+1, missing transaction, missing index | `backend` | — |
 
-## Contradicciones típicas
+## Typical contradictions
 
-- **`design-patterns` propone abstraer / `clean-code` pide simplicidad.** Decide con la regla de proporcionalidad: ¿existe ya la segunda variante? Si no, gana la simplicidad; anota el patrón como "aplazado".
-- **`solid-principles` quiere una interfaz / el framework ya inyecta.** Gana la convención del framework.
-- **`backend` pide validación y capas / `clean-code` pide menos código.** La seguridad y la integridad de datos ganan; no añadas capas que no las aporten.
-- **`tdd-workflow` pide tests / el cambio es un script desechable.** Declara el riesgo, no insistas.
+- **`design-patterns` proposes abstracting / `clean-code` asks for simplicity.** Decide with the proportionality rule: does the second variant already exist? If not, simplicity wins; note the pattern as "deferred".
+- **`solid-principles` wants an interface / the framework already injects.** The framework's convention wins.
+- **`backend` asks for validation and layers / `clean-code` asks for less code.** Security and data integrity win; do not add layers that don't provide them.
+- **`tdd-workflow` asks for tests / the change is a throwaway script.** State the risk, do not insist.
 
-## Si falta una skill
+## If a skill is missing
 
-Si una skill hermana no está instalada, no la inventes: revisa ese aspecto con criterio general y breve, márcalo en el informe como "sin la skill X" y recomienda instalarla (`npx skills add bryanus1/agent-skills --skill <nombre>`).
+If a sibling skill is not installed, do not make it up: review that aspect with brief, general judgment, mark it in the report as "without skill X" and recommend installing it (`npx skills add bryanus1/agent-skills --skill <name>`).

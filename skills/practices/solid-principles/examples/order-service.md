@@ -1,8 +1,8 @@
-# Ejemplo: servicio de pedidos
+# Example: order service
 
-**Pedido:** "Este `OrderService` es un monstruo, ayúdame con SOLID."
+**Request:** "This `OrderService` is a monster, help me with SOLID."
 
-## Código de partida
+## Starting code
 
 ```ts
 import nodemailer from 'nodemailer';
@@ -18,27 +18,27 @@ export class OrderService {
     if (dto.country === 'ES') total *= 1.21;
     else if (dto.country === 'FR') total *= 1.2;
     const { rows } = await db.query('insert into orders(email,total) values($1,$2) returning id', [dto.email, total]);
-    await nodemailer.createTransport({ host: process.env.SMTP_HOST }).sendMail({ to: dto.email, subject: 'Pedido ' + rows[0].id, text: 'Total: ' + total });
+    await nodemailer.createTransport({ host: process.env.SMTP_HOST }).sendMail({ to: dto.email, subject: 'Order ' + rows[0].id, text: 'Total: ' + total });
     return { id: rows[0].id, total };
   }
 }
 ```
 
-## Diagnóstico
+## Diagnosis
 
-| Principio | Ubicación | Evidencia | ¿Duele hoy? | Decisión |
+| Principle | Location | Evidence | Hurts today? | Decision |
 |---|---|---|---|---|
-| DIP | líneas 2, 14-15 | El servicio importa `db` y `nodemailer`; para probarlo hay que tener BD y SMTP | Sí: no hay tests | **Aplicar**: interfaces `OrderRepository` y `OrderNotifier` |
-| SRP | `checkout` completo | Precios, cupones, impuestos, SQL y email: cinco razones de cambio | Sí: cada campaña toca este archivo | **Aplicar**: extraer cálculo de precio como funciones puras |
-| OCP | cupones (líneas 7-8) e impuestos (10-11) | Cadenas `if/else` sobre cupón y país | Parcial: 2 y 2 casos, un solo sitio | **Aplazar**: usar tablas de datos (barato), sin clases |
-| LSP / ISP | — | No hay herencia; las interfaces nuevas nacen pequeñas | No | **No aplicar** |
+| DIP | lines 2, 14-15 | The service imports `db` and `nodemailer`; testing it requires a DB and SMTP | Yes: there are no tests | **Apply**: `OrderRepository` and `OrderNotifier` interfaces |
+| SRP | the whole `checkout` | Prices, coupons, taxes, SQL and email: five reasons to change | Yes: every campaign touches this file | **Apply**: extract the price calculation as pure functions |
+| OCP | coupons (lines 7-8) and taxes (10-11) | `if/else` chains on coupon and country | Partly: 2 and 2 cases, a single place | **Defer**: use data tables (cheap), no classes |
+| LSP / ISP | — | No inheritance; the new interfaces are born small | No | **Don't apply** |
 
-Decisión explícita: **no** crear `CouponStrategy`, `TaxStrategy` ni factorías. Con dos cupones y dos países en un único sitio, una tabla `Record` basta; se reevaluará con una tercera variante o si las reglas empiezan a necesitar lógica propia.
+Explicit decision: do **not** create `CouponStrategy`, `TaxStrategy` or factories. With two coupons and two countries in a single place, a `Record` table is enough; it will be reassessed with a third variant or if the rules start needing their own logic.
 
-## Resultado
+## Result
 
 ```ts
-// pricing.ts: reglas puras, sin I/O
+// pricing.ts: pure rules, no I/O
 const COUPON_FACTOR: Record<string, number> = { WELCOME10: 0.9, VIP20: 0.8 };
 const VAT_BY_COUNTRY: Record<string, number> = { ES: 0.21, FR: 0.2 };
 
@@ -48,7 +48,7 @@ export function priceOrder(items: Item[], coupon: string | undefined, country: s
   return discounted * (1 + (VAT_BY_COUNTRY[country] ?? 0));
 }
 
-// order.service.ts: orquestación; depende de abstracciones definidas aquí
+// order.service.ts: orchestration; depends on abstractions defined here
 export interface OrderRepository { create(order: { email: string; total: number }): Promise<{ id: string }>; }
 export interface OrderNotifier { orderConfirmed(order: { id: string; total: number }, email: string): Promise<void>; }
 
@@ -65,11 +65,11 @@ export class OrderService {
 }
 ```
 
-`PgOrderRepository` y `SmtpOrderNotifier` viven en `infra/` y se componen en `main.ts`. Los tests de `priceOrder` no necesitan nada; los de `OrderService` usan un repositorio en memoria y un notificador espía.
+`PgOrderRepository` and `SmtpOrderNotifier` live in `infra/` and are composed in `main.ts`. The `priceOrder` tests need nothing; the `OrderService` tests use an in-memory repository and a spy notifier.
 
-> En un refactor real, el cambio de comportamiento no declarado (un cupón desconocido se ignora igual que antes, pero el error `Error('empty')` pasa a `EmptyOrderError`) se señala en el reporte para que el usuario lo confirme.
+> In a real refactor, the undeclared behavior change (an unknown coupon is ignored as before, but the `Error('empty')` error becomes `EmptyOrderError`) is flagged in the report for the user to confirm.
 
-## Fuera de alcance
+## Out of scope
 
-- Redondeo de importes con coma flotante (guardar céntimos como enteros).
-- El texto del email está acoplado al total; si marketing quiere plantillas, será otra tarea.
+- Rounding amounts with floating point (store cents as integers).
+- The email copy is coupled to the total; if marketing wants templates, that is another task.

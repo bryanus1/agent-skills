@@ -1,45 +1,45 @@
-# Patrones de frontend y backend
+# Frontend and Backend Patterns
 
-## Contenido
+## Contents
 
 **Backend**
 1. [Repository](#repository)
 2. [Result / Either](#result--either)
 3. [Middleware / Chain of Responsibility](#middleware--chain-of-responsibility)
-4. [Unit of Work y transacciones](#unit-of-work-y-transacciones)
-5. [Idempotencia y Outbox](#idempotencia-y-outbox)
+4. [Unit of Work and transactions](#unit-of-work-and-transactions)
+5. [Idempotency and Outbox](#idempotency-and-outbox)
 
 **Frontend**
 6. [Custom Hook](#custom-hook)
 7. [Compound Components](#compound-components)
 8. [Container / Presentational](#container--presentational)
-9. [Render props y Slots](#render-props-y-slots)
-10. [Adapter de datos y estado remoto](#adapter-de-datos-y-estado-remoto)
+9. [Render props and Slots](#render-props-and-slots)
+10. [Data adapter and remote state](#data-adapter-and-remote-state)
 
 ---
 
 ## Repository
 
-**Problema:** la lógica de negocio no debe conocer SQL, el ORM ni el formato de almacenamiento.
+**Problem:** the business logic must not know about SQL, the ORM or the storage format.
 
-**Cuándo sí:** reglas de negocio no triviales que se prueban sin BD; probable cambio de almacenamiento; varias fuentes de datos. **Cuándo no:** CRUD simple donde el repositorio solo reenvía cada método del ORM (capa vacía) o donde el framework/ORM ya expone un repositorio suficiente.
+**When yes:** non-trivial business rules tested without a DB; a likely storage change; several data sources. **When not:** simple CRUD where the repository only forwards each ORM method (an empty layer), or where the framework/ORM already exposes a good-enough repository.
 
 ```ts
-// El dominio define lo que necesita, en lenguaje de negocio
+// The domain defines what it needs, in business language
 export interface OrderRepository {
   findById(id: OrderId): Promise<Order | null>;
-  findOverdue(now: Date): Promise<Order[]>;     // consultas con intención, no un `query(sql)` genérico
+  findOverdue(now: Date): Promise<Order[]>;     // queries with intent, not a generic `query(sql)`
   save(order: Order): Promise<void>;
 }
 ```
 
-Reglas: métodos con **intención de negocio**; devuelve entidades de dominio, no filas del ORM; una implementación en memoria (`InMemoryOrderRepository`) para tests; los tests de integración del repositorio real contra la BD. No expongas el ORM (`QueryBuilder`) fuera de él.
+Rules: methods with **business intent**; return domain entities, not ORM rows; an in-memory implementation (`InMemoryOrderRepository`) for tests; integration tests for the real repository against the DB. Do not expose the ORM (`QueryBuilder`) outside it.
 
 ## Result / Either
 
-**Problema:** distinguir fallos **esperados** de negocio (stock insuficiente, cupón caducado) de errores inesperados, sin depender de excepciones para el flujo normal.
+**Problem:** tell **expected** business failures (insufficient stock, expired coupon) apart from unexpected errors, without relying on exceptions for the normal flow.
 
-**Cuándo sí:** el llamador debe tratar cada fallo posible y el compilador debería obligarle; fallos frecuentes en el camino normal. **Cuándo no:** el proyecto ya usa excepciones de dominio de forma consistente: **no mezcles dos convenciones**; en ese caso, usa excepciones tipadas.
+**When yes:** the caller must handle each possible failure and the compiler should force it to; frequent failures on the normal path. **When not:** the project already uses domain exceptions consistently: **don't mix two conventions**; in that case, use typed exceptions.
 
 ```ts
 type Result<T, E> = { ok: true; value: T } | { ok: false; error: E };
@@ -52,48 +52,48 @@ async function placeOrder(input: PlaceOrderInput): Promise<Result<Order, PlaceOr
 }
 
 const result = await placeOrder(input);
-if (!result.ok) return res.status(409).json(result.error);   // el compilador fuerza a comprobar
+if (!result.ok) return res.status(409).json(result.error);   // the compiler forces the check
 ```
 
-No instales librerías (`neverthrow`, `fp-ts`) sin confirmar; un tipo de cuatro líneas basta. Los errores **inesperados** (red caída, bug) siguen siendo excepciones.
+Don't install libraries (`neverthrow`, `fp-ts`) without confirming; a four-line type is enough. **Unexpected** errors (network down, a bug) are still exceptions.
 
 ## Middleware / Chain of Responsibility
 
-**Problema:** un pipeline de pasos independientes para cada petición (auth, validación, logging, rate limit, manejo de errores) que se pueden componer.
+**Problem:** a pipeline of independent steps for each request (auth, validation, logging, rate limiting, error handling) that can be composed.
 
-Ya lo resuelven Express/Fastify/Hono (`app.use`), NestJS (guards, pipes, interceptors, filters) y los routers de tRPC. **Usa el mecanismo del framework**; no construyas una cadena propia salvo para pipelines fuera de HTTP (importaciones, procesamiento de mensajes).
+Express/Fastify/Hono (`app.use`), NestJS (guards, pipes, interceptors, filters) and tRPC routers already solve it. **Use the framework's mechanism**; don't build your own chain except for pipelines outside HTTP (imports, message processing).
 
-Reglas: cada paso hace una sola cosa; el orden importa y debe estar documentado (auth antes de validación; manejo de errores el último); no pongas lógica de negocio en middleware.
+Rules: each step does one thing; order matters and must be documented (auth before validation; error handling last); don't put business logic in middleware.
 
-## Unit of Work y transacciones
+## Unit of Work and transactions
 
-**Problema:** varios cambios que deben confirmarse o revertirse juntos.
+**Problem:** several changes that must be committed or rolled back together.
 
-La mayoría de ORMs ya implementan Unit of Work (Prisma `$transaction`, TypeORM `EntityManager`, Drizzle `transaction`). Define el **límite de la transacción en el caso de uso** y pásala a los repositorios, sin que el dominio conozca el ORM:
+Most ORMs already implement Unit of Work (Prisma `$transaction`, TypeORM `EntityManager`, Drizzle `transaction`). Define the **transaction boundary in the use case** and pass it to the repositories, without the domain knowing the ORM:
 
 ```ts
-await this.tx.run(async (repos) => {   // `tx` es un puerto; su adaptador usa la transacción del ORM
+await this.tx.run(async (repos) => {   // `tx` is a port; its adapter uses the ORM's transaction
   await repos.orders.save(order);
   await repos.stock.decrement(order.items);
 });
 ```
 
-**Cuándo no:** operaciones con una sola escritura. No abras una transacción larga alrededor de llamadas de red.
+**When not:** operations with a single write. Don't open a long transaction around network calls.
 
-## Idempotencia y Outbox
+## Idempotency and Outbox
 
-**Problema:** reintentos o duplicados no deben repetir efectos (cobrar dos veces) y un cambio en BD debe publicar un evento de forma fiable.
+**Problem:** retries or duplicates must not repeat effects (charging twice), and a DB change must publish an event reliably.
 
-- **Idempotency key** guardada con el resultado: si llega de nuevo la misma clave, se devuelve el resultado anterior.
-- **Outbox:** escribe el evento en una tabla dentro de la misma transacción que el cambio y un proceso aparte lo publica. Evita el "guardé pero no publiqué".
+- **Idempotency key** stored with the result: if the same key arrives again, the previous result is returned.
+- **Outbox:** write the event to a table in the same transaction as the change, and a separate process publishes it. It avoids "saved but not published".
 
-Aplícalos solo donde el riesgo lo justifique (pagos, integraciones, mensajería); añaden infraestructura.
+Apply them only where the risk justifies it (payments, integrations, messaging); they add infrastructure.
 
 ---
 
 ## Custom Hook
 
-**Problema:** reutilizar lógica con estado (suscripciones, formularios, datos remotos, debounce) entre componentes.
+**Problem:** reuse stateful logic (subscriptions, forms, remote data, debounce) across components.
 
 ```tsx
 function useDebouncedValue<T>(value: T, delayMs: number) {
@@ -106,11 +106,11 @@ function useDebouncedValue<T>(value: T, delayMs: number) {
 }
 ```
 
-Reglas: un hook expresa **una** preocupación; devuelve una forma estable y pequeña; limpia efectos; si no usa estado ni efectos, es una función normal. Es el equivalente funcional de Strategy/Observer en React.
+Rules: a hook expresses **one** concern; it returns a small, stable shape; it cleans up its effects; if it uses no state or effects, it is a plain function. It is the functional equivalent of Strategy/Observer in React.
 
 ## Compound Components
 
-**Problema:** un conjunto de piezas relacionadas que comparten estado implícito (Tabs, Accordion, Select, Menu) y cuyo consumidor quiere controlar la composición, en lugar de recibir un API de 20 props.
+**Problem:** a set of related pieces that share implicit state (Tabs, Accordion, Select, Menu) whose consumer wants to control the composition, instead of receiving a 20-prop API.
 
 ```tsx
 const TabsContext = createContext<{ active: string; setActive(id: string): void } | null>(null);
@@ -128,23 +128,23 @@ Tabs.Panel = function Panel({ id, children }: { id: string; children: React.Reac
 };
 ```
 
-**Cuándo no:** componentes simples con pocas props; compón con `children`. Cuida la accesibilidad (roles, teclado), y considera librerías headless (Radix, React Aria) antes de implementarlo a mano.
+**When not:** simple components with few props; compose with `children`. Mind accessibility (roles, keyboard), and consider headless libraries (Radix, React Aria) before implementing it by hand.
 
 ## Container / Presentational
 
-**Problema:** mezcla de acceso a datos y presentación en un componente, difícil de probar y de reutilizar.
+**Problem:** data access and presentation mixed in one component, hard to test and reuse.
 
-Hoy se expresa con **hook + componente presentacional**: el hook obtiene/transforma datos; el componente solo recibe props y renderiza (fácil de probar y de mostrar en Storybook).
+Today it is expressed as **hook + presentational component**: the hook fetches/transforms data; the component only receives props and renders (easy to test and to show in Storybook).
 
-## Render props y Slots
+## Render props and Slots
 
-**Problema:** un componente debe delegar parte del renderizado al consumidor (listas, tablas, virtualización) sin conocer su contenido. Usa `children` como función o props tipo slot (`header`, `footer`, `renderRow`) en lugar de bifurcar con banderas booleanas. Hoy suelen sustituirse por composición con `children` o por hooks; usa render props cuando el componente necesita **pasar datos** al contenido.
+**Problem:** a component must delegate part of the rendering to the consumer (lists, tables, virtualization) without knowing its content. Use `children` as a function or slot-style props (`header`, `footer`, `renderRow`) instead of branching on boolean flags. Today they are often replaced by composition with `children` or by hooks; use render props when the component needs to **pass data** to the content.
 
-## Adapter de datos y estado remoto
+## Data adapter and remote state
 
-**Problema:** los componentes dependen del formato del backend y duplican fetch, caché y estados de carga.
+**Problem:** components depend on the backend's format and duplicate fetching, caching and loading states.
 
-- Convierte la respuesta a un modelo de UI en **un solo sitio** (`toUser(dto)`), a la salida de la capa de datos.
-- Usa la librería de datos que ya tenga el proyecto (TanStack Query, SWR, RTK Query) en lugar de reimplementar caché e invalidación con `useEffect`.
-- Modela los estados asíncronos como unión discriminada (`idle | loading | success | error`), no como booleanos sueltos.
-- Mantén el **estado del servidor** (datos remotos) separado del **estado de UI** (modales, filtros): cada uno tiene su herramienta.
+- Convert the response into a UI model in **a single place** (`toUser(dto)`), at the exit of the data layer.
+- Use the data library the project already has (TanStack Query, SWR, RTK Query) instead of reimplementing caching and invalidation with `useEffect`.
+- Model async states as a discriminated union (`idle | loading | success | error`), not as loose booleans.
+- Keep **server state** (remote data) separate from **UI state** (modals, filters): each has its own tool.

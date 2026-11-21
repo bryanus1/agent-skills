@@ -1,23 +1,23 @@
-# Fiabilidad y observabilidad
+# Reliability and Observability
 
-## Fiabilidad
+## Reliability
 
-- **Timeouts en todo lo externo** (HTTP, BD, colas). Sin timeout, un tercero lento agota tus conexiones y te tumba a ti.
-- **Reintentos** con espera exponencial y jitter, límite de intentos y **solo para operaciones idempotentes** o con clave de idempotencia. Un reintento ciego de un cobro duplica el cargo.
-- **Disyuntor / degradación**: si una dependencia no esencial falla, responde sin ella en lugar de caer entero.
-- **Bucle de eventos (Node)**: no bloquear con trabajo CPU (hash grande, JSON enorme, bucles pesados); delega a workers o a una cola. Evita `*Sync` en rutas de petición.
-- **Cierre ordenado**: al recibir `SIGTERM`, deja de aceptar peticiones, termina las en curso, cierra conexiones y sal.
-- **Tareas en segundo plano** (correos, informes) fuera del ciclo de la petición, con cola y reintentos; si pierden fiabilidad por ser "fire and forget" (`promise` sin `await` ni `catch`), regístralo como hallazgo.
-- **Configuración**: variables de entorno validadas al arrancar (falla rápido si falta una), sin valores de producción por defecto.
-- **Eventos y datos duplicados**: los consumidores de mensajes deben tolerar duplicados (idempotencia, patrón outbox para publicar de forma fiable; ver `design-patterns`).
+- **Timeouts on everything external** (HTTP, DB, queues). Without a timeout, a slow third party exhausts your connections and takes you down too.
+- **Retries** with exponential backoff and jitter, a bounded number of attempts, and **only for idempotent operations** or ones with an idempotency key. A blind retry of a charge doubles the charge.
+- **Circuit breaker / degradation**: if a non-essential dependency fails, respond without it instead of going down entirely.
+- **Event loop (Node)**: don't block it with CPU work (large hashes, huge JSON, heavy loops); delegate to workers or a queue. Avoid `*Sync` calls on request paths.
+- **Graceful shutdown**: on `SIGTERM`, stop accepting requests, finish the ones in flight, close connections and exit.
+- **Background tasks** (emails, reports) outside the request cycle, with a queue and retries; if they lose reliability by being "fire and forget" (a `promise` with no `await` or `catch`), report it as a finding.
+- **Configuration**: environment variables validated at startup (fail fast if one is missing), with no production values as defaults.
+- **Duplicate events and data**: message consumers must tolerate duplicates (idempotency, the outbox pattern to publish reliably; see `design-patterns`).
 
-## Observabilidad
+## Observability
 
-- **Logs estructurados** (JSON) con nivel, mensaje, `requestId`/`traceId`, usuario (id, no datos personales) y el contexto necesario. Un `console.log("error")` no ayuda a las 3 de la mañana.
-- **Nivel adecuado**: `error` para lo que requiere acción, `warn` para lo anómalo recuperable, `info` para eventos de negocio relevantes, `debug` desactivado en producción.
-- **No registres** secretos, tokens, contraseñas ni cuerpos completos con datos personales.
-- **Correlación**: genera o propaga un id por petición (`X-Request-Id`, traceparent) y devuélvelo en las respuestas de error.
-- **Métricas**: tasa de peticiones, errores y latencia (p50/p95/p99) por endpoint; saturación (conexiones de BD, cola).
-- **Health checks**: `/health` (vivo) y `/ready` (listo para tráfico, con comprobación de dependencias críticas) sin exponer detalles internos.
-- **Trazas** distribuidas (OpenTelemetry) cuando hay varios servicios.
-- Alertas basadas en síntomas del usuario (errores, latencia), no solo en la CPU.
+- **Structured logs** (JSON) with level, message, `requestId`/`traceId`, user (id, not personal data) and the necessary context. A `console.log("error")` does not help at 3 a.m.
+- **The right level**: `error` for what needs action, `warn` for recoverable anomalies, `info` for relevant business events, `debug` disabled in production.
+- **Do not log** secrets, tokens, passwords or full bodies with personal data.
+- **Correlation**: generate or propagate an id per request (`X-Request-Id`, traceparent) and return it in error responses.
+- **Metrics**: request rate, errors and latency (p50/p95/p99) per endpoint; saturation (DB connections, queue).
+- **Health checks**: `/health` (alive) and `/ready` (ready for traffic, checking critical dependencies) without exposing internal details.
+- Distributed **traces** (OpenTelemetry) when there are several services.
+- Alerts based on user-facing symptoms (errors, latency), not only on CPU.

@@ -1,112 +1,117 @@
 ---
 name: backend-best-practices
-version: 1.0.0
+version: 1.1.0
 description: >-
-  Revisa y mejora código backend (APIs HTTP, servicios, acceso a datos) con buenas prácticas verificables: diseño de API, validación y errores, acceso a datos, seguridad, fiabilidad y observabilidad. Prioriza por impacto y corrige solo lo que duele. Úsala al revisar o escribir endpoints, servicios y consultas.
+  Review and improve backend code (HTTP APIs, services, data access) with verifiable good practices: API design, validation and errors, data access, security, reliability and observability. Prioritizes by impact and fixes only what hurts. Use it when reviewing or writing endpoints, services and queries.
 tags: [backend, api, rest, security, database, observability, best-practices]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
   - buenas prácticas backend
   - backend best practices
   - revisa este endpoint
+  - review this endpoint
   - review api
   - diseño de api
+  - api design
   - seguridad backend
+  - backend security
   - n+1
   - revisión de backend
+  - backend review
 requirements:
   tools: [view_file, replace_file_content, run_command]
 ---
 
 # Backend Best Practices
 
-## 🎯 Propósito
+## 🎯 Purpose
 
-Revisar y mejorar código de servidor con **criterios verificables y priorizados**. Cada hallazgo cita evidencia (`archivo:línea`), su impacto (seguridad, datos, disponibilidad, mantenimiento) y una corrección proporcionada. Lo que ya está bien se deja como está.
+Review and improve server code with **verifiable, prioritized criteria**. Each finding cites evidence (`file:line`), its impact (security, data, availability, maintenance) and a proportionate fix. What is already fine stays as it is.
 
-Cubre cinco áreas: **diseño de API y errores, acceso a datos, seguridad, fiabilidad y observabilidad**. No decide la estructura de módulos (`nestjs-architecture`, `monorepo-architecture`), ni la legibilidad interna (`clean-code`), ni responsabilidades de clases (`solid-principles`), ni qué patrón usar (`design-patterns`). Para tests usa `tdd-workflow`.
+It covers five areas: **API design and errors, data access, security, reliability and observability**. It does not decide the module structure (`nestjs-architecture`, `monorepo-architecture`), internal readability (`clean-code`), class responsibilities (`solid-principles`) or which pattern to use (`design-patterns`). For tests use `tdd-workflow`.
 
-## ⚡ Cuándo Activar esta Skill
+## ⚡ When to Trigger
 
-- El usuario pide revisar, endurecer o "aplicar buenas prácticas" a endpoints, servicios, consultas o middleware.
-- Se escribe un endpoint o servicio nuevo que recibe entrada externa, toca la base de datos o llama a terceros.
-- Hay síntomas: consultas lentas, errores 500 sin explicación, datos inconsistentes, fugas de información, falta de trazabilidad.
+- The user asks to review, harden or "apply good practices" to endpoints, services, queries or middleware.
+- A new endpoint or service is written that receives external input, touches the database or calls third parties.
+- There are symptoms: slow queries, unexplained 500 errors, inconsistent data, information leaks, lack of traceability.
 
-## 📋 Flujo de Trabajo Paso a Paso
+## 📋 Workflow
 
-### 1. Leer el contexto
+### 1. Read the context
 
-Identifica lenguaje y framework (NestJS, Express, Fastify, Hono…), ORM o cliente de BD, cómo se validan entradas y se manejan errores hoy, cómo se loguea y cómo se configura. **Usa las convenciones y librerías del proyecto**; no introduzcas otras sin confirmar.
+Identify the language and framework (NestJS, Express, Fastify, Hono…), the ORM or DB client, how input is validated and errors are handled today, how logging and configuration work. **Use the project's conventions and libraries**; don't introduce others without confirming.
 
-### 2. Revisar por áreas
+### 2. Review by area
 
-| Área | Comprobaciones clave | Detalle |
+| Area | Key checks | Details |
 |---|---|---|
-| **Diseño de API y errores** | Validación de entrada en el borde; códigos de estado correctos; formato de error uniforme sin filtrar detalles internos; paginación; idempotencia en operaciones repetibles | [api-design](references/api-design.md) |
-| **Acceso a datos** | Consultas parametrizadas; sin N+1; transacciones para cambios relacionados; índices para los filtros reales; migraciones seguras | [data-access](references/data-access.md) |
-| **Seguridad** | Autenticación y **autorización por recurso**; inyección; secretos fuera del código; límites de tasa; datos sensibles no expuestos ni registrados | [security-backend](references/security-backend.md) |
-| **Fiabilidad** | Timeouts en llamadas externas; reintentos con límite y solo si es idempotente; cierre ordenado; sin trabajo pesado bloqueando el bucle de eventos | [reliability-observability](references/reliability-observability.md) |
-| **Observabilidad** | Logs estructurados con correlación; sin datos sensibles; métricas y health checks; errores con contexto | [reliability-observability](references/reliability-observability.md) |
+| **API design and errors** | Input validation at the edge; correct status codes; a uniform error format that does not leak internal details; pagination; idempotency in repeatable operations | [api-design](references/api-design.md) |
+| **Data access** | Parameterized queries; no N+1; transactions for related changes; indexes for the real filters; safe migrations | [data-access](references/data-access.md) |
+| **Security** | Authentication and **per-resource authorization**; injection; secrets out of the code; rate limits; sensitive data neither exposed nor logged | [security-backend](references/security-backend.md) |
+| **Reliability** | Timeouts on external calls; bounded retries, and only if idempotent; graceful shutdown; no heavy work blocking the event loop | [reliability-observability](references/reliability-observability.md) |
+| **Observability** | Structured logs with correlation; no sensitive data; metrics and health checks; errors with context | [reliability-observability](references/reliability-observability.md) |
 
-Limítate a las áreas relevantes para el alcance pedido y a los archivos que se pidieron.
+Stick to the areas relevant to the requested scope and to the files that were requested.
 
-### 3. Priorizar
+### 3. Prioritize
 
-- **Crítico**: vulnerabilidad explotable (inyección, falta de autorización, secretos expuestos), pérdida o corrupción de datos.
-- **Importante**: errores que devuelven códigos incorrectos o filtran detalles, consultas N+1 o sin índice en rutas calientes, ausencia de transacción, falta de timeouts.
-- **Menor**: consistencia de nombres, logs poco útiles, mejoras de formato. Menciónalos sin corregir si no se pidió.
+- **Critical**: an exploitable vulnerability (injection, missing authorization, exposed secrets), data loss or corruption.
+- **Important**: errors that return wrong codes or leak details, N+1 or unindexed queries on hot paths, missing transactions, missing timeouts.
+- **Minor**: naming consistency, unhelpful logs, formatting improvements. Mention them without fixing if they were not requested.
 
-### 4. Corregir con red de seguridad
+### 4. Fix with a safety net
 
-Ejecuta los tests antes y después. Si el cambio altera el contrato HTTP (códigos de estado, forma de la respuesta, campos), **avísalo antes de aplicarlo**: los clientes dependen de él. Para un bug o una vulnerabilidad, escribe antes un test que la reproduzca (flujo de `tdd-workflow`). Un cambio por hallazgo.
+Run the tests before and after. If the change alters the HTTP contract (status codes, response shape, fields), **say so before applying it**: clients depend on it. For a bug or a vulnerability, first write a test that reproduces it (the `tdd-workflow` flow). One change per finding.
 
-### 5. Verificar y reportar
+### 5. Verify and report
 
-Ejecuta tests, typecheck y lint si existen. Indica lo que **no pudiste verificar** (rendimiento real con datos de producción, comportamiento bajo carga, políticas de red) y cómo comprobarlo. Reporta con el formato de abajo.
+Run tests, typecheck and lint if they exist. State what you **could not verify** (real performance with production data, behavior under load, network policies) and how to check it. Report using the format below.
 
-## 🚫 Cuándo NO sobre-ingenierizar
+## 🚫 When NOT to Over-Engineer
 
-- **Añadir capas** (repositorio, DTO, caso de uso) a un CRUD simple que el framework ya cubre.
-- **Caché, colas o microservicios** sin un problema de rendimiento medido.
-- **Reintentos en operaciones no idempotentes** (cobros, envíos): crean duplicados.
-- **Índices "por si acaso"**: cada índice cuesta en escrituras; basa la decisión en las consultas reales (`EXPLAIN`).
-- **Handlers pequeños y correctos**: si no hay hallazgos reales, dilo; "sin cambios necesarios" es un resultado válido.
+- **Adding layers** (repository, DTO, use case) to a simple CRUD the framework already covers.
+- **Caching, queues or microservices** without a measured performance problem.
+- **Retries on non-idempotent operations** (charges, shipments): they create duplicates.
+- **Indexes "just in case"**: every index costs on writes; base the decision on the real queries (`EXPLAIN`).
+- **Small, correct handlers**: if there are no real findings, say so; "no changes needed" is a valid result.
 
-## ⚠️ Reglas Críticas
+## ⚠️ Critical Rules
 
-- **Evidencia primero**: cada hallazgo con `archivo:línea` y efecto concreto.
-- **La seguridad no se aplaza**: una inyección o una autorización ausente se reporta como crítica aunque no lo hayan pedido.
-- **No cambies el contrato público sin avisar** (rutas, códigos de estado, forma de respuesta, nombres de campos).
-- **Nunca registres ni devuelvas secretos, tokens ni datos personales** innecesarios; no los pongas en el código ni en los ejemplos.
-- **Migraciones destructivas** (borrar columnas, cambiar tipos) y cualquier operación sobre datos reales: confirmar con el usuario; proponer pasos compatibles hacia atrás.
-- **No instales dependencias** sin confirmación.
-- **No inventes métricas** de rendimiento: mide o declara que no se midió.
-- **No toques lo que no se pidió**: lo demás va a "Fuera de alcance".
+- **Reply in the user's language**, even though this skill is written in English.
+- **Evidence first**: every finding with `file:line` and a concrete effect.
+- **Security is never deferred**: an injection or missing authorization is reported as critical even if it was not requested.
+- **Do not change the public contract without warning** (routes, status codes, response shape, field names).
+- **Never log or return secrets, tokens or unnecessary personal data**; don't put them in the code or in examples.
+- **Destructive migrations** (dropping columns, changing types) and any operation on real data: confirm with the user; propose backward-compatible steps.
+- **Do not install dependencies** without confirmation.
+- **Do not make up performance metrics**: measure, or state that nothing was measured.
+- **Do not touch what was not requested**: everything else goes under "Out of scope".
 
-## 📤 Reporte
+## 📤 Report
 
 ```markdown
-### Resumen
-<estado general y los 1–3 hallazgos de más impacto>
+### Summary
+<overall state and the 1–3 highest-impact findings>
 
-### Hallazgos
-| # | Severidad | Área | Ubicación | Problema y efecto | Acción |
+### Findings
+| # | Severity | Area | Location | Problem and effect | Action |
 |---|---|---|---|---|---|
-| 1 | Crítico | Seguridad | orders.ts:21 | SQL por concatenación con `req.query.status`: inyección | Corregido (consulta parametrizada) |
-| 2 | Importante | API | orders.ts:30 | Devuelve 200 con `{error}` en fallo y expone `err.stack` | Corregido (4xx/5xx, mensaje genérico) — cambia el contrato |
-| 3 | Menor | Logs | orders.ts:44 | `console.log` sin contexto | Solo mencionado |
+| 1 | Critical | Security | orders.ts:21 | SQL built by concatenating `req.query.status`: injection | Fixed (parameterized query) |
+| 2 | Important | API | orders.ts:30 | Returns 200 with `{error}` on failure and exposes `err.stack` | Fixed (4xx/5xx, generic message) — changes the contract |
+| 3 | Minor | Logs | orders.ts:44 | `console.log` without context | Mentioned only |
 
-### Cambios aplicados
-1. <cambio> — tests: ✅ N/N
+### Changes applied
+1. <change> — tests: ✅ N/N
 
-### No verificado / fuera de alcance
-- <qué requiere carga real, datos de producción o decisión del usuario>
+### Not verified / out of scope
+- <what needs real load, production data or a user decision>
 ```
 
-## 📚 Referencias
+## 📚 References
 
-- [Diseño de API, validación y errores](references/api-design.md)
-- [Acceso a datos](references/data-access.md)
-- [Seguridad en el backend](references/security-backend.md)
-- [Fiabilidad y observabilidad](references/reliability-observability.md)
-- [Ejemplo de revisión completa](examples/review-orders-api.md)
+- [API design, validation and errors](references/api-design.md)
+- [Data access](references/data-access.md)
+- [Backend security](references/security-backend.md)
+- [Reliability and observability](references/reliability-observability.md)
+- [Full review example](examples/review-orders-api.md)

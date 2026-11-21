@@ -6,18 +6,18 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const HELP = `detect-test-runner: detecta el runner de tests del proyecto y los comandos para ejecutarlo.
+const HELP = `detect-test-runner: detects the project's test runner and the commands to run it.
 
-Uso:
+Usage:
   node <skill-dir>/scripts/detect-test-runner.mjs [--cwd <dir>] [--json]
 
-Opciones:
-  --cwd <dir>   Directorio del proyecto (por defecto, el directorio actual).
-  --json        Imprime el resultado como JSON.
-  -h, --help    Muestra esta ayuda.
+Options:
+  --cwd <dir>   Project directory (defaults to the current directory).
+  --json        Print the result as JSON.
+  -h, --help    Show this help.
 
-Soporta: vitest, jest, playwright, mocha, node:test (JS/TS), pytest, go test y cargo test.
-No escribe ni instala nada. Sale con 0 aunque no detecte ningún runner (runners: []).`;
+Supports: vitest, jest, playwright, mocha, node:test (JS/TS), pytest, go test and cargo test.
+It writes and installs nothing. Exits with 0 even when no runner is found (runners: []).`;
 
 function parseArgs(argv) {
   const opts = { cwd: process.cwd(), json: false };
@@ -26,9 +26,9 @@ function parseArgs(argv) {
     if (arg === '-h' || arg === '--help') opts.help = true;
     else if (arg === '--json') opts.json = true;
     else if (arg === '--cwd') {
-      if (!argv[i + 1]) throw new Error('--cwd requiere un directorio');
+      if (!argv[i + 1]) throw new Error('--cwd requires a directory');
       opts.cwd = path.resolve(argv[++i]);
-    } else throw new Error(`Opción desconocida: ${arg}`);
+    } else throw new Error(`Unknown option: ${arg}`);
   }
   return opts;
 }
@@ -215,24 +215,24 @@ function detect(cwd) {
 }
 
 function printHuman(result) {
-  const lines = [`Proyecto: ${result.cwd}`];
-  if (result.packageManager) lines.push(`Gestor de paquetes: ${result.packageManager}`);
-  if (result.testScript) lines.push(`Script de test: ${result.testScript}`);
-  if (result.monorepo) lines.push('Monorepo: sí (ejecuta los tests desde el paquete afectado o con el filtro del workspace)');
+  const lines = [`Project: ${result.cwd}`];
+  if (result.packageManager) lines.push(`Package manager: ${result.packageManager}`);
+  if (result.testScript) lines.push(`Test script: ${result.testScript}`);
+  if (result.monorepo) lines.push('Monorepo: yes (run the tests from the affected package or with the workspace filter)');
   if (!result.runners.length) {
-    lines.push('', 'No se detectó ningún runner de tests.');
+    lines.push('', 'No test runner detected.');
   }
   for (const runner of result.runners) {
     lines.push('', `▸ ${runner.name} (${runner.kind})${runner.config ? ` — config: ${runner.config}` : ''}`);
-    lines.push(`  todo:     ${runner.commands.all}`);
-    lines.push(`  archivo:  ${runner.commands.file}`);
+    lines.push(`  all:      ${runner.commands.all}`);
+    lines.push(`  file:     ${runner.commands.file}`);
     if (runner.commands.watch) lines.push(`  watch:    ${runner.commands.watch}`);
   }
   if (result.conventions) {
-    lines.push('', `Convención de tests: sufijo ${result.conventions.suffix}, ${result.conventions.placement}`);
-    for (const sample of result.conventions.samples) lines.push(`  ej. ${sample}`);
+    lines.push('', `Test convention: suffix ${result.conventions.suffix}, ${result.conventions.placement}`);
+    for (const sample of result.conventions.samples) lines.push(`  e.g. ${sample}`);
   } else {
-    lines.push('', 'No hay archivos de test existentes de los que inferir convenciones.');
+    lines.push('', 'No existing test files to infer conventions from.');
   }
   console.log(lines.join('\n'));
 }
@@ -244,13 +244,13 @@ try {
     process.exit(0);
   }
   if (!fs.existsSync(opts.cwd) || !fs.statSync(opts.cwd).isDirectory()) {
-    throw new Error(`No existe el directorio: ${opts.cwd}`);
+    throw new Error(`Directory does not exist: ${opts.cwd}`);
   }
   const result = detect(opts.cwd);
   if (opts.json) console.log(JSON.stringify(result, null, 2));
   else printHuman(result);
 } catch (error) {
   console.error(`Error: ${error.message}`);
-  console.error('Usa --help para ver las opciones.');
+  console.error('Use --help to see the options.');
   process.exit(2);
 }

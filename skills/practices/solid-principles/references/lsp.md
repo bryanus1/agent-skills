@@ -1,20 +1,20 @@
-# LSP: sustitución de Liskov
+# LSP: Liskov Substitution
 
-> Cualquier implementación (o subtipo) debe poder usarse donde se espera su tipo base **sin que el cliente note sorpresas**. Respeta el contrato: no endurece precondiciones, no debilita postcondiciones, no rompe invariantes.
+> Any implementation (or subtype) must be usable wherever its base type is expected **without the client noticing surprises**. It respects the contract: it does not tighten preconditions, weaken postconditions or break invariants.
 
-LSP trata del **comportamiento**, no de que el compilador acepte la herencia. Un subtipo que compila pero rompe lo que el cliente da por hecho viola LSP.
+LSP is about **behavior**, not about the compiler accepting the inheritance. A subtype that compiles but breaks what the client takes for granted violates LSP.
 
-## Cómo detectarlo
+## How to detect it
 
-- Un método sobrescrito que lanza `NotImplemented`/`Unsupported` o no hace nada.
-- Una subclase que añade validaciones más estrictas (rechaza entradas que la base acepta).
-- `instanceof` o comprobaciones de tipo en el código cliente "para tratar el caso especial".
-- Tests del contrato base que fallan con alguna implementación.
-- Una implementación que devuelve `null` donde la interfaz promete un valor, o lanza errores no documentados.
+- An overridden method that throws `NotImplemented`/`Unsupported` or does nothing.
+- A subclass that adds stricter validations (it rejects inputs the base accepts).
+- `instanceof` or type checks in the client code "to handle the special case".
+- Base contract tests that fail with some implementation.
+- An implementation that returns `null` where the interface promises a value, or throws undocumented errors.
 
 ## Backend
 
-### Antes
+### Before
 
 ```ts
 interface FileStorage {
@@ -23,14 +23,14 @@ interface FileStorage {
 }
 
 class ReadOnlyArchiveStorage implements FileStorage {
-  async save() { throw new Error('read only'); }      // 💥 el cliente no lo espera
+  async save() { throw new Error('read only'); }      // 💥 the client does not expect it
   async delete() { throw new Error('read only'); }
 }
 ```
 
-Cualquier código que reciba un `FileStorage` y llame a `save` puede fallar según la implementación.
+Any code that receives a `FileStorage` and calls `save` may fail depending on the implementation.
 
-### Después: separar contratos (LSP + ISP)
+### After: split the contracts (LSP + ISP)
 
 ```ts
 interface FileReader { read(path: string): Promise<Buffer>; }
@@ -40,31 +40,31 @@ class DiskStorage implements FileReader, FileWriter { /* ... */ }
 class ReadOnlyArchiveStorage implements FileReader { /* ... */ }
 ```
 
-Quien solo lee depende de `FileReader`; quien escribe exige `FileWriter`. Ninguna implementación miente.
+Whoever only reads depends on `FileReader`; whoever writes requires `FileWriter`. No implementation lies.
 
-### Herencia que rompe invariantes
+### Inheritance that breaks invariants
 
 ```ts
 class Rectangle { setWidth(w) {...} setHeight(h) {...} }
-class Square extends Rectangle { setWidth(w) { super.setWidth(w); super.setHeight(w); } } // rompe lo que espera el cliente
+class Square extends Rectangle { setWidth(w) { super.setWidth(w); super.setHeight(w); } } // breaks what the client expects
 ```
 
-Arreglo: no heredes por "es un" en el mundo real; modela por comportamiento (`Shape` con `area()`), o prefiere composición.
+Fix: don't inherit because of a real-world "is a"; model by behavior (`Shape` with `area()`), or prefer composition.
 
 ## Frontend
 
-- **Componente "variante" que cambia el contrato**: `<Button>` que sustituido por `<LinkButton>` deja de aceptar `onClick` o ignora `disabled`. Un componente que envuelve a otro debe respetar sus props (`...rest`, `ref`, accesibilidad).
-- **Hooks con la misma forma, comportamiento distinto**: `useStorage()` que en una implementación es síncrono y en otra devuelve promesas. Los consumidores no pueden tratarlos por igual.
-- **Props que se aceptan pero se ignoran** (`disabled` que no deshabilita): sorpresa para el cliente.
+- **A "variant" component that changes the contract**: a `<Button>` that, when replaced by `<LinkButton>`, no longer accepts `onClick` or ignores `disabled`. A component that wraps another must respect its props (`...rest`, `ref`, accessibility).
+- **Hooks with the same shape but different behavior**: a `useStorage()` that is synchronous in one implementation and returns promises in another. Consumers cannot treat them the same way.
+- **Props that are accepted but ignored** (a `disabled` that does not disable): a surprise for the client.
 
-## Cómo refactorizar
+## How to refactor
 
-1. Escribe (o localiza) tests de **contrato** que cualquier implementación debería pasar, y ejecútalos contra todas.
-2. Si una implementación no puede cumplir el contrato, **no la fuerces**: divide la interfaz (ISP) o cambia la jerarquía por composición.
-3. Elimina los `instanceof` del cliente: si hacen falta, el contrato está mal planteado.
-4. Documenta precondiciones, postcondiciones y errores esperados en la interfaz.
+1. Write (or find) **contract** tests that any implementation should pass, and run them against all of them.
+2. If an implementation cannot meet the contract, **don't force it**: split the interface (ISP) or replace the hierarchy with composition.
+3. Remove the `instanceof` checks from the client: if they are needed, the contract is badly designed.
+4. Document preconditions, postconditions and expected errors in the interface.
 
-## Cuándo no aplicarlo
+## When not to apply it
 
-- No hay herencia ni polimorfismo en el código: LSP casi no aplica; no lo fuerces.
-- En TypeScript estructural, la sustitución "por forma" no basta: revisa el comportamiento, no solo los tipos.
+- There is no inheritance or polymorphism in the code: LSP barely applies; don't force it.
+- In structural TypeScript, substitution "by shape" is not enough: check the behavior, not just the types.

@@ -1,24 +1,24 @@
-# TDD en backend
+# TDD in the Backend
 
-## Qué probar en cada nivel
+## What to test at each level
 
-| Nivel | Qué cubre | Dobles |
+| Level | What it covers | Doubles |
 |---|---|---|
-| Unitario (dominio / casos de uso) | Reglas de negocio, validaciones, cálculos, transiciones de estado | Fakes en memoria para repositorios, reloj y servicios externos |
-| Integración | Repositorios contra una BD real (contenedor o BD de test), adaptadores HTTP contra un servidor simulado | Ninguno en el componente bajo prueba |
-| HTTP / contrato | Rutas, validación de entrada, códigos de estado, formato de errores, auth | Casos de uso reales con fakes en los bordes, o la app completa con BD de test |
-| E2E | Flujos completos entre servicios | Mínimos |
+| Unit (domain / use cases) | Business rules, validations, calculations, state transitions | In-memory fakes for repositories, clock and external services |
+| Integration | Repositories against a real DB (container or test DB), HTTP adapters against a simulated server | None in the component under test |
+| HTTP / contract | Routes, input validation, status codes, error format, auth | Real use cases with fakes at the edges, or the full app with a test DB |
+| E2E | Complete flows across services | Minimal |
 
-El ciclo TDD suele empezar **desde fuera hacia dentro**: un test HTTP que describe el contrato (rojo), y luego tests unitarios para cada regla de negocio que aparece al implementarlo. Para lógica de dominio pura, empieza directamente por el unitario.
+The TDD cycle usually starts **outside-in**: an HTTP test that describes the contract (red), then unit tests for each business rule that comes up while implementing it. For pure domain logic, start directly with the unit test.
 
-## Casos de uso / servicios
+## Use cases / services
 
-- Inyecta dependencias por constructor; en el test pasa fakes (`InMemoryUserRepository`, `FixedClock`).
-- Verifica el resultado y el estado final, no la secuencia de llamadas.
-- Cubre explícitamente los errores de dominio (`InsufficientStockError`, `CouponExpiredError`) con `await expect(promise).rejects.toThrow(...)`.
+- Inject dependencies through the constructor; in the test pass fakes (`InMemoryUserRepository`, `FixedClock`).
+- Verify the result and the final state, not the sequence of calls.
+- Explicitly cover domain errors (`InsufficientStockError`, `CouponExpiredError`) with `await expect(promise).rejects.toThrow(...)`.
 
 ```ts
-it('rechaza la reserva si no hay stock', async () => {
+it('rejects the reservation when there is no stock', async () => {
   const stock = new InMemoryStockRepository({ 'sku-1': 0 });
   const reserve = new ReserveStock(stock);
 
@@ -28,20 +28,20 @@ it('rechaza la reserva si no hay stock', async () => {
 
 ## NestJS
 
-- Unitario: instancia la clase directamente (`new InvoiceService(fakeRepo)`); no necesitas `Test.createTestingModule` para lógica pura.
-- Integración del módulo: `Test.createTestingModule({ imports: [InvoiceModule] }).overrideProvider(PAYMENT_GATEWAY).useValue(fakeGateway).compile()`.
-- HTTP: `app = moduleRef.createNestApplication(); await app.init();` y `request(app.getHttpServer()).post('/invoices').send(dto).expect(201)` con `supertest`. Aplica en el test los mismos `ValidationPipe`/filtros globales que en `main.ts`, o el contrato probado no será el real.
+- Unit: instantiate the class directly (`new InvoiceService(fakeRepo)`); you don't need `Test.createTestingModule` for pure logic.
+- Module integration: `Test.createTestingModule({ imports: [InvoiceModule] }).overrideProvider(PAYMENT_GATEWAY).useValue(fakeGateway).compile()`.
+- HTTP: `app = moduleRef.createNestApplication(); await app.init();` and `request(app.getHttpServer()).post('/invoices').send(dto).expect(201)` with `supertest`. Apply the same global `ValidationPipe`/filters as in `main.ts` in the test, or the contract you test is not the real one.
 
 ## Express / Fastify / Hono
 
-- Exporta la app sin llamar a `listen` para poder usar `supertest` (Express) o `app.inject()` (Fastify) / `app.request()` (Hono).
+- Export the app without calling `listen` so you can use `supertest` (Express) or `app.inject()` (Fastify) / `app.request()` (Hono).
 
-## Base de datos
+## Database
 
-- Repositorios: tests de integración contra el motor real (Testcontainers o una BD de test), no contra SQLite si producción es Postgres.
-- Aísla cada test: transacción con rollback, truncado en `beforeEach` o esquema por worker.
-- No mockees el ORM. Si un caso de uso necesita el repositorio, usa el fake en memoria en el unitario y deja el ORM para el test de integración del repositorio.
+- Repositories: integration tests against the real engine (Testcontainers or a test DB), not SQLite if production is Postgres.
+- Isolate each test: a transaction with rollback, truncation in `beforeEach`, or a schema per worker.
+- Don't mock the ORM. If a use case needs the repository, use the in-memory fake in the unit test and leave the ORM for the repository's integration test.
 
-## Contrato de errores HTTP
+## HTTP error contract
 
-Por cada endpoint, prueba al menos: éxito, entrada inválida (400/422 con detalle de campos), no encontrado (404), no autorizado (401/403) y conflicto si aplica (409). Comprueba el formato del cuerpo de error, no solo el código.
+For each endpoint, test at least: success, invalid input (400/422 with field details), not found (404), unauthorized (401/403) and conflict where it applies (409). Check the format of the error body, not just the status code.

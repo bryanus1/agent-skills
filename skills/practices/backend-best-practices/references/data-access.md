@@ -1,51 +1,51 @@
-# Acceso a datos
+# Data Access
 
-## Contenido
-1. [Consultas seguras](#consultas-seguras)
-2. [N+1 y consultas en bucle](#n1-y-consultas-en-bucle)
-3. [Transacciones y concurrencia](#transacciones-y-concurrencia)
-4. [Índices y rendimiento](#índices-y-rendimiento)
-5. [Migraciones](#migraciones)
+## Contents
+1. [Safe queries](#safe-queries)
+2. [N+1 and queries in loops](#n1-and-queries-in-loops)
+3. [Transactions and concurrency](#transactions-and-concurrency)
+4. [Indexes and performance](#indexes-and-performance)
+5. [Migrations](#migrations)
 
-## Consultas seguras
+## Safe queries
 
-- **Siempre parametrizadas**: `db.query('SELECT … WHERE id = $1', [id])`. Concatenar o interpolar valores en SQL es inyección, también en `ORDER BY` y nombres de columna (usa lista permitida).
-- Con ORM, evita las funciones "raw" con interpolación; si son necesarias, usa los parámetros del propio ORM.
-- Selecciona solo las columnas necesarias; no expongas filas completas del ORM como respuesta (filtran campos internos como `passwordHash`): mapea a un DTO de salida.
+- **Always parameterized**: `db.query('SELECT … WHERE id = $1', [id])`. Concatenating or interpolating values into SQL is injection, also in `ORDER BY` and column names (use an allowlist).
+- With an ORM, avoid "raw" functions with interpolation; if they are needed, use the ORM's own parameters.
+- Select only the columns you need; don't expose full ORM rows as the response (they leak internal fields such as `passwordHash`): map to an output DTO.
 
-## N+1 y consultas en bucle
+## N+1 and queries in loops
 
-**Señal:** un `for`/`map` que hace una consulta por elemento.
+**Signal:** a `for`/`map` that runs one query per element.
 
 ```ts
-// Evitar: 1 + N consultas
+// Avoid: 1 + N queries
 const orders = await db.query('SELECT * FROM orders WHERE user_id = $1', [userId]);
 for (const o of orders) o.items = await db.query('SELECT * FROM items WHERE order_id = $1', [o.id]);
 
-// Preferir: 2 consultas (o un JOIN)
+// Prefer: 2 queries (or a JOIN)
 const items = await db.query('SELECT * FROM items WHERE order_id = ANY($1)', [orders.map(o => o.id)]);
 ```
 
-Con ORM: carga anticipada (`include`, `relations`, `joinedload`) o un `DataLoader` en GraphQL. Confirma con el log de consultas, no por intuición.
+With an ORM: eager loading (`include`, `relations`, `joinedload`) or a `DataLoader` in GraphQL. Confirm it with the query log, not by intuition.
 
-## Transacciones y concurrencia
+## Transactions and concurrency
 
-- Varios cambios que deben confirmarse o revertirse juntos van en **una transacción** (crear pedido + descontar stock). Sin ella, un fallo a mitad deja datos inconsistentes.
-- Mantén las transacciones **cortas** y sin llamadas de red dentro.
-- **Condiciones de carrera** (comprobar y luego escribir): usa restricciones únicas, `UPDATE … WHERE stock >= n`, bloqueo optimista (columna de versión) o bloqueo de fila, en lugar de "leer, decidir en código, escribir".
-- Las restricciones de integridad (`UNIQUE`, `FOREIGN KEY`, `NOT NULL`, `CHECK`) las impone la base de datos; la validación del código no las sustituye.
-- Dinero: enteros en la unidad mínima o `DECIMAL`, nunca `float`.
+- Several changes that must be committed or rolled back together go in **one transaction** (create order + decrement stock). Without it, a failure halfway leaves inconsistent data.
+- Keep transactions **short**, with no network calls inside.
+- **Race conditions** (check, then write): use unique constraints, `UPDATE … WHERE stock >= n`, optimistic locking (a version column) or row locking, instead of "read, decide in code, write".
+- Integrity constraints (`UNIQUE`, `FOREIGN KEY`, `NOT NULL`, `CHECK`) are enforced by the database; validation in code does not replace them.
+- Money: integers in the smallest unit or `DECIMAL`, never `float`.
 
-## Índices y rendimiento
+## Indexes and performance
 
-- Indexa las columnas de **filtros, joins y ordenaciones reales** de consultas frecuentes; verifica con `EXPLAIN (ANALYZE)`.
-- Un índice compuesto respeta el orden de las columnas (igualdad primero, rango después).
-- Cada índice encarece las escrituras: no añadas "por si acaso".
-- Cuidado con funciones sobre la columna en el `WHERE` (`WHERE lower(email) = …` no usa un índice simple), `LIKE '%x'` y `OFFSET` enormes.
-- Pool de conexiones con tamaño acotado; libera siempre la conexión (`finally`).
+- Index the columns of the **real filters, joins and sorts** of frequent queries; verify with `EXPLAIN (ANALYZE)`.
+- A composite index respects the column order (equality first, range after).
+- Every index makes writes more expensive: don't add them "just in case".
+- Watch out for functions on the column in the `WHERE` (`WHERE lower(email) = …` does not use a simple index), `LIKE '%x'` and huge `OFFSET`s.
+- A connection pool with a bounded size; always release the connection (`finally`).
 
-## Migraciones
+## Migrations
 
-- Versionadas, repetibles y revisadas; nunca editar una migración ya aplicada.
-- **Compatibles hacia atrás** en despliegues sin parada: añadir columna nullable → desplegar código → rellenar → hacer obligatoria; eliminar columnas en un despliegue posterior al que deja de usarlas.
-- Operaciones peligrosas en tablas grandes (añadir índice sin `CONCURRENTLY` en Postgres, cambiar tipos) requieren plan; confirmar con el usuario antes de ejecutarlas contra datos reales.
+- Versioned, repeatable and reviewed; never edit a migration that has already been applied.
+- **Backward compatible** for zero-downtime deploys: add a nullable column → deploy the code → backfill → make it required; drop columns in a deploy after the one that stops using them.
+- Dangerous operations on large tables (adding an index without `CONCURRENTLY` in Postgres, changing types) need a plan; confirm with the user before running them against real data.

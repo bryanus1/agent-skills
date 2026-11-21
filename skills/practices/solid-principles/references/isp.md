@@ -1,18 +1,18 @@
-# ISP: segregación de interfaces
+# ISP: Interface Segregation
 
-> Ningún cliente debería depender de métodos (o props) que no usa. Prefiere **interfaces pequeñas y específicas del cliente** a una interfaz grande de propósito general.
+> No client should depend on methods (or props) it does not use. Prefer **small, client-specific interfaces** to one large general-purpose interface.
 
-## Cómo detectarlo
+## How to detect it
 
-- Una interfaz con muchos miembros de los que cada cliente usa dos o tres.
-- Implementaciones con métodos vacíos o que lanzan "no soportado".
-- Mocks de test de 15 métodos para probar algo que usa uno.
-- Un cambio en un método de la interfaz obliga a recompilar o revisar clientes que no lo usan.
-- En frontend: componentes con 20 props donde cada consumidor usa 4; props "opcionales" que solo tienen sentido en ciertas combinaciones.
+- An interface with many members, of which each client uses two or three.
+- Implementations with empty methods or methods that throw "not supported".
+- 15-method test mocks to check something that uses one.
+- A change to one interface method forces you to recompile or review clients that don't use it.
+- In the frontend: components with 20 props where each consumer uses 4; "optional" props that only make sense in certain combinations.
 
 ## Backend
 
-### Antes
+### Before
 
 ```ts
 interface UserRepository {
@@ -25,15 +25,15 @@ interface UserRepository {
 }
 
 class LoginService {
-  constructor(private users: UserRepository) {} // solo necesita findByEmail
+  constructor(private users: UserRepository) {} // only needs findByEmail
 }
 ```
 
-Probar `LoginService` obliga a implementar o mockear los seis métodos.
+Testing `LoginService` forces you to implement or mock all six methods.
 
-### Después
+### After
 
-La interfaz la define **el consumidor**, con lo que necesita:
+The interface is defined by **the consumer**, with what it needs:
 
 ```ts
 // login.service.ts
@@ -43,15 +43,15 @@ export class LoginService {
   constructor(private users: UserByEmailFinder) {}
 }
 
-// El repositorio concreto implementa varias interfaces pequeñas sin cambios:
+// The concrete repository implements several small interfaces without changes:
 class PgUserRepository implements UserByEmailFinder, UserWriter, UserReportReader { /* ... */ }
 ```
 
-En TypeScript, la tipificación estructural permite que `PgUserRepository` se pase directamente: no hace falta declarar `implements` salvo para documentar. El test ahora es `{ findByEmail: async () => user }`.
+In TypeScript, structural typing lets you pass `PgUserRepository` directly: you don't need to declare `implements` except as documentation. The test is now `{ findByEmail: async () => user }`.
 
 ## Frontend
 
-### Antes
+### Before
 
 ```tsx
 interface TableProps {
@@ -61,7 +61,7 @@ interface TableProps {
 }
 ```
 
-### Después: componer en lugar de acumular props
+### After: compose instead of piling up props
 
 ```tsx
 <DataTable rows={rows} columns={columns}>
@@ -70,17 +70,17 @@ interface TableProps {
 </DataTable>
 ```
 
-Cada pieza declara solo sus props. También sirve dividir un **contexto grande** en varios (`AuthUserContext`, `AuthActionsContext`) para que los componentes que solo leen no se rendericen por cambios de acciones, y pasar a los hijos **solo los datos que necesitan**, no el objeto entero (`<Avatar src={user.avatarUrl} />` en lugar de `<Avatar user={user} />`).
+Each piece declares only its own props. It also helps to split a **large context** into several (`AuthUserContext`, `AuthActionsContext`) so components that only read don't re-render on action changes, and to pass children **only the data they need**, not the whole object (`<Avatar src={user.avatarUrl} />` instead of `<Avatar user={user} />`).
 
-## Cómo refactorizar
+## How to refactor
 
-1. Lista qué miembros usa realmente cada cliente.
-2. Crea una interfaz por cliente (o por rol: lectura, escritura, informes), nombrada por lo que **hace** el cliente con ella.
-3. Haz que la implementación concreta satisfaga todas; cambia los clientes para depender de la pequeña.
-4. Si una interfaz grande se usa en tests, comprueba que los dobles ahora son triviales: es la prueba de que la segregación funcionó.
+1. List which members each client actually uses.
+2. Create one interface per client (or per role: read, write, reporting), named after what the client **does** with it.
+3. Make the concrete implementation satisfy all of them; change the clients to depend on the small one.
+4. If a large interface is used in tests, check that the doubles are now trivial: that is the proof the segregation worked.
 
-## Cuándo no aplicarlo
+## When not to apply it
 
-- Una interfaz pequeña que ya usan todos los clientes por completo.
-- Dividir por división: diez interfaces de un método para un único cliente son ruido.
-- Librerías externas cuya interfaz no controlas: envuélvelas en un adaptador propio con la interfaz mínima (ver [DIP](dip.md)) en lugar de segregarlas.
+- A small interface that every client already uses in full.
+- Splitting for its own sake: ten one-method interfaces for a single client are noise.
+- External libraries whose interface you don't control: wrap them in your own adapter with the minimal interface (see [DIP](dip.md)) instead of segregating them.

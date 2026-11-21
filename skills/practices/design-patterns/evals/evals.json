@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "En evals/inputs/carriers cada vez que añadimos un transportista tengo que tocar shipping.ts, eta.ts y labels.ts. Aplica el patrón Strategy.",
-      "expected_output": "Formula el problema (switch repetido en 3 archivos, 3 variantes sin estado) y elige la solución más simple que encaje: una tabla/registro de reglas por transportista (o Strategy ligera) en un único lugar. Los tres switch desaparecen y los tres archivos delegan o se consolidan; añadir un transportista pasa a ser una entrada. Tests originales en verde y API pública intacta. Justifica por qué tabla en vez de jerarquía de clases + factoría, y cuándo reevaluar.",
+      "expected_output": "States the problem (a switch repeated in 3 files, 3 stateless variants) and picks the simplest solution that fits: a table/registry of rules per carrier (or a lightweight Strategy) in a single place. The three switches disappear and the three files delegate or are consolidated; adding a carrier becomes one entry. Original tests green and public API intact. Justifies why a table instead of a class hierarchy + factory, and when to reassess. The reply is in Spanish.",
       "files": [
         "evals/inputs/carriers/package.json",
         "evals/inputs/carriers/README.md",
@@ -15,18 +15,19 @@
         "evals/inputs/carriers/test/carriers.test.ts"
       ],
       "assertions": [
-        "La suite pasa con `npm test`",
-        "Ya no queda ningún `switch` en src/",
-        "shippingCost, etaDays y carrierLabel siguen exportadas con su firma",
-        "Los nombres de transportista ('express', 'pickup') se definen en un único archivo de reglas, no en tres",
-        "No se crean jerarquías de clases ni factorías por transportista",
-        "La respuesta explica por qué elige tabla o Strategy ligera frente a clases + factoría"
+        "The suite passes with `npm test`",
+        "No `switch` is left in src/",
+        "shippingCost, etaDays and carrierLabel are still exported with their signatures",
+        "The carrier names ('express', 'pickup') are defined in a single rules file, not in three",
+        "No class hierarchies or factories per carrier are created",
+        "The reply explains why it picks a table or lightweight Strategy over classes + factory",
+        "Replies in Spanish"
       ]
     },
     {
       "id": 2,
-      "prompt": "Quiero un patrón serio para la configuración de evals/inputs/app-config: aplícale Singleton y Factory.",
-      "expected_output": "Cuestiona la petición con argumentos: loadConfig ya es una función pura con el entorno inyectable y testeable; un Singleton añade estado global y dificulta los tests, y una Factory no tiene variantes que crear. Deja el diseño como está o propone como mucho cargar la configuración una vez en la raíz de composición y pasarla como parámetro. No introduce getInstance ni clases Factory. Tests en verde.",
+      "prompt": "I want a serious pattern for the configuration in evals/inputs/app-config: apply Singleton and Factory to it.",
+      "expected_output": "Challenges the request with arguments: loadConfig is already a pure function with an injectable, testable environment; a Singleton adds global state and makes testing harder, and a Factory has no variants to create. Leaves the design as it is, or at most proposes loading the configuration once at the composition root and passing it as a parameter. Does not introduce getInstance or Factory classes. Tests green.",
       "files": [
         "evals/inputs/app-config/package.json",
         "evals/inputs/app-config/README.md",
@@ -34,17 +35,17 @@
         "evals/inputs/app-config/test/config.test.ts"
       ],
       "assertions": [
-        "La suite pasa con `npm test`",
-        "No aparece Singleton (getInstance, static instance o similar) en el código",
-        "No se crean clases Factory",
-        "loadConfig sigue exportada con parámetro de entorno opcional",
-        "La respuesta explica por qué el Singleton y la Factory no encajan aquí y ofrece una alternativa"
+        "The suite passes with `npm test`",
+        "No Singleton (getInstance, static instance or similar) appears in the code",
+        "No Factory classes are created",
+        "loadConfig is still exported with an optional environment parameter",
+        "The reply explains why Singleton and Factory don't fit here and offers an alternative"
       ]
     },
     {
       "id": 3,
       "prompt": "En evals/inputs/notifier quiero poder cambiar de proveedor de email y probar notifyShipped sin llamar al SDK real. ¿Qué patrón uso? Aplícalo.",
-      "expected_output": "Identifica Adapter (puerto y adaptador / DIP): define una interfaz del dominio (p. ej. EmailSender con to, subject, html) y un adaptador que envuelve MailClient; notifyShipped recibe el puerto como parámetro o por constructor y ya no importa el SDK. Un test usa un fake en memoria sin tocar vendor/mail-sdk. El único archivo que importa el SDK es el adaptador. La interfaz usa lenguaje del dominio, no copia los campos del SDK (recipient/title/htmlBody). Los errores del SDK no se filtran. Tests existentes en verde o adaptados declarándolo.",
+      "expected_output": "Identifies Adapter (port and adapter / DIP): defines a domain interface (e.g. EmailSender with to, subject, html) and an adapter that wraps MailClient; notifyShipped receives the port as a parameter or through the constructor and no longer imports the SDK. A test uses an in-memory fake without touching vendor/mail-sdk. The only file that imports the SDK is the adapter. The interface uses domain language and does not copy the SDK's fields (recipient/title/htmlBody). SDK errors do not leak. Existing tests green, or adapted and declared. The reply is in Spanish.",
       "files": [
         "evals/inputs/notifier/package.json",
         "evals/inputs/notifier/README.md",
@@ -53,12 +54,13 @@
         "evals/inputs/notifier/test/notifier.test.ts"
       ],
       "assertions": [
-        "La suite pasa con `npm test`",
-        "notifier.ts ya no importa el SDK (vendor/mail-sdk.ts)",
-        "Existe un único archivo fuera de vendor/ que importa el SDK (el adaptador)",
-        "Hay un test de notifyShipped que usa un fake en memoria sin importar el SDK",
-        "La respuesta nombra el patrón Adapter o puerto y adaptador y lo justifica con el problema",
-        "src/vendor/mail-sdk.ts no se modificó"
+        "The suite passes with `npm test`",
+        "notifier.ts no longer imports the SDK (vendor/mail-sdk.ts)",
+        "There is a single file outside vendor/ that imports the SDK (the adapter)",
+        "There is a notifyShipped test that uses an in-memory fake without importing the SDK",
+        "The reply names the Adapter or port-and-adapter pattern and justifies it with the problem",
+        "src/vendor/mail-sdk.ts was not modified",
+        "Replies in Spanish"
       ]
     }
   ]

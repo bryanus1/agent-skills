@@ -1,47 +1,47 @@
 # 🧹 Clean Code (`clean-code`)
 
-> **Código legible y mantenible a nivel de función y archivo: nombres, funciones pequeñas, manejo de errores, comentarios y un catálogo de code smells → refactor. Incluye un proceso de refactor seguro (tests antes y después) y un detector heurístico de smells para JS/TS.**
+> **Readable, maintainable code at the function and file level: names, small functions, error handling, comments and a code smell → refactor catalog. Includes a safe refactoring process (tests before and after) and a heuristic smell detector for JS/TS.**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `clean-code` |
-| **Categoría** | `practices` |
-| **Versión** | `1.0.0` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Name** | `clean-code` |
+| **Category** | `practices` |
+| **Version** | `1.1.0` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
 ```bash
-# En el proyecto actual:
+# In the current project:
 npx skills add bryanus1/agent-skills --skill clean-code
 
 # Global:
 npx skills add bryanus1/agent-skills --skill clean-code -g
 
-# Recomendado junto a tdd-workflow (tests de caracterización antes de refactorizar):
+# Recommended together with tdd-workflow (characterization tests before refactoring):
 npx skills add bryanus1/agent-skills --skill tdd-workflow
 ```
 
 ---
 
-## 💡 Ejemplos de Uso con Agentes de IA
+## 💡 Usage Examples with AI Agents
 
-* **Refactor seguro**:
-  > *"Refactoriza `src/orders/report.ts`, nadie lo entiende. Los tests deben seguir pasando."*
+* **Safe refactor**:
+  > *"Refactor `src/orders/report.ts`, nobody understands it. The tests must keep passing."*
   >
-  > 🤖 Ejecuta los tests, detecta smells, refactoriza en pasos pequeños con tests entre pasos y reporta los cambios. Los bugs encontrados se reportan aparte en lugar de corregirse en silencio.
+  > 🤖 Runs the tests, detects smells, refactors in small steps with tests between steps and reports the changes. Bugs found are reported separately instead of being fixed silently.
 
-* **Revisión de legibilidad (sin cambios)**:
-  > *"Revisa `UserList.tsx` y dime qué mejorarías."*
+* **Readability review (no changes)**:
+  > *"Review `UserList.tsx` and tell me what you would improve."*
   >
-  > 🤖 Tabla de hallazgos priorizada (corrección → comprensión → duplicación → cosmética) con `archivo:línea` y el refactor concreto.
+  > 🤖 A prioritized findings table (correctness → comprehension → duplication → cosmetic) with `file:line` and the concrete refactor.
 
-* **Código legacy sin tests**:
-  > *"Limpia `pricing.ts`, se usa en checkout."*
+* **Legacy code without tests**:
+  > *"Clean up `pricing.ts`, it's used in checkout."*
   >
-  > 🤖 Primero tests de caracterización, después el refactor.
+  > 🤖 Characterization tests first, then the refactor.
 
 ---
 
@@ -53,12 +53,12 @@ node <skill-dir>/scripts/detect-smells.mjs src/orders --json
 node <skill-dir>/scripts/detect-smells.mjs src --max-lines 60 --max-params 4 --fail-on-findings
 ```
 
-Detector heurístico y de solo lectura para JS/TS: `long-function`, `deep-nesting`, `too-many-params`, `long-file`, `magic-number`, `nested-ternary` y `todo-comment`. Son señales para revisar, no veredictos.
+Heuristic, read-only detector for JS/TS: `long-function`, `deep-nesting`, `too-many-params`, `long-file`, `magic-number`, `nested-ternary` and `todo-comment`. They are signals to review, not verdicts.
 
 ---
 
-## 📚 Documentación
+## 📚 Documentation
 
-- **[`SKILL.md`](SKILL.md)**: flujo y reglas para el agente.
-- **[Catálogo de smells](references/smells.md)** y **[catálogo de refactorings](references/refactorings.md)**.
-- **[Ejemplos antes/después](examples/before-after.md)** (backend y frontend).
+- **[`SKILL.md`](SKILL.md)**: workflow and rules for the agent.
+- **[Smell catalog](references/smells.md)** and **[refactoring catalog](references/refactorings.md)**.
+- **[Before/after examples](examples/before-after.md)** (backend and frontend).

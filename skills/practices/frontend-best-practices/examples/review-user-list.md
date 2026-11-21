@@ -1,28 +1,28 @@
-# Ejemplo: revisión de un componente de lista de usuarios
+# Example: reviewing a user list component
 
-**Pedido:** "Revisa `UserList.tsx` y aplica buenas prácticas de frontend."
+**Request:** "Review `UserList.tsx` and apply frontend best practices."
 
-## Código de partida (resumido)
+## Starting code (abridged)
 
 ```tsx
 export function UserList({ query }: { query: string }) {
   const [users, setUsers] = useState<User[]>([]);
   const [visible, setVisible] = useState<User[]>([]);
 
-  useEffect(() => {                                   // línea 6
+  useEffect(() => {                                   // line 6
     fetch(`/api/users?q=${query}`).then(r => r.json()).then(setUsers);
   }, [query]);
 
-  useEffect(() => {                                   // línea 10
+  useEffect(() => {                                   // line 10
     setVisible(users.filter(u => u.active));
   }, [users]);
 
   return (
     <ul>
       {visible.map((u, i) => (
-        <li key={i} onClick={() => open(u.id)}>       // línea 17
-          <img src={u.avatar} />                      // línea 18
-          <div dangerouslySetInnerHTML={{ __html: u.bio }} />   // línea 19
+        <li key={i} onClick={() => open(u.id)}>       // line 17
+          <img src={u.avatar} />                      // line 18
+          <div dangerouslySetInnerHTML={{ __html: u.bio }} />   // line 19
         </li>
       ))}
     </ul>
@@ -30,25 +30,25 @@ export function UserList({ query }: { query: string }) {
 }
 ```
 
-## Hallazgos
+## Findings
 
-| # | Severidad | Área | Ubicación | Problema y efecto | Acción |
+| # | Severity | Area | Location | Problem and effect | Action |
 |---|---|---|---|---|---|
-| 1 | Crítico | Seguridad | UserList.tsx:19 | `bio` es texto del usuario inyectado como HTML: XSS almacenado | Renderizar como texto `{u.bio}` (no hay formato rico en el diseño) |
-| 2 | Crítico | Accesibilidad | UserList.tsx:17 | `<li onClick>` no es operable con teclado ni lector de pantalla | `<button type="button">` dentro del `<li>` |
-| 3 | Importante | Datos | UserList.tsx:6 | `fetch` en efecto sin cancelación ni manejo de error: al escribir rápido, una respuesta antigua puede pisar la nueva; un fallo deja la lista vacía sin aviso | `AbortController`, estado de carga y error |
-| 4 | Importante | Estado | UserList.tsx:10 | `visible` es estado derivado: render doble y posible desincronización | Calcular `users.filter(...)` en el render |
-| 5 | Importante | Estado | UserList.tsx:17 | `key={i}` rompe el estado al filtrar/reordenar | `key={u.id}` |
-| 6 | Importante | Accesibilidad | UserList.tsx:18 | `<img>` sin `alt` | `alt=""` (decorativa: el nombre está junto a ella) |
-| 7 | Menor | Datos | UserList.tsx:7 | `query` sin `encodeURIComponent` | Codificar el parámetro |
+| 1 | Critical | Security | UserList.tsx:19 | `bio` is user text injected as HTML: stored XSS | Render it as text `{u.bio}` (the design has no rich formatting) |
+| 2 | Critical | Accessibility | UserList.tsx:17 | `<li onClick>` cannot be operated with a keyboard or screen reader | `<button type="button">` inside the `<li>` |
+| 3 | Important | Data | UserList.tsx:6 | `fetch` in an effect with no cancellation or error handling: when typing fast, an old response can overwrite the new one; a failure leaves the list empty without notice | `AbortController`, loading and error state |
+| 4 | Important | State | UserList.tsx:10 | `visible` is derived state: double render and possible desync | Compute `users.filter(...)` during render |
+| 5 | Important | State | UserList.tsx:17 | `key={i}` breaks state on filter/reorder | `key={u.id}` |
+| 6 | Important | Accessibility | UserList.tsx:18 | `<img>` without `alt` | `alt=""` (decorative: the name is next to it) |
+| 7 | Minor | Data | UserList.tsx:7 | `query` without `encodeURIComponent` | Encode the parameter |
 
-## Decisiones de no aplicar
+## Decisions not to apply
 
-- **No se introduce TanStack Query**: el proyecto no lo usa y el componente tiene una sola petición; con `AbortController` se resuelve la carrera. Se recomienda si aparecen más peticiones.
-- **No se añade `useMemo`** al filtrado: la lista es pequeña y no hay medición que lo justifique.
-- **No se virtualiza**: la API devuelve páginas de 20 elementos.
+- **TanStack Query is not introduced**: the project doesn't use it and the component has a single request; `AbortController` solves the race. It is recommended if more requests appear.
+- **No `useMemo`** on the filter: the list is small and no measurement justifies it.
+- **No virtualization**: the API returns pages of 20 items.
 
-## Resultado (fragmento)
+## Result (excerpt)
 
 ```tsx
 useEffect(() => {
@@ -64,8 +64,8 @@ useEffect(() => {
 const visible = users.filter(u => u.active);
 ```
 
-## Reporte (resumen)
+## Report (summary)
 
-- **Aplicado:** 7 hallazgos corregidos; tests: ✅ 3/3.
-- **No verificado:** recorrido con lector de pantalla y foco visible del nuevo botón (requiere navegador).
-- **Fuera de alcance:** el diseño del estado vacío (decisión de producto).
+- **Applied:** 7 findings fixed; tests: ✅ 3/3.
+- **Not verified:** a screen reader walkthrough and the visible focus of the new button (needs a browser).
+- **Out of scope:** the empty-state design (a product decision).

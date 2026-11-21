@@ -1,18 +1,22 @@
 ---
 name: design-patterns
-version: 1.0.0
+version: 1.1.0
 description: >-
-  Elige y aplica patrones de diseño (GoF y modernos: Strategy, Adapter, Factory, Repository, Result, Compound Components, hooks) a partir del problema, no del catálogo, y decide cuándo NO usar ninguno. Úsala al pedir un patrón, al ver ifs/switch repetidos, SDKs acoplados o lógica de UI duplicada, en frontend o backend.
+  Choose and apply design patterns (GoF and modern: Strategy, Adapter, Factory, Repository, Result, Compound Components, hooks) starting from the problem, not the catalog, and decide when to use NONE. Use it when a pattern is requested, or on repeated ifs/switches, coupled SDKs or duplicated UI logic, in frontend or backend.
 tags: [design-patterns, gof, strategy, adapter, factory, repository, refactoring, best-practices]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
   - patrón de diseño
   - patrones de diseño
   - design pattern
+  - design patterns
   - qué patrón uso
+  - which pattern should I use
   - aplica el patrón strategy
   - patrón repository
+  - repository pattern
   - patrón adapter
+  - adapter pattern
   - factory pattern
   - strategy pattern
   - observer pattern
@@ -22,123 +26,124 @@ requirements:
 
 # Design Patterns
 
-## 🎯 Propósito
+## 🎯 Purpose
 
-Un patrón es una **solución con nombre a un problema recurrente**, y su valor es el vocabulario compartido y el equilibrio de fuerzas ya estudiado. Esta skill parte del problema (qué dolor hay, qué variación existe) y llega al patrón, no al revés. Aplicar un patrón sin el problema es el error más común: produce capas sin beneficio.
+A pattern is a **named solution to a recurring problem**, and its value is the shared vocabulary and the already-studied balance of forces. This skill starts from the problem (what hurts, what varies) and arrives at the pattern, not the other way round. Applying a pattern without the problem is the most common mistake: it produces layers with no benefit.
 
-Complementa a `solid-principles` (por qué separar y qué depende de qué) y a `clean-code` (legibilidad dentro de las funciones). Para la estructura de carpetas, usa las skills de arquitectura del catálogo.
+It complements `solid-principles` (why to separate and what depends on what) and `clean-code` (readability inside functions). For folder structure, use the catalog's architecture skills.
 
-## ⚡ Cuándo Activar esta Skill
+## ⚡ When to Trigger
 
-- El usuario pide un patrón por nombre ("aplica Strategy", "usa el patrón Repository") o pregunta "qué patrón uso para…".
-- Hay `if`/`switch` sobre un tipo repetidos, SDKs de terceros acoplados a la lógica, objetos con construcción compleja, eventos que muchos módulos necesitan escuchar, o lógica de UI duplicada entre componentes.
-- Se revisa un diseño y se quiere saber si un patrón ayudaría (o si sobra el que ya hay).
+- The user asks for a pattern by name ("apply Strategy", "use the Repository pattern") or asks "which pattern should I use for…".
+- There are repeated `if`/`switch` statements on a type, third-party SDKs coupled to the logic, objects with complex construction, events that many modules need to listen to, or UI logic duplicated across components.
+- A design is being reviewed and you want to know whether a pattern would help (or whether the existing one is unnecessary).
 
-No la actives para legibilidad local (nombres, funciones largas): usa `clean-code`.
+Do not trigger it for local readability (names, long functions): use `clean-code`.
 
-## 📋 Flujo de Trabajo Paso a Paso
+## 📋 Workflow
 
-### 1. Formular el problema, no la solución
+### 1. State the problem, not the solution
 
-Antes de nombrar ningún patrón, responde por escrito:
+Before naming any pattern, answer in writing:
 
-1. **¿Qué duele hoy?** (cambio que se propaga, test imposible, duplicación, acoplamiento a un proveedor, construcción repetida).
-2. **¿Qué varía y qué es estable?** El patrón aísla lo que varía de lo que no.
-3. **¿Cuántas variantes reales existen?** (una, dos, tres o más; ya conocidas o hipotéticas).
-4. **¿Qué convenciones tiene el proyecto?** (clases o funciones, contenedor DI, librerías de estado y de datos, framework).
+1. **What hurts today?** (a change that ripples, an impossible test, duplication, coupling to a vendor, repeated construction).
+2. **What varies and what is stable?** The pattern isolates what varies from what doesn't.
+3. **How many real variants exist?** (one, two, three or more; known or hypothetical).
+4. **What conventions does the project have?** (classes or functions, DI container, state and data libraries, framework).
 
-Si el usuario pidió un patrón concreto, comprueba igualmente que encaja con el problema; si no encaja, dilo y propón la alternativa.
+If the user asked for a specific pattern, still check that it fits the problem; if it doesn't, say so and propose the alternative.
 
-### 2. Elegir con la tabla problema → patrón
+### 2. Choose with the problem → pattern table
 
-| Problema | Candidato | Alternativa más simple a considerar primero |
+| Problem | Candidate | Simpler alternative to consider first |
 |---|---|---|
-| Varias formas de hacer lo mismo, elegidas en tiempo de ejecución (tarifas, exportadores, validadores) | **Strategy** | Tabla `Record<Tipo, función>` |
-| Integrar una API/SDK de terceros sin acoplarse a él | **Adapter** (puerto + adaptador) | Función envoltorio |
-| Crear objetos cuyo tipo depende de datos o configuración | **Factory** / Factory Method | Función `create(...)` con `switch` |
-| Construcción con muchos parámetros opcionales | **Builder** | Objeto de opciones con valores por defecto |
-| Añadir comportamiento transversal sin tocar el original (caché, logs, reintentos, auth) | **Decorator** / middleware | Función de orden superior |
-| Ocultar un subsistema complejo tras una API simple | **Facade** | Un módulo con una función pública |
-| Notificar a varios interesados de un cambio, sin acoplarlos | **Observer** / eventos | Callback directo si hay un único interesado |
-| Un proceso con pasos fijos y detalles variables | **Template Method** | Función que recibe los pasos variables como parámetros |
-| Cambiar de comportamiento según el estado, con transiciones explícitas | **State** / máquina de estados | `switch` sobre un enum si son pocos estados |
-| Encapsular una acción para deshacer, encolar o registrar | **Command** | Función + datos |
-| Aislar el acceso a datos de la lógica de negocio | **Repository** | Función de acceso a datos con interfaz |
-| Devolver éxito/fallo sin excepciones en flujos esperados | **Result / Either** | Excepciones de dominio tipadas |
-| Instancia compartida por toda la app | Módulo/instancia compuesta en la raíz | **Evita Singleton clásico** (estado global, tests difíciles) |
-| UI con piezas relacionadas que comparten estado (tabs, accordion, select) | **Compound Components** | Props + `children` |
-| Reutilizar lógica con estado entre componentes | **Custom Hook** | Función pura |
-| Separar presentación de acceso a datos en UI | **Container/Presentational** o hook + componente | — |
+| Several ways to do the same thing, chosen at runtime (rates, exporters, validators) | **Strategy** | A `Record<Type, function>` table |
+| Integrate a third-party API/SDK without coupling to it | **Adapter** (port + adapter) | Wrapper function |
+| Create objects whose type depends on data or configuration | **Factory** / Factory Method | A `create(...)` function with a `switch` |
+| Construction with many optional parameters | **Builder** | Options object with defaults |
+| Add cross-cutting behavior without touching the original (cache, logs, retries, auth) | **Decorator** / middleware | Higher-order function |
+| Hide a complex subsystem behind a simple API | **Facade** | A module with one public function |
+| Notify several parties of a change without coupling them | **Observer** / events | A direct callback if there is a single listener |
+| A process with fixed steps and variable details | **Template Method** | A function that takes the variable steps as parameters |
+| Change behavior by state, with explicit transitions | **State** / state machine | A `switch` on an enum if there are few states |
+| Encapsulate an action to undo, queue or log it | **Command** | Function + data |
+| Isolate data access from business logic | **Repository** | A data-access function behind an interface |
+| Return success/failure without exceptions in expected flows | **Result / Either** | Typed domain exceptions |
+| An instance shared across the whole app | Module/instance composed at the root | **Avoid the classic Singleton** (global state, hard tests) |
+| UI with related pieces that share state (tabs, accordion, select) | **Compound Components** | Props + `children` |
+| Reuse stateful logic across components | **Custom Hook** | Pure function |
+| Separate presentation from data access in the UI | **Container/Presentational** or hook + component | — |
 
-Detalle, forma y ejemplos en TypeScript: [Creacionales](references/creational.md), [Estructurales](references/structural.md), [Comportamiento](references/behavioral.md), [Frontend y backend](references/frontend-backend.md).
+Details, shape and TypeScript examples: [Creational](references/creational.md), [Structural](references/structural.md), [Behavioral](references/behavioral.md), [Frontend and backend](references/frontend-backend.md).
 
-### 3. Contrastar con la alternativa más simple (obligatorio)
+### 3. Compare with the simplest alternative (mandatory)
 
-Para el candidato elegido, responde:
+For the chosen candidate, answer:
 
-- ¿Una **función** o una **tabla de datos** resuelve el problema con menos piezas? En TypeScript/JavaScript muchos patrones GoF son *funciones de orden superior* o *objetos literales*; una jerarquía de clases suele sobrar.
-- ¿Hay **al menos dos variantes reales** o una costura de test necesaria? Con una sola, **aplaza**.
-- ¿El patrón **encaja con las convenciones** del proyecto? (No metas clases en un código funcional, ni un contenedor DI donde no lo hay.)
-- ¿Cuánto añade? (archivos, indirección, curva de lectura). Debe pagar por sí mismo.
+- Does a **function** or a **data table** solve the problem with fewer pieces? In TypeScript/JavaScript many GoF patterns are *higher-order functions* or *object literals*; a class hierarchy is usually unnecessary.
+- Are there **at least two real variants** or a necessary test seam? With only one, **defer**.
+- Does the pattern **fit the project's conventions**? (Don't bring classes into functional code, or a DI container where there is none.)
+- How much does it add? (files, indirection, reading curve). It must pay for itself.
 
-Resultado: **Aplicar**, **Aplazar** (esperar a la segunda variante) o **No aplicar** (alternativa simple). Anótalo con la razón.
+Outcome: **Apply**, **Defer** (wait for the second variant) or **Don't apply** (simple alternative). Write it down with the reason.
 
-### 4. Red de seguridad
+### 4. Safety net
 
-Si el patrón se introduce en código existente, es un refactor: ejecuta los tests antes y después. Si no cubren el código afectado, añade tests de caracterización primero (si `tdd-workflow` está disponible, sigue su Flujo C). Si construyes algo nuevo, escribe el test del comportamiento primero.
+If the pattern is introduced into existing code, it is a refactor: run the tests before and after. If they don't cover the affected code, add characterization tests first (if `tdd-workflow` is available, follow its Flow C). If you are building something new, write the behavior test first.
 
-### 5. Implementar de forma mínima
+### 5. Implement minimally
 
-- **Nombra el patrón en el código** solo cuando ayude (`ShippingStrategy`, `StripeAdapter`, `OrderRepository`); es vocabulario compartido. No lo fuerces en el nombre si la convención del proyecto es otra.
-- Define la interfaz **desde el consumidor** y con lo mínimo que necesita (ver ISP en `solid-principles`).
-- Concentra la composición (qué implementación se usa) en un único punto, no repartida.
-- Mantén la API pública salvo petición expresa, y avisa de cualquier cambio de comportamiento.
+- **Name the pattern in the code** only when it helps (`ShippingStrategy`, `StripeAdapter`, `OrderRepository`); it is shared vocabulary. Don't force it into the name if the project's convention is different.
+- Define the interface **from the consumer's side** with the minimum it needs (see ISP in `solid-principles`).
+- Keep composition (which implementation is used) in a single place, not scattered.
+- Keep the public API unless explicitly asked, and flag any behavior change.
 
-### 6. Verificar y reportar
+### 6. Verify and report
 
-Ejecuta tests, typecheck y lint si existen. Usa el formato de la sección "Reporte"; incluye las decisiones de **No aplicar** y **Aplazar**.
+Run tests, typecheck and lint if they exist. Use the format in the "Report" section; include the **Don't apply** and **Defer** decisions.
 
-## 🚫 Cuándo NO usar un patrón
+## 🚫 When NOT to Use a Pattern
 
-- **Una sola implementación y sin segunda a la vista**: la interfaz, la factoría o la estrategia son ruido.
-- **Un `switch` pequeño, estable y en un único sitio**: es más legible que N clases.
-- **Para parecer "profesional"** o porque "el proyecto debería tener patrones": cada pieza debe justificar su coste.
-- **Singleton, Service Locator y estado global**: casi siempre hay una alternativa por inyección o composición.
-- **Cuando el framework ya lo resuelve** (middleware de Express/Nest como Decorator/Chain, hooks como Strategy/Observer, ORM como Repository/Unit of Work): usa el mecanismo nativo.
-- **Combinaciones decorativas**: apilar Factory + Strategy + Builder para dos casos es sobreingeniería, no diseño.
+- **A single implementation with no second one in sight**: the interface, the factory or the strategy is noise.
+- **A small, stable `switch` in a single place**: it is more readable than N classes.
+- **To look "professional"** or because "the project should have patterns": every piece must justify its cost.
+- **Singleton, Service Locator and global state**: there is almost always an alternative through injection or composition.
+- **When the framework already solves it** (Express/Nest middleware as Decorator/Chain, hooks as Strategy/Observer, an ORM as Repository/Unit of Work): use the native mechanism.
+- **Decorative combinations**: stacking Factory + Strategy + Builder for two cases is over-engineering, not design.
 
-## ⚠️ Reglas Críticas
+## ⚠️ Critical Rules
 
-- **Parte del problema**, no del patrón. Cita el dolor concreto en el reporte; sin dolor ni variación real, no hay patrón.
-- **Pregunta por la alternativa simple antes de añadir clases.** Una función o una tabla vence a una jerarquía casi siempre en TS/JS.
-- **No cambies la API pública ni el comportamiento sin avisar.** Un refactor a patrón mantiene el comportamiento; ejecuta los tests antes y después e informa del resultado real.
-- **No instales dependencias** (contenedores DI, librerías de eventos, `neverthrow`, `xstate`…) sin confirmación del usuario.
-- **Respeta las convenciones del proyecto**: estilo funcional vs clases, contenedor DI existente, librería de estado o de datos ya elegida.
-- **No toques lo que no se pidió**: lo demás va a "Aplazado / fuera de alcance".
+- **Reply in the user's language**, even though this skill is written in English.
+- **Start from the problem**, not the pattern. Cite the concrete pain in the report; without real pain or variation, there is no pattern.
+- **Ask about the simple alternative before adding classes.** A function or a table beats a hierarchy almost every time in TS/JS.
+- **Do not change the public API or the behavior without warning.** A refactor to a pattern keeps the behavior; run the tests before and after and report the real result.
+- **Do not install dependencies** (DI containers, event libraries, `neverthrow`, `xstate`…) without the user's confirmation.
+- **Respect the project's conventions**: functional style vs classes, an existing DI container, the state or data library already chosen.
+- **Do not touch what was not requested**: everything else goes under "Deferred / out of scope".
 
-## 📤 Reporte
+## 📤 Report
 
 ```markdown
-### Problema
-<qué duele, qué varía, cuántas variantes reales>
+### Problem
+<what hurts, what varies, how many real variants>
 
-### Decisión
-| Candidato | Alternativa simple | Veredicto | Razón |
+### Decision
+| Candidate | Simple alternative | Verdict | Reason |
 |---|---|---|---|
-| Strategy | Tabla Record<Carrier, fn> | Aplicar tabla, no clases | 3 variantes sin estado; encaja con el estilo funcional del proyecto |
-| Factory | — | No aplicar | Solo un punto de creación |
+| Strategy | Record<Carrier, fn> table | Apply the table, not classes | 3 stateless variants; fits the project's functional style |
+| Factory | — | Don't apply | Only one creation point |
 
-### Cambios aplicados
-1. <cambio> — tests: ✅ N/N
+### Changes applied
+1. <change> — tests: ✅ N/N
 
-### Aplazado / fuera de alcance
-- <qué reevaluar con una segunda variante, riesgos, decisiones para el usuario>
+### Deferred / out of scope
+- <what to reassess with a second variant, risks, decisions for the user>
 ```
 
-## 📚 Referencias
+## 📚 References
 
-- [Patrones creacionales](references/creational.md): Factory, Builder, evitar Singleton
-- [Patrones estructurales](references/structural.md): Adapter, Decorator, Facade
-- [Patrones de comportamiento](references/behavioral.md): Strategy, Observer, State, Command, Template Method
-- [Frontend y backend](references/frontend-backend.md): Repository, Result, Compound Components, hooks, middleware
-- [Ejemplo: de switch repetido a estrategias](examples/strategy-vs-table.md)
+- [Creational patterns](references/creational.md): Factory, Builder, avoiding Singleton
+- [Structural patterns](references/structural.md): Adapter, Decorator, Facade
+- [Behavioral patterns](references/behavioral.md): Strategy, Observer, State, Command, Template Method
+- [Frontend and backend](references/frontend-backend.md): Repository, Result, Compound Components, hooks, middleware
+- [Example: from a repeated switch to strategies](examples/strategy-vs-table.md)

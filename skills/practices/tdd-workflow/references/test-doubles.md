@@ -1,28 +1,28 @@
 # Test doubles
 
-Un *test double* sustituye a una dependencia real durante un test. Elegir el tipo correcto evita tests frágiles que se rompen con cada refactor.
+A *test double* replaces a real dependency during a test. Choosing the right type avoids brittle tests that break on every refactor.
 
-## Tipos
+## Types
 
-| Tipo | Qué hace | Úsalo para |
+| Type | What it does | Use it to |
 |---|---|---|
-| **Dummy** | Se pasa pero nunca se usa | Rellenar parámetros obligatorios |
-| **Stub** | Devuelve respuestas fijas | Controlar entradas indirectas (lo que la dependencia devuelve) |
-| **Spy** | Registra cómo se le llamó | Verificar salidas indirectas cuando no hay otro efecto observable |
-| **Mock** | Spy con expectativas preprogramadas | Protocolos donde la interacción *es* el comportamiento (enviar un email, publicar un evento) |
-| **Fake** | Implementación funcional simplificada | Repositorios en memoria, reloj controlable, cola en memoria |
+| **Dummy** | Passed in but never used | Fill required parameters |
+| **Stub** | Returns fixed answers | Control indirect inputs (what the dependency returns) |
+| **Spy** | Records how it was called | Verify indirect outputs when there is no other observable effect |
+| **Mock** | A spy with preprogrammed expectations | Protocols where the interaction *is* the behavior (sending an email, publishing an event) |
+| **Fake** | A simplified working implementation | In-memory repositories, a controllable clock, an in-memory queue |
 
-## Reglas de uso
+## Usage Rules
 
-1. **Dobla solo los bordes del sistema**: red, base de datos, sistema de archivos, reloj, aleatoriedad, servicios de terceros. La lógica de dominio propia se prueba real.
-2. **Prefiere fakes a mocks.** Un `InMemoryOrderRepository` permite verificar el estado final (`repo.findById(id)`) en lugar de verificar llamadas (`expect(repo.save).toHaveBeenCalledWith(...)`), que acopla el test a la implementación.
-3. **Verifica interacciones solo cuando la interacción es el resultado.** "Se envió un email de bienvenida" sí; "se llamó a `calculateTax` antes que a `applyDiscount`" no.
-4. **No mockees lo que no te pertenece.** En lugar de mockear `axios` o el SDK de Stripe, crea un adaptador propio (`PaymentGateway`) con una interfaz pequeña y dobla esa interfaz. Prueba el adaptador real con tests de integración.
-5. **Si necesitas más de 2–3 dobles para un test**, la unidad tiene demasiadas dependencias. Es una señal de diseño (ver SRP), no un problema del test.
+1. **Double only the system's edges**: network, database, file system, clock, randomness, third-party services. Your own domain logic is tested for real.
+2. **Prefer fakes to mocks.** An `InMemoryOrderRepository` lets you check the final state (`repo.findById(id)`) instead of checking calls (`expect(repo.save).toHaveBeenCalledWith(...)`), which couples the test to the implementation.
+3. **Verify interactions only when the interaction is the result.** "A welcome email was sent": yes. "`calculateTax` was called before `applyDiscount`": no.
+4. **Don't mock what you don't own.** Instead of mocking `axios` or the Stripe SDK, create your own adapter (`PaymentGateway`) with a small interface and double that interface. Test the real adapter with integration tests.
+5. **If a test needs more than 2–3 doubles**, the unit has too many dependencies. That is a design signal (see SRP), not a test problem.
 
-## Ejemplos (TypeScript)
+## Examples (TypeScript)
 
-### Fake de repositorio
+### Repository fake
 
 ```ts
 export interface OrderRepository {
@@ -36,7 +36,7 @@ export class InMemoryOrderRepository implements OrderRepository {
   async findById(id: string) { return this.orders.get(id) ?? null; }
 }
 
-it('persiste el pedido confirmado', async () => {
+it('persists the confirmed order', async () => {
   const repo = new InMemoryOrderRepository();
   const service = new OrderService(repo);
 
@@ -46,7 +46,7 @@ it('persiste el pedido confirmado', async () => {
 });
 ```
 
-### Reloj inyectable (en vez de mockear `Date`)
+### Injectable clock (instead of mocking `Date`)
 
 ```ts
 type Clock = () => Date;
@@ -55,18 +55,18 @@ export function isCouponValid(coupon: Coupon, now: Clock = () => new Date()) {
   return coupon.expiresAt.getTime() > now().getTime();
 }
 
-it('rechaza un cupón caducado', () => {
+it('rejects an expired coupon', () => {
   const now = () => new Date('2026-01-10T00:00:00Z');
   expect(isCouponValid({ expiresAt: new Date('2026-01-09T23:59:59Z') }, now)).toBe(false);
 });
 ```
 
-Si el código ya usa `Date` global y no puedes inyectar, usa los fake timers del runner (`vi.useFakeTimers()` / `vi.setSystemTime()`, `jest.useFakeTimers()`, o `mock.timers` en `node:test`) y restáuralos en `afterEach`.
+If the code already uses the global `Date` and you cannot inject, use the runner's fake timers (`vi.useFakeTimers()` / `vi.setSystemTime()`, `jest.useFakeTimers()`, or `mock.timers` in `node:test`) and restore them in `afterEach`.
 
-### Spy cuando la interacción es el resultado
+### Spy when the interaction is the result
 
 ```ts
-it('envía el email de bienvenida al registrarse', async () => {
+it('sends the welcome email on sign-up', async () => {
   const mailer = { send: vi.fn().mockResolvedValue(undefined) };
   const signup = new SignupService(new InMemoryUserRepository(), mailer);
 

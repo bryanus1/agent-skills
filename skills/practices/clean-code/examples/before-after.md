@@ -1,8 +1,8 @@
-# Ejemplos antes/después
+# Before/After Examples
 
-## Backend: handler que lo hace todo
+## Backend: a handler that does everything
 
-### Antes
+### Before
 
 ```ts
 export async function handle(req: Request, res: Response) {
@@ -33,12 +33,12 @@ export async function handle(req: Request, res: Response) {
 }
 ```
 
-**Smells:** función larga con tres niveles de abstracción (HTTP, reglas de negocio, SQL); nombres de una letra; anidamiento de 4 niveles; número mágico `100`; error tragado con `console.log` y mensaje genérico; validación ad hoc; un cupón inexistente se ignora en silencio.
+**Smells:** a long function with three abstraction levels (HTTP, business rules, SQL); one-letter names; 4 levels of nesting; magic number `100`; error swallowed with `console.log` and a generic message; ad hoc validation; a non-existent coupon is silently ignored.
 
-### Después
+### After
 
 ```ts
-// HTTP: traduce petición ↔ caso de uso
+// HTTP: translates request ↔ use case
 export async function createOrderHandler(req: Request, res: Response) {
   const input = createOrderSchema.safeParse(req.body);
   if (!input.success) return res.status(400).json({ error: 'INVALID_ORDER', details: input.error.flatten() });
@@ -46,9 +46,9 @@ export async function createOrderHandler(req: Request, res: Response) {
   const order = await createOrder(input.data, { coupons, orders });
   return res.status(201).json(order);
 }
-// los errores inesperados los gestiona el middleware de errores, con log estructurado
+// unexpected errors are handled by the error middleware, with a structured log
 
-// Caso de uso: reglas de negocio, sin SQL ni HTTP
+// Use case: business rules, no SQL or HTTP
 export async function createOrder(input: CreateOrderInput, deps: { coupons: CouponRepository; orders: OrderRepository }) {
   const subtotal = subtotalOf(input.items);
   const discount = input.couponCode ? await discountFor(input.couponCode, subtotal, deps.coupons) : 0;
@@ -66,11 +66,11 @@ async function discountFor(code: string, subtotal: number, coupons: CouponReposi
 const percentToRatio = (percent: number) => percent / 100;
 ```
 
-Nota: el "después" **cambia un comportamiento** (un cupón inexistente ahora es un error en lugar de ignorarse). En un refactor real ese cambio se reporta y se confirma con el usuario antes de aplicarlo, en un paso aparte y con su test.
+Note: the "after" **changes a behavior** (a non-existent coupon is now an error instead of being ignored). In a real refactor that change is reported and confirmed with the user before it is applied, in a separate step with its own test.
 
-## Frontend: componente con lógica mezclada
+## Frontend: a component with mixed logic
 
-### Antes
+### Before
 
 ```tsx
 export function UserList({ users, flag }: { users: any[]; flag: boolean }) {
@@ -90,9 +90,9 @@ export function UserList({ users, flag }: { users: any[]; flag: boolean }) {
 }
 ```
 
-**Smells:** `any`; argumento bandera `flag`; estado derivado sincronizado con `useEffect` (render doble y riesgo de desincronización); número mágico `1`; ternario anidado en el JSX; códigos de rol crípticos.
+**Smells:** `any`; the `flag` flag argument; derived state synced with `useEffect` (double render and risk of getting out of sync); magic number `1`; nested ternary in the JSX; cryptic role codes.
 
-### Después
+### After
 
 ```tsx
 type Role = 'admin' | 'editor' | 'viewer';
@@ -116,4 +116,4 @@ export function UserList({ users, onlyActive = false }: { users: User[]; onlyAct
 const isActive = (user: User) => user.status === UserStatus.Active;
 ```
 
-Si los códigos `'a'`/`'e'` vienen así de la API, el mapeo a `Role` se hace en la capa de datos (adaptador), no en el componente.
+If the `'a'`/`'e'` codes come from the API like that, the mapping to `Role` happens in the data layer (an adapter), not in the component.
