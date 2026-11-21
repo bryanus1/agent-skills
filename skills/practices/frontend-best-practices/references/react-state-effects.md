@@ -1,42 +1,42 @@
-# Estado, efectos y datos remotos
+# State, Effects and Remote Data
 
-## Contenido
+## Contents
 
-1. [Estado derivado](#estado-derivado)
-2. [Cuándo usar un efecto](#cuándo-usar-un-efecto)
-3. [Carreras y limpieza](#carreras-y-limpieza)
-4. [Datos remotos](#datos-remotos)
-5. [Listas y claves](#listas-y-claves)
-6. [Dónde vive el estado](#dónde-vive-el-estado)
+1. [Derived state](#derived-state)
+2. [When to use an effect](#when-to-use-an-effect)
+3. [Races and cleanup](#races-and-cleanup)
+4. [Remote data](#remote-data)
+5. [Lists and keys](#lists-and-keys)
+6. [Where state lives](#where-state-lives)
 
-## Estado derivado
+## Derived state
 
-**Señal:** `useEffect(() => setX(f(y)), [y])`. Dos renders por cada cambio y estados que pueden desincronizarse.
+**Signal:** `useEffect(() => setX(f(y)), [y])`. Two renders per change, and states that can get out of sync.
 
 ```tsx
-// Evitar
+// Avoid
 const [filtered, setFiltered] = useState<User[]>([]);
 useEffect(() => setFiltered(users.filter(u => u.active)), [users]);
 
-// Preferir: se calcula en el render
+// Prefer: computed during render
 const filtered = users.filter(u => u.active);
-// Con coste medido alto: useMemo(() => users.filter(...), [users])
+// With a high measured cost: useMemo(() => users.filter(...), [users])
 ```
 
-Regla: si un valor se puede calcular a partir de props o estado, **no es estado**. Tampoco copies props a estado salvo para un valor inicial editable (y entonces nómbralo `initialX`).
+Rule: if a value can be computed from props or state, **it is not state**. Don't copy props into state either, except for an editable initial value (and then name it `initialX`).
 
-## Cuándo usar un efecto
+## When to use an effect
 
-Un efecto sincroniza el componente con algo **externo** al render: suscripciones, temporizadores, listeners del DOM, librerías de terceros, analítica al montar. No es para:
+An effect syncs the component with something **external** to rendering: subscriptions, timers, DOM listeners, third-party libraries, analytics on mount. It is not for:
 
-- Reaccionar a un evento del usuario: pon la lógica en el **manejador del evento**.
-- Transformar datos para renderizar: cálculo en el render.
-- Reiniciar estado al cambiar una prop: usa `key` en el componente.
-- Obtener datos si el proyecto tiene TanStack Query, SWR o loaders del framework.
+- Reacting to a user event: put the logic in the **event handler**.
+- Transforming data for rendering: compute it during render.
+- Resetting state when a prop changes: use a `key` on the component.
+- Fetching data if the project has TanStack Query, SWR or framework loaders.
 
-Dependencias: incluye todo lo que el efecto lee. Si el linter (`react-hooks/exhaustive-deps`) avisa, corrige la causa; no la silencies con un comentario.
+Dependencies: include everything the effect reads. If the linter (`react-hooks/exhaustive-deps`) warns, fix the cause; don't silence it with a comment.
 
-## Carreras y limpieza
+## Races and cleanup
 
 ```tsx
 useEffect(() => {
@@ -45,25 +45,25 @@ useEffect(() => {
     .then(r => r.json())
     .then(setUser)
     .catch(e => { if (e.name !== 'AbortError') setError(e); });
-  return () => controller.abort();   // al cambiar `id` se cancela la petición anterior
+  return () => controller.abort();   // when `id` changes, the previous request is cancelled
 }, [id]);
 ```
 
-Toda suscripción, temporizador o listener devuelve su limpieza. En desarrollo, React 18 monta dos veces con StrictMode: si el efecto rompe, le falta limpieza.
+Every subscription, timer or listener returns its cleanup. In development, React 18 mounts twice under StrictMode: if the effect breaks, it is missing a cleanup.
 
-## Datos remotos
+## Remote data
 
-- Con la librería de datos del proyecto: `useQuery({ queryKey: ['user', id], queryFn })`. Aporta caché, reintentos, cancelación y deduplicación.
-- Modela el estado asíncrono explícitamente: **cargando, error, vacío, éxito**. Un componente que solo pinta el caso feliz es un bug pendiente.
-- Mantén separados el **estado del servidor** (usuarios, pedidos) y el **estado de UI** (modal abierto, pestaña): cada uno con su herramienta.
-- Tras una mutación, invalida o actualiza la caché en lugar de refetch manual disperso.
-- En frameworks con componentes de servidor, obtén los datos en el servidor y pásalos como props; reserva el cliente para la interactividad.
+- With the project's data library: `useQuery({ queryKey: ['user', id], queryFn })`. It brings caching, retries, cancellation and deduplication.
+- Model the async state explicitly: **loading, error, empty, success**. A component that only renders the happy path is a pending bug.
+- Keep **server state** (users, orders) and **UI state** (modal open, tab) separate: each with its own tool.
+- After a mutation, invalidate or update the cache instead of scattered manual refetches.
+- In frameworks with server components, fetch the data on the server and pass it as props; keep the client for interactivity.
 
-## Listas y claves
+## Lists and keys
 
-- `key` estable y única (id del dato). `key={index}` rompe el estado interno al reordenar, insertar o filtrar.
-- Listas de cientos de filas o más: paginar o virtualizar (ver [performance](performance.md)).
+- A stable, unique `key` (the data's id). `key={index}` breaks internal state on reorder, insert or filter.
+- Lists of hundreds of rows or more: paginate or virtualize (see [performance](performance.md)).
 
-## Dónde vive el estado
+## Where state lives
 
-Sube el estado solo hasta el ancestro común más cercano. Contexto para datos de "ambiente" (tema, sesión) que cambian poco; un store (Zustand, Redux) cuando muchos componentes lejanos lo comparten y cambia a menudo. No metas en un store global lo que es local a un formulario o a un diálogo.
+Lift state only up to the nearest common ancestor. Context for "ambient" data (theme, session) that rarely changes; a store (Zustand, Redux) when many distant components share it and it changes often. Don't put in a global store what is local to a form or a dialog.

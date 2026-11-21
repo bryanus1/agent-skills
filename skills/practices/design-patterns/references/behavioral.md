@@ -1,25 +1,25 @@
-# Patrones de comportamiento
+# Behavioral Patterns
 
-## Contenido
+## Contents
 
 1. [Strategy](#strategy)
-2. [Observer / eventos](#observer--eventos)
+2. [Observer / events](#observer--events)
 3. [State](#state)
 4. [Command](#command)
 5. [Template Method](#template-method)
 
 ## Strategy
 
-**Problema:** varias formas intercambiables de hacer lo mismo (calcular una tarifa, validar, exportar, ordenar), elegidas en tiempo de ejecución, y un `switch` que se repite o crece.
+**Problem:** several interchangeable ways to do the same thing (compute a rate, validate, export, sort), chosen at runtime, and a `switch` that repeats or grows.
 
-**Escala de soluciones, de menos a más pesada. Usa la primera que baste:**
+**Ladder of solutions, from lightest to heaviest. Use the first one that is enough:**
 
-1. **Tabla de datos** si las variantes solo difieren en valores (`{ standard: 4.99, express: 9.99 }`).
-2. **Tabla de funciones** si difieren en comportamiento sin estado.
-3. **Clases con interfaz** si cada variante necesita estado o dependencias propias.
+1. **Data table** if the variants only differ in values (`{ standard: 4.99, express: 9.99 }`).
+2. **Function table** if they differ in stateless behavior.
+3. **Classes with an interface** if each variant needs its own state or dependencies.
 
 ```ts
-// 2. Tabla de funciones
+// 2. Function table
 type PricingRule = (order: Order) => number;
 
 const PRICING: Record<Tier, PricingRule> = {
@@ -32,21 +32,21 @@ const priceFor = (order: Order) => PRICING[order.tier](order);
 ```
 
 ```ts
-// 3. Clases, cuando hay estado o dependencias
+// 3. Classes, when there is state or dependencies
 interface PaymentMethod { pay(amountCents: number): Promise<PaymentResult>; }
 class CardPayment implements PaymentMethod { constructor(private gateway: CardGateway) {} /* ... */ }
 class BankTransferPayment implements PaymentMethod { constructor(private bank: BankApi) {} /* ... */ }
 ```
 
-**Cuándo no:** un `switch` pequeño, estable y en un solo sitio; una sola variante.
+**When not:** a small, stable `switch` in a single place; a single variant.
 
-## Observer / eventos
+## Observer / events
 
-**Problema:** varios módulos necesitan reaccionar a un hecho (`OrderPlaced`) sin que quien lo origina los conozca.
+**Problem:** several modules need to react to a fact (`OrderPlaced`) without the originator knowing them.
 
-**Cuándo sí:** efectos secundarios independientes (email, analítica, inventario) que no deben bloquear ni acoplarse al flujo principal; UI que se suscribe a un estado.
+**When yes:** independent side effects (email, analytics, inventory) that must not block or couple to the main flow; UI that subscribes to a state.
 
-**Cuándo no:** hay un único interesado (un callback o una llamada directa es más claro), o el orden y la transaccionalidad importan (los eventos hacen el flujo implícito y difícil de seguir).
+**When not:** there is a single listener (a callback or a direct call is clearer), or order and transactionality matter (events make the flow implicit and hard to follow).
 
 ```ts
 type Handler<E> = (event: E) => void | Promise<void>;
@@ -58,13 +58,13 @@ class EventBus<Events extends Record<string, unknown>> {
 }
 ```
 
-Cuidados: define cómo se tratan los errores de un manejador (¿rompen el flujo?), evita bucles de eventos, **devuelve una función para desuscribirse** (fugas de memoria en UI) y no uses eventos para flujos que son una secuencia de negocio explícita. En NestJS: `@nestjs/event-emitter`; en el navegador: `EventTarget`/`useSyncExternalStore`.
+Watch out for: define how a handler's errors are treated (do they break the flow?), avoid event loops, **return a function to unsubscribe** (memory leaks in the UI) and don't use events for flows that are an explicit business sequence. In NestJS: `@nestjs/event-emitter`; in the browser: `EventTarget`/`useSyncExternalStore`.
 
 ## State
 
-**Problema:** el comportamiento de un objeto cambia según su estado y las transiciones válidas son un requisito de negocio (pedido: `draft → paid → shipped → delivered`).
+**Problem:** an object's behavior changes with its state, and the valid transitions are a business requirement (order: `draft → paid → shipped → delivered`).
 
-**Alternativa simple:** un `enum`/unión de literales más una tabla de transiciones permitidas.
+**Simple alternative:** an `enum`/union of literals plus a table of allowed transitions.
 
 ```ts
 type OrderStatus = 'draft' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
@@ -83,7 +83,7 @@ function transition(order: Order, to: OrderStatus): Order {
 }
 ```
 
-**Cuándo escalar a clases State o a una máquina de estados (`xstate`):** cada estado tiene lógica propia y sustancial, hay estados anidados/paralelos o efectos asociados a transiciones. En UI, formularios con múltiples pasos o flujos asíncronos (`idle | loading | success | error`) se modelan mejor con **uniones discriminadas** que con booleanos sueltos (`isLoading`, `isError`):
+**When to scale up to State classes or a state machine (`xstate`):** each state has substantial logic of its own, there are nested/parallel states, or effects tied to transitions. In the UI, multi-step forms or async flows (`idle | loading | success | error`) are better modeled with **discriminated unions** than with loose booleans (`isLoading`, `isError`):
 
 ```ts
 type State<T> = { status: 'idle' } | { status: 'loading' } | { status: 'success'; data: T } | { status: 'error'; error: Error };
@@ -91,11 +91,11 @@ type State<T> = { status: 'idle' } | { status: 'loading' } | { status: 'success'
 
 ## Command
 
-**Problema:** convertir una acción en un objeto para ponerla en cola, registrarla, reintentarla, deshacerla o ejecutarla más tarde.
+**Problem:** turn an action into an object so you can queue, log, retry, undo or run it later.
 
-**Cuándo sí:** deshacer/rehacer en un editor, colas de trabajos, auditoría de acciones, macros, reintentos.
+**When yes:** undo/redo in an editor, job queues, action auditing, macros, retries.
 
-**Cuándo no:** una llamada directa basta. No lo uses para "desacoplar" una función de su único llamador.
+**When not:** a direct call is enough. Don't use it to "decouple" a function from its only caller.
 
 ```ts
 interface Command { execute(): Promise<void>; undo?(): Promise<void>; }
@@ -107,13 +107,13 @@ class RenameFile implements Command {
 }
 ```
 
-En un backend, los *jobs* de BullMQ/SQS son comandos serializados: `{ type: 'SendInvoice', invoiceId }` más un manejador.
+In a backend, BullMQ/SQS *jobs* are serialized commands: `{ type: 'SendInvoice', invoiceId }` plus a handler.
 
 ## Template Method
 
-**Problema:** un proceso con pasos fijos y algunos pasos variables.
+**Problem:** a process with fixed steps and some variable steps.
 
-**En TS/JS prefiere pasar los pasos variables como parámetros (composición) en lugar de heredar:**
+**In TS/JS, prefer passing the variable steps as parameters (composition) instead of inheriting:**
 
 ```ts
 async function importFile<T>(file: File, steps: { parse(raw: string): T[]; validate(row: T): void; persist(rows: T[]): Promise<void> }) {
@@ -123,4 +123,4 @@ async function importFile<T>(file: File, steps: { parse(raw: string): T[]; valid
 }
 ```
 
-**Versión clásica con herencia** (clase base abstracta con `abstract parse()`), válida si el proyecto ya usa jerarquías y los pasos comparten estado, pero tiene el coste de acoplar subclases a la base (riesgo de violar LSP). Si ves una jerarquía de un solo nivel con dos subclases, probablemente una función que reciba los pasos sea más simple.
+**The classic inheritance version** (an abstract base class with `abstract parse()`) is valid if the project already uses hierarchies and the steps share state, but it has the cost of coupling subclasses to the base (risk of violating LSP). If you see a one-level hierarchy with two subclasses, a function that receives the steps is probably simpler.

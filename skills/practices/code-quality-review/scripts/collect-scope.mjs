@@ -1,27 +1,27 @@
 #!/usr/bin/env node
-// collect-scope: lista los archivos que cambió una rama o el árbol de trabajo, los clasifica
-// por área (frontend, backend, datos, tests, config/docs) y recomienda qué lentes aplicar.
-// Solo lectura: ejecuta `git diff` y `git ls-files`; no modifica nada.
+// collect-scope: lists the files a branch or the working tree changed, classifies them
+// by area (frontend, backend, data, tests, config/docs) and recommends which lenses to apply.
+// Read-only: runs `git diff` and `git ls-files`; modifies nothing.
 import { execFileSync } from 'node:child_process';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
-const HELP = `collect-scope: clasifica los archivos cambiados y recomienda lentes de revisión (solo lectura).
+const HELP = `collect-scope: classifies the changed files and recommends review lenses (read-only).
 
-Uso:
-  node <skill-dir>/scripts/collect-scope.mjs [opciones] [-- rutas...]
-  (sin git, indica las rutas a revisar tras '--' y se clasifican tal cual)
+Usage:
+  node <skill-dir>/scripts/collect-scope.mjs [options] [-- paths...]
+  (without git, give the paths to review after '--' and they are classified as they are)
 
-Opciones:
-  --base <ref>   Compara contra el ancestro común con <ref> (por defecto main, master o develop si existe).
-  --working      Solo cambios sin commitear (staged, unstaged y archivos nuevos).
-  --cwd <dir>    Directorio del repositorio (por defecto, el actual).
-  --json         Salida JSON.
-  -h, --help     Muestra esta ayuda.
+Options:
+  --base <ref>   Compare against the merge base with <ref> (defaults to main, master or develop if it exists).
+  --working      Only uncommitted changes (staged, unstaged and new files).
+  --cwd <dir>    Repository directory (defaults to the current one).
+  --json         JSON output.
+  -h, --help     Show this help.
 
-Salida: archivos por área, líneas añadidas/eliminadas y lentes recomendadas
+Output: files by area, added/removed lines and recommended lenses
 (clean-code, solid-principles, design-patterns, tdd-workflow, frontend-best-practices, backend-best-practices).
-Códigos de salida: 0 informe generado, 2 error de uso o de git.`;
+Exit codes: 0 report generated, 2 usage or git error.`;
 
 const args = process.argv.slice(2);
 const opts = { base: null, working: false, cwd: process.cwd(), json: false, paths: [] };
@@ -33,10 +33,10 @@ for (let i = 0; i < args.length; i++) {
   else if (a === '--base') opts.base = args[++i];
   else if (a === '--cwd') opts.cwd = path.resolve(args[++i] ?? '');
   else if (a === '--') { opts.paths = args.slice(i + 1); break; }
-  else { console.error(`Opción desconocida: ${a}\n\n${HELP}`); process.exit(2); }
+  else { console.error(`Unknown option: ${a}\n\n${HELP}`); process.exit(2); }
 }
 if (opts.base === undefined || (args.includes('--base') && !opts.base)) {
-  console.error('--base requiere un valor'); process.exit(2);
+  console.error('--base requires a value'); process.exit(2);
 }
 
 function git(...gitArgs) {
@@ -49,18 +49,18 @@ function refExists(ref) {
 let isRepo = true;
 try { git('rev-parse', '--is-inside-work-tree'); } catch { isRepo = false; }
 if (!isRepo && opts.paths.length === 0) {
-  console.error('No es un repositorio git. Indica los archivos a revisar: collect-scope.mjs -- <rutas...>');
+  console.error('Not a git repository. Give the files to review: collect-scope.mjs -- <paths...>');
   process.exit(2);
 }
 
 let baseRef = null;
 if (isRepo && !opts.working) {
   baseRef = opts.base ?? ['main', 'master', 'develop'].find(refExists) ?? null;
-  if (opts.base && !refExists(opts.base)) { console.error(`La referencia ${opts.base} no existe.`); process.exit(2); }
+  if (opts.base && !refExists(opts.base)) { console.error(`The ref ${opts.base} does not exist.`); process.exit(2); }
 }
 
 const pathspec = opts.paths.length ? ['--', ...opts.paths] : [];
-const changed = new Map(); // archivo -> { added, removed, status }
+const changed = new Map(); // file -> { added, removed, status }
 
 function addNumstat(output) {
   for (const line of output.split('\n').filter(Boolean)) {
@@ -75,15 +75,15 @@ function addNumstat(output) {
 
 let mode;
 if (!isRepo) {
-  // Sin git: se clasifican las rutas indicadas (archivos o directorios) tal cual.
-  mode = 'lista manual (sin git)';
+  // Without git: the given paths (files or directories) are classified as they are.
+  mode = 'manual list (no git)';
   const walk = (target) => {
     const abs = path.resolve(opts.cwd, target);
     let stat; try { stat = statSync(abs); } catch { return; }
     if (stat.isDirectory()) {
       for (const entry of readdirSync(abs)) { if (!['node_modules', '.git'].includes(entry)) walk(path.join(target, entry)); }
     } else {
-      let lines = 0; try { lines = readFileSync(abs, 'utf8').split('\n').length; } catch { /* binario */ }
+      let lines = 0; try { lines = readFileSync(abs, 'utf8').split('\n').length; } catch { /* binary */ }
       changed.set(path.normalize(target).split(path.sep).join('/'), { added: lines, removed: 0, status: 'new' });
     }
   };
@@ -94,12 +94,12 @@ if (!isRepo) {
     try { mergeBase = git('merge-base', baseRef, 'HEAD').trim(); } catch { mergeBase = null; }
   }
   if (mergeBase && git('rev-parse', 'HEAD').trim() !== mergeBase) {
-    mode = `rama contra ${baseRef}`;
+    mode = `branch vs ${baseRef}`;
     addNumstat(git('diff', '--numstat', mergeBase, 'HEAD', ...pathspec));
   } else {
-    mode = 'árbol de trabajo';
+    mode = 'working tree';
   }
-  // Cambios sin commitear (siempre se incluyen)
+  // Uncommitted changes (always included)
   addNumstat(git('diff', '--numstat', 'HEAD', ...pathspec));
   for (const file of git('ls-files', '--others', '--exclude-standard', ...pathspec).split('\n').filter(Boolean)) {
     let lines = 0;
@@ -109,7 +109,7 @@ if (!isRepo) {
     changed.set(file, { added: lines, removed: 0, status: 'new' });
   }
 } catch (error) {
-  console.error(`Error de git: ${String(error.stderr ?? error.message).trim()}`);
+  console.error(`Git error: ${String(error.stderr ?? error.message).trim()}`);
   process.exit(2);
 }
 
@@ -141,33 +141,33 @@ for (const [file, info] of [...changed.entries()].sort(([a], [b]) => a.localeCom
 
 const sourceCount = areas.frontend.length + areas.backend.length + areas.data.length + areas.code.length;
 const lenses = [];
-if (sourceCount > 0) lenses.push({ skill: 'clean-code', why: 'hay código fuente cambiado' });
-if (areas.frontend.length) lenses.push({ skill: 'frontend-best-practices', why: `${areas.frontend.length} archivo(s) de interfaz` });
-if (areas.backend.length || areas.data.length) lenses.push({ skill: 'backend-best-practices', why: `${areas.backend.length + areas.data.length} archivo(s) de servidor o datos` });
-if (areas.backend.length + areas.code.length + areas.frontend.length >= 3) lenses.push({ skill: 'solid-principles', why: 'varias unidades de código: revisa responsabilidades y dependencias' });
-if (sourceCount > 0) lenses.push({ skill: 'design-patterns', why: 'solo si el cambio introduce o debería introducir un patrón (condicional)', conditional: true });
-if (sourceCount > 0) lenses.push({ skill: 'tdd-workflow', why: areas.tests.length ? 'hay tests cambiados: comprobar que cubren el cambio' : 'cambia código sin tests: revisar la cobertura del cambio' });
+if (sourceCount > 0) lenses.push({ skill: 'clean-code', why: 'source code changed' });
+if (areas.frontend.length) lenses.push({ skill: 'frontend-best-practices', why: `${areas.frontend.length} UI file(s)` });
+if (areas.backend.length || areas.data.length) lenses.push({ skill: 'backend-best-practices', why: `${areas.backend.length + areas.data.length} server or data file(s)` });
+if (areas.backend.length + areas.code.length + areas.frontend.length >= 3) lenses.push({ skill: 'solid-principles', why: 'several code units: review responsibilities and dependencies' });
+if (sourceCount > 0) lenses.push({ skill: 'design-patterns', why: 'only if the change introduces or should introduce a pattern (conditional)', conditional: true });
+if (sourceCount > 0) lenses.push({ skill: 'tdd-workflow', why: areas.tests.length ? 'tests changed: check that they cover the change' : 'code changed without tests: review the coverage of the change' });
 
 const warnings = [];
-if (sourceCount > 0 && areas.tests.length === 0) warnings.push('Cambia código fuente sin tocar ningún test.');
-if (added + removed > 800) warnings.push(`Cambio grande (${added + removed} líneas): revisa por partes o por área.`);
-if (changed.size === 0) warnings.push('No se detectaron cambios.');
+if (sourceCount > 0 && areas.tests.length === 0) warnings.push('Changes source code without touching any test.');
+if (added + removed > 800) warnings.push(`Large change (${added + removed} lines): review it in parts or by area.`);
+if (changed.size === 0) warnings.push('No changes detected.');
 
 const result = { mode, base: baseRef, files: changed.size, added, removed, areas, lenses, warnings };
 
 if (opts.json) { console.log(JSON.stringify(result, null, 2)); process.exit(0); }
 
-console.log(`Alcance: ${mode} · ${changed.size} archivo(s) · +${added} −${removed}`);
+console.log(`Scope: ${mode} · ${changed.size} file(s) · +${added} −${removed}`);
 for (const [area, items] of Object.entries(areas)) {
   if (!items.length) continue;
   console.log(`\n${area} (${items.length})`);
   for (const item of items) console.log(`  ${item.status === 'new' ? '+' : ' '} ${item.file}  +${item.added} −${item.removed}`);
 }
 if (lenses.length) {
-  console.log('\nLentes recomendadas');
-  for (const lens of lenses) console.log(`  - ${lens.skill}${lens.conditional ? ' (condicional)' : ''}: ${lens.why}`);
+  console.log('\nRecommended lenses');
+  for (const lens of lenses) console.log(`  - ${lens.skill}${lens.conditional ? ' (conditional)' : ''}: ${lens.why}`);
 }
 if (warnings.length) {
-  console.log('\nAvisos');
+  console.log('\nWarnings');
   for (const w of warnings) console.log(`  ! ${w}`);
 }

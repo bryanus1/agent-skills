@@ -1,43 +1,43 @@
-# SRP: responsabilidad única
+# SRP: Single Responsibility
 
-> Una unidad debe tener **una razón para cambiar**: un único actor o decisión de negocio que pueda pedir cambios en ella.
+> A unit should have **one reason to change**: a single actor or business decision that can ask for changes to it.
 
-SRP no significa "hace una sola cosa" (eso es de funciones, ver `clean-code`). Significa que **personas o decisiones distintas** no deben obligar a editar el mismo archivo. Una clase `InvoicePrinter` puede tener veinte métodos y cumplir SRP si todos cambian por el mismo motivo.
+SRP does not mean "does one thing" (that belongs to functions, see `clean-code`). It means **different people or decisions** should not force you to edit the same file. An `InvoicePrinter` class can have twenty methods and satisfy SRP if they all change for the same reason.
 
-## Cómo detectarlo
+## How to detect it
 
-- El archivo se modifica en commits con motivos no relacionados (cambio de tarifa, cambio de formato de email, cambio de esquema SQL).
-- Imports de capas distintas en el mismo archivo: HTTP/framework, ORM o SQL, SDKs de terceros, formato de presentación.
-- Nombres como `Manager`, `Helper`, `Service` que acumulan de todo.
-- Cada test necesita montar medio sistema para probar una regla.
+- The file is modified in commits with unrelated motives (a rate change, an email format change, a SQL schema change).
+- Imports from different layers in the same file: HTTP/framework, ORM or SQL, third-party SDKs, presentation formatting.
+- Names like `Manager`, `Helper`, `Service` that pile up everything.
+- Every test needs to set up half the system to check one rule.
 
 ## Backend
 
-### Antes
+### Before
 
 ```ts
 export class OrderService {
   async checkout(dto: CheckoutDto) {
-    if (!dto.items.length) throw new Error('empty');                     // validación
-    const subtotal = dto.items.reduce((s, i) => s + i.price * i.qty, 0); // regla de precio
-    const total = subtotal * 1.21;                                       // regla de impuestos
-    const order = await db.query('insert into orders ...', [total]);     // persistencia
-    await smtp.send({ to: dto.email, subject: 'Pedido', body: `...${total}` }); // notificación
+    if (!dto.items.length) throw new Error('empty');                     // validation
+    const subtotal = dto.items.reduce((s, i) => s + i.price * i.qty, 0); // pricing rule
+    const total = subtotal * 1.21;                                       // tax rule
+    const order = await db.query('insert into orders ...', [total]);     // persistence
+    await smtp.send({ to: dto.email, subject: 'Order', body: `...${total}` }); // notification
     return order;
   }
 }
 ```
 
-Cambia por: reglas de impuestos (finanzas), esquema de BD (datos), texto del email (marketing).
+It changes because of: tax rules (finance), DB schema (data), email copy (marketing).
 
-### Después
+### After
 
 ```ts
-// pricing.ts: reglas de precio e impuestos, puras y testeables
+// pricing.ts: pricing and tax rules, pure and testable
 export const totalWithTax = (items: Item[], vatRate: number) =>
   items.reduce((s, i) => s + i.price * i.qty, 0) * (1 + vatRate);
 
-// order.service.ts: orquesta el caso de uso, no conoce SQL ni SMTP
+// order.service.ts: orchestrates the use case, knows nothing about SQL or SMTP
 export class OrderService {
   constructor(private orders: OrderRepository, private notifier: OrderNotifier) {}
 
@@ -50,11 +50,11 @@ export class OrderService {
 }
 ```
 
-El servicio sigue siendo uno, pero ahora **orquesta**; cada decisión vive donde su actor puede cambiarla sin tocar las demás.
+There is still one service, but now it **orchestrates**; each decision lives where its actor can change it without touching the others.
 
 ## Frontend
 
-### Antes: componente con fetch, estado, reglas y UI
+### Before: a component with fetch, state, rules and UI
 
 ```tsx
 function Checkout() {
@@ -65,14 +65,14 @@ function Checkout() {
 }
 ```
 
-### Después
+### After
 
 ```tsx
-const totalWithTax = (items: Item[]) => /* regla pura, testeable sin React */;
+const totalWithTax = (items: Item[]) => /* pure rule, testable without React */;
 
-function useCart() { /* acceso a datos: fetch, caché, errores */ }
+function useCart() { /* data access: fetch, cache, errors */ }
 
-function CartSummary({ items }: { items: Item[] }) { /* solo presentación */ }
+function CartSummary({ items }: { items: Item[] }) { /* presentation only */ }
 
 function Checkout() {
   const { items } = useCart();
@@ -80,15 +80,15 @@ function Checkout() {
 }
 ```
 
-## Cómo refactorizar
+## How to refactor
 
-1. Identifica las razones de cambio y nómbralas (precio, persistencia, notificación).
-2. Extrae primero lo **puro** (cálculos, reglas) a funciones: es lo más barato y lo que más gana en tests.
-3. Extrae después lo que toca el exterior (BD, red, correo) detrás de una interfaz pequeña (ver [DIP](dip.md)).
-4. El original se queda como **orquestador** con la misma firma pública.
+1. Identify the reasons to change and name them (pricing, persistence, notification).
+2. Extract the **pure** parts first (calculations, rules) into functions: it is the cheapest step and gains the most in tests.
+3. Then extract what touches the outside world (DB, network, email) behind a small interface (see [DIP](dip.md)).
+4. The original stays as the **orchestrator** with the same public signature.
 
-## Falsos positivos
+## False positives
 
-- Una clase larga cuyos métodos cambian siempre juntos: es cohesión, no violación.
-- Dividir por tamaño sin criterio produce `OrderValidator`, `OrderCalculator`, `OrderSaver`… que siempre se editan a la vez: has creado acoplamiento disperso, no SRP.
-- Un controlador de framework que traduce HTTP a un caso de uso y devuelve la respuesta ya cumple su única responsabilidad.
+- A long class whose methods always change together: that is cohesion, not a violation.
+- Splitting by size without criteria produces `OrderValidator`, `OrderCalculator`, `OrderSaver`… that are always edited together: you created scattered coupling, not SRP.
+- A framework controller that translates HTTP into a use case and returns the response already fulfills its single responsibility.

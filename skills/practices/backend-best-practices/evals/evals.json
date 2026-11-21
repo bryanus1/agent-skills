@@ -4,7 +4,7 @@
     {
       "id": 1,
       "prompt": "Revisa evals/inputs/orders-api/src/orders-api.ts y aplica buenas prácticas de backend. Corrige lo que haga falta.",
-      "expected_output": "Tabla de hallazgos priorizada con archivo:línea. Críticos: inyección SQL por interpolación en listOrders (status e id), getOrder sin comprobar propiedad del pedido (IDOR) y createOrder que copia req.body (mass assignment, user_id/status del cliente). Importantes: createOrder devuelve 200 con err.stack, N+1 de items, listado sin límite. Corrige con consultas parametrizadas (= ANY($1) para items), comprobación de propiedad y construcción explícita del pedido con user.id de la sesión. Avisa de que cambiar códigos de estado/límite modifica el contrato y lo declara o pide confirmación. No añade capas, caché ni dependencias. Los tests siguen pasando.",
+      "expected_output": "A prioritized findings table with file:line. Critical: SQL injection by interpolation in listOrders (status and id), getOrder without checking order ownership (IDOR) and createOrder copying req.body (mass assignment, user_id/status from the client). Important: createOrder returns 200 with err.stack, N+1 on items, listing without a limit. Fixes with parameterized queries (= ANY($1) for items), an ownership check and explicit construction of the order with user.id from the session. Warns that changing status codes/the limit modifies the contract and declares it or asks for confirmation. Adds no layers, cache or dependencies. Tests still pass. The reply is in Spanish.",
       "files": [
         "evals/inputs/orders-api/package.json",
         "evals/inputs/orders-api/README.md",
@@ -13,22 +13,23 @@
         "evals/inputs/orders-api/test/orders-api.test.ts"
       ],
       "assertions": [
-        "La suite pasa con `npm test`",
-        "Las consultas de listOrders ya no interpolan valores (parámetros $1)",
-        "Elimina el N+1 de items (una consulta para todos los pedidos o equivalente)",
-        "getOrder comprueba que el pedido pertenece al usuario autenticado",
-        "createOrder no copia req.body entero ni toma user_id del cuerpo",
-        "El error de createOrder ya no devuelve 200 ni err.stack",
-        "Avisa explícitamente de qué cambios modifican el contrato HTTP",
-        "No añade dependencias ni capas de repositorio/DTO generales",
-        "Cita archivo:línea en los hallazgos",
-        "Declara qué no pudo verificar (rendimiento con datos reales o índices)"
+        "The suite passes with `npm test`",
+        "The listOrders queries no longer interpolate values ($1 parameters)",
+        "Removes the items N+1 (one query for all orders or equivalent)",
+        "getOrder checks that the order belongs to the authenticated user",
+        "createOrder does not copy the whole req.body or take user_id from the body",
+        "The createOrder error no longer returns 200 or err.stack",
+        "Explicitly warns which changes modify the HTTP contract",
+        "Adds no dependencies or general repository/DTO layers",
+        "Cites file:line in the findings",
+        "States what it could not verify (performance with real data or indexes)",
+        "Replies in Spanish"
       ]
     },
     {
       "id": 2,
-      "prompt": "Aplica buenas prácticas de backend a evals/inputs/health-handler/src/get-user.ts, quiero que quede perfecto.",
-      "expected_output": "Revisa las áreas y concluye que el handler ya cumple (autenticación, validación del id, autorización por recurso, 404, almacén inyectado, respuesta con campos explícitos). No añade capas, caché, logging innecesario ni dependencias; las sugerencias opcionales (por ejemplo log estructurado en el middleware) se marcan como tales con su condición. El archivo queda sin cambios o con cambios mínimos justificados y los tests pasan.",
+      "prompt": "Apply backend best practices to evals/inputs/health-handler/src/get-user.ts, I want it to be perfect.",
+      "expected_output": "Reviews the areas and concludes that the handler already complies (authentication, id validation, per-resource authorization, 404, injected store, response with explicit fields). Adds no layers, cache, unnecessary logging or dependencies; optional suggestions (for example structured logging in the middleware) are marked as such with their condition. The file stays unchanged or with minimal justified changes, and the tests pass.",
       "files": [
         "evals/inputs/health-handler/package.json",
         "evals/inputs/health-handler/README.md",
@@ -36,11 +37,11 @@
         "evals/inputs/health-handler/test/get-user.test.ts"
       ],
       "assertions": [
-        "La suite pasa con `npm test`",
-        "Declara explícitamente que no hay hallazgos relevantes o que el handler ya cumple",
-        "No añade capas (repositorio, servicio, DTO), caché ni dependencias",
-        "Cualquier mejora sugerida se presenta como opcional con su condición",
-        "El archivo queda sin cambios o con un cambio mínimo justificado"
+        "The suite passes with `npm test`",
+        "Explicitly states that there are no relevant findings or that the handler already complies",
+        "Adds no layers (repository, service, DTO), cache or dependencies",
+        "Any suggested improvement is presented as optional with its condition",
+        "The file stays unchanged or with a minimal justified change"
       ]
     }
   ]

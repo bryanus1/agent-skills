@@ -1,26 +1,26 @@
 # 🖥️ Frontend Best Practices (`frontend-best-practices`)
 
-> **Revisa y mejora componentes, hooks y páginas con criterios verificables y priorizados: estado y efectos, datos remotos, formularios, accesibilidad, rendimiento y seguridad. Corrige lo que duele y deja en paz lo que ya está bien.**
+> **Review and improve components, hooks and pages with verifiable, prioritized criteria: state and effects, remote data, forms, accessibility, performance and security. Fixes what hurts and leaves alone what is already fine.**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `frontend-best-practices` |
-| **Categoría** | `practices` |
-| **Versión** | `1.0.0` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Name** | `frontend-best-practices` |
+| **Category** | `practices` |
+| **Version** | `1.1.0` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
 ```bash
-# En el proyecto actual:
+# In the current project:
 npx skills add bryanus1/agent-skills --skill frontend-best-practices
 
 # Global:
 npx skills add bryanus1/agent-skills --skill frontend-best-practices -g
 
-# Recomendadas junto a esta:
+# Recommended together with this one:
 npx skills add bryanus1/agent-skills --skill tdd-workflow
 npx skills add bryanus1/agent-skills --skill clean-code
 npx skills add bryanus1/agent-skills --skill nextjs-architecture
@@ -28,44 +28,44 @@ npx skills add bryanus1/agent-skills --skill nextjs-architecture
 
 ---
 
-## 💡 Ejemplos de Uso con Agentes de IA
+## 💡 Usage Examples with AI Agents
 
-* **Revisión de un componente**:
-  > *"Revisa `UserList.tsx` y aplica buenas prácticas de frontend."*
+* **Reviewing a component**:
+  > *"Review `UserList.tsx` and apply frontend best practices."*
   >
-  > 🤖 Tabla de hallazgos por severidad con `archivo:línea` (XSS, teclado, carreras en `fetch`, estado derivado, claves), correcciones mínimas, decisiones de *no aplicar* y qué no pudo verificar sin navegador.
+  > 🤖 A findings table by severity with `file:line` (XSS, keyboard, `fetch` races, derived state, keys), minimal fixes, *don't apply* decisions and what it could not verify without a browser.
 
-* **Escribir un componente nuevo**:
-  > *"Crea un formulario de contacto accesible con validación."*
+* **Writing a new component**:
+  > *"Create an accessible contact form with validation."*
   >
-  > 🤖 Etiquetas, errores asociados al campo, estado de envío, validación en cliente y en servidor.
+  > 🤖 Labels, errors tied to each field, submitting state, validation on the client and the server.
 
-* **Un componente que ya está bien**:
-  > *"Aplica buenas prácticas a este botón."*
+* **A component that is already fine**:
+  > *"Apply good practices to this button."*
   >
-  > 🤖 Informa que no hay hallazgos relevantes en lugar de inventar mejoras.
+  > 🤖 Reports that there are no relevant findings instead of inventing improvements.
 
 ---
 
-## 🧭 Qué cubre
+## 🧭 What It Covers
 
-| Área | Referencia |
+| Area | Reference |
 |---|---|
-| Estado, efectos y datos remotos | [react-state-effects](references/react-state-effects.md) |
-| Formularios | [forms-and-data](references/forms-and-data.md) |
-| Accesibilidad (WCAG 2.2 AA) | [accessibility](references/accessibility.md) |
-| Rendimiento (Core Web Vitals) | [performance](references/performance.md) |
-| Seguridad (XSS, tokens, secretos) | [security-frontend](references/security-frontend.md) |
+| State, effects and remote data | [react-state-effects](references/react-state-effects.md) |
+| Forms | [forms-and-data](references/forms-and-data.md) |
+| Accessibility (WCAG 2.2 AA) | [accessibility](references/accessibility.md) |
+| Performance (Core Web Vitals) | [performance](references/performance.md) |
+| Security (XSS, tokens, secrets) | [security-frontend](references/security-frontend.md) |
 
-## 🚫 Qué NO hace
+## 🚫 What It Does NOT Do
 
-- No define la estructura de carpetas (usa las skills de arquitectura).
-- No afirma mejoras de rendimiento ni accesibilidad sin poder medirlas: lo declara como no verificado.
-- No instala dependencias sin confirmación.
+- It does not define the folder structure (use the architecture skills).
+- It does not claim performance or accessibility improvements it cannot measure: it declares them as not verified.
+- It does not install dependencies without confirmation.
 
 ---
 
-## 📁 Estructura
+## 📁 Structure
 
 ```
 frontend-best-practices/

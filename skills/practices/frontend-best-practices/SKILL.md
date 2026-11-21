@@ -1,114 +1,119 @@
 ---
 name: frontend-best-practices
-version: 1.0.0
+version: 1.1.0
 description: >-
-  Revisa y mejora código frontend (React/Next.js y afines) con buenas prácticas verificables: estado y efectos, datos remotos, formularios, accesibilidad, rendimiento y seguridad. Prioriza hallazgos por impacto y corrige solo lo que duele. Úsala al revisar o escribir componentes, hooks y páginas.
+  Review and improve frontend code (React/Next.js and similar) with verifiable good practices: state and effects, remote data, forms, accessibility, performance and security. Prioritizes findings by impact and fixes only what hurts. Use it when reviewing or writing components, hooks and pages.
 tags: [frontend, react, nextjs, accessibility, performance, security, best-practices]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
   - buenas prácticas frontend
   - frontend best practices
   - revisa este componente
+  - review this component
   - review react component
   - accesibilidad
+  - accessibility
   - mejorar rendimiento react
+  - improve react performance
   - useEffect
   - revisión de frontend
+  - frontend review
 requirements:
   tools: [view_file, replace_file_content, run_command]
 ---
 
 # Frontend Best Practices
 
-## 🎯 Propósito
+## 🎯 Purpose
 
-Revisar y mejorar código de interfaz con **criterios verificables y priorizados**, no con listas genéricas. Cada hallazgo cita evidencia (`archivo:línea`), su impacto (usuario, seguridad, mantenimiento) y una corrección proporcionada. Lo que ya está bien se deja como está.
+Review and improve UI code with **verifiable, prioritized criteria**, not generic checklists. Each finding cites evidence (`file:line`), its impact (user, security, maintenance) and a proportionate fix. What is already fine stays as it is.
 
-Cubre seis áreas: **estado y efectos, datos remotos, formularios, accesibilidad, rendimiento y seguridad**. No decide la estructura de carpetas (skills de arquitectura: `nextjs-architecture`, `react-native-architecture`, `astro-architecture`), ni la legibilidad interna de funciones (`clean-code`), ni responsabilidades de clases (`solid-principles`), ni los patrones (`design-patterns`). Para tests usa `tdd-workflow`.
+It covers six areas: **state and effects, remote data, forms, accessibility, performance and security**. It does not decide the folder structure (architecture skills: `nextjs-architecture`, `react-native-architecture`, `astro-architecture`), internal function readability (`clean-code`), class responsibilities (`solid-principles`) or patterns (`design-patterns`). For tests use `tdd-workflow`.
 
-## ⚡ Cuándo Activar esta Skill
+## ⚡ When to Trigger
 
-- El usuario pide revisar, endurecer o "aplicar buenas prácticas" a componentes, hooks o páginas.
-- Se escribe un componente nuevo con datos remotos, formularios o HTML de contenido externo.
-- Hay síntomas: re-renders de más, parpadeos, datos desactualizados, bucles de `useEffect`, fallos de accesibilidad o de Lighthouse.
+- The user asks to review, harden or "apply good practices" to components, hooks or pages.
+- A new component is written with remote data, forms or HTML from external content.
+- There are symptoms: extra re-renders, flicker, stale data, `useEffect` loops, accessibility or Lighthouse failures.
 
-## 📋 Flujo de Trabajo Paso a Paso
+## 📋 Workflow
 
-### 1. Leer el contexto
+### 1. Read the context
 
-Identifica framework y versión (React 18/19, Next App Router o Pages, Vite…), librería de datos (TanStack Query, SWR, RTK Query), de formularios (React Hook Form, Zod…), de estilos y de tests. **Usa lo que el proyecto ya tiene**; no introduzcas librerías sin confirmar. Distingue componentes de servidor y de cliente si el framework los tiene.
+Identify the framework and version (React 18/19, Next App Router or Pages, Vite…), the data library (TanStack Query, SWR, RTK Query), the forms library (React Hook Form, Zod…), styling and tests. **Use what the project already has**; don't introduce libraries without confirming. Tell server and client components apart if the framework has them.
 
-### 2. Revisar por áreas, con la lista de comprobación
+### 2. Review by area, with the checklist
 
-| Área | Comprobaciones clave | Detalle |
+| Area | Key checks | Details |
 |---|---|---|
-| **Estado y efectos** | Estado derivado calculado en el render, no copiado con `useEffect`; efectos solo para sincronizar con sistemas externos; dependencias correctas; limpieza de suscripciones y peticiones; claves estables en listas | [react-state-effects](references/react-state-effects.md) |
-| **Datos remotos** | Estado de servidor separado del de UI; carga, error y vacío tratados; sin `fetch` en `useEffect` si hay librería de datos; cancelación o ignorar respuestas obsoletas | [react-state-effects](references/react-state-effects.md) |
-| **Formularios** | Validación en cliente **y** servidor; errores asociados a su campo; estado de envío y doble envío; no perder datos al fallar | [forms-and-data](references/forms-and-data.md) |
-| **Accesibilidad** | HTML semántico antes que ARIA; todo interactivo con teclado y foco visible; nombres accesibles; `alt`, etiquetas, contraste; foco tras diálogos y rutas | [accessibility](references/accessibility.md) |
-| **Rendimiento** | Medir antes de optimizar; no renderizar listas enormes sin virtualizar; imágenes dimensionadas y diferidas; código dividido por ruta; `memo`/`useMemo` solo con evidencia | [performance](references/performance.md) |
-| **Seguridad** | Sin HTML sin sanear (`dangerouslySetInnerHTML`); tokens fuera de `localStorage` si hay alternativa; sin secretos en el bundle; URLs de usuario validadas; enlaces `target=_blank` con `rel` | [security-frontend](references/security-frontend.md) |
+| **State and effects** | Derived state computed during render, not copied with `useEffect`; effects only to sync with external systems; correct dependencies; cleanup of subscriptions and requests; stable keys in lists | [react-state-effects](references/react-state-effects.md) |
+| **Remote data** | Server state separate from UI state; loading, error and empty handled; no `fetch` in `useEffect` if there is a data library; cancel or ignore stale responses | [react-state-effects](references/react-state-effects.md) |
+| **Forms** | Validation on the client **and** the server; errors tied to their field; submitting state and double submits; no data lost on failure | [forms-and-data](references/forms-and-data.md) |
+| **Accessibility** | Semantic HTML before ARIA; everything interactive works with the keyboard and has a visible focus; accessible names; `alt`, labels, contrast; focus after dialogs and route changes | [accessibility](references/accessibility.md) |
+| **Performance** | Measure before optimizing; don't render huge lists without virtualizing; sized and lazy images; code split by route; `memo`/`useMemo` only with evidence | [performance](references/performance.md) |
+| **Security** | No unsanitized HTML (`dangerouslySetInnerHTML`); tokens out of `localStorage` if there is an alternative; no secrets in the bundle; user URLs validated; `target=_blank` links with `rel` | [security-frontend](references/security-frontend.md) |
 
-Limítate a las áreas relevantes para el alcance pedido y a los archivos que se pidieron.
+Stick to the areas relevant to the requested scope and to the files that were requested.
 
-### 3. Priorizar
+### 3. Prioritize
 
-Clasifica cada hallazgo y ordénalos:
+Classify each finding and sort them:
 
-- **Crítico**: seguridad explotable (XSS), pérdida de datos, bloqueo de usuarios (teclado/lector de pantalla imposible).
-- **Importante**: bugs de estado o datos (carreras, estados sin manejar), problemas medibles de rendimiento, accesibilidad parcial.
-- **Menor**: consistencia, nombres, micro-optimizaciones. Menciónalos sin corregir si no se pidió.
+- **Critical**: exploitable security (XSS), data loss, users blocked (keyboard/screen reader impossible).
+- **Important**: state or data bugs (races, unhandled states), measurable performance problems, partial accessibility.
+- **Minor**: consistency, names, micro-optimizations. Mention them without fixing if they were not requested.
 
-### 4. Corregir con red de seguridad
+### 4. Fix with a safety net
 
-Con tests existentes, ejecútalos antes y después. Sin tests de la zona, describe el cambio de comportamiento esperado y, si es un bug, escribe primero un test que lo reproduzca (flujo de `tdd-workflow`). Un cambio por hallazgo; mantén props y exports públicos salvo que se pida lo contrario.
+With existing tests, run them before and after. Without tests for the area, describe the expected behavior change and, if it is a bug, first write a test that reproduces it (the `tdd-workflow` flow). One change per finding; keep public props and exports unless asked otherwise.
 
-### 5. Verificar y reportar
+### 5. Verify and report
 
-Ejecuta tests, typecheck y lint si existen. Para accesibilidad y rendimiento, indica qué **no pudiste verificar** sin navegador (lector de pantalla, Lighthouse, rendimiento real) y cómo comprobarlo. Reporta con el formato de abajo.
+Run tests, typecheck and lint if they exist. For accessibility and performance, state what you **could not verify** without a browser (screen reader, Lighthouse, real performance) and how to check it. Report using the format below.
 
-## 🚫 Cuándo NO sobre-optimizar
+## 🚫 When NOT to Over-Optimize
 
-- **`useMemo`/`useCallback`/`memo` en todas partes** sin un problema medido: añaden ruido y a veces coste.
-- **Reescribir un componente que funciona** para adoptar otra librería o estilo.
-- **Accesibilidad con ARIA añadida a mano** cuando un `<button>` o `<label>` lo resuelve.
-- **Componentes pequeños y correctos**: si no hay hallazgos reales, dilo; "sin cambios necesarios" es un resultado válido.
+- **`useMemo`/`useCallback`/`memo` everywhere** without a measured problem: they add noise and sometimes cost.
+- **Rewriting a component that works** to adopt another library or style.
+- **Accessibility with hand-added ARIA** when a `<button>` or `<label>` solves it.
+- **Small, correct components**: if there are no real findings, say so; "no changes needed" is a valid result.
 
-## ⚠️ Reglas Críticas
+## ⚠️ Critical Rules
 
-- **Evidencia primero**: cada hallazgo con `archivo:línea` y su efecto concreto; nada de "podría ser más limpio".
-- **Seguridad no se aplaza**: un `dangerouslySetInnerHTML` con datos no confiables se reporta como crítico aunque no lo hayan pedido; saneamiento con la librería que ya use el proyecto o, si no hay, propón una y pide confirmación.
-- **No cambies comportamiento visible** (textos, estilos, flujos) sin avisarlo.
-- **No inventes métricas**: no afirmes mejoras de rendimiento sin medirlas.
-- **No instales dependencias** sin confirmación.
-- **Respeta las convenciones del proyecto** (estilos, estructura, librerías) y las skills de arquitectura si están presentes.
-- **No toques lo que no se pidió**: lo demás va a "Fuera de alcance".
+- **Reply in the user's language**, even though this skill is written in English. Keep UI copy in the language the project already uses.
+- **Evidence first**: every finding with `file:line` and its concrete effect; no "could be cleaner".
+- **Security is never deferred**: a `dangerouslySetInnerHTML` with untrusted data is reported as critical even if it was not requested; sanitize with the library the project already uses or, if there is none, propose one and ask for confirmation.
+- **Do not change visible behavior** (copy, styles, flows) without saying so.
+- **Do not make up metrics**: don't claim performance improvements without measuring them.
+- **Do not install dependencies** without confirmation.
+- **Respect the project's conventions** (styles, structure, libraries) and the architecture skills if they are present.
+- **Do not touch what was not requested**: everything else goes under "Out of scope".
 
-## 📤 Reporte
+## 📤 Report
 
 ```markdown
-### Resumen
-<estado general y los 1–3 hallazgos de más impacto>
+### Summary
+<overall state and the 1–3 highest-impact findings>
 
-### Hallazgos
-| # | Severidad | Área | Ubicación | Problema y efecto | Acción |
+### Findings
+| # | Severity | Area | Location | Problem and effect | Action |
 |---|---|---|---|---|---|
-| 1 | Crítico | Seguridad | UserCard.tsx:42 | `dangerouslySetInnerHTML` con `bio` del usuario: XSS almacenado | Corregido (sanear / renderizar texto) |
-| 2 | Importante | Datos | UserList.tsx:15 | `fetch` en efecto sin cancelación: respuesta antigua pisa la nueva | Corregido |
-| 3 | Menor | Estilo | — | Nombres inconsistentes | Solo mencionado |
+| 1 | Critical | Security | UserCard.tsx:42 | `dangerouslySetInnerHTML` with the user's `bio`: stored XSS | Fixed (sanitize / render as text) |
+| 2 | Important | Data | UserList.tsx:15 | `fetch` in an effect without cancellation: an old response overwrites the new one | Fixed |
+| 3 | Minor | Style | — | Inconsistent names | Mentioned only |
 
-### Cambios aplicados
-1. <cambio> — tests: ✅ N/N
+### Changes applied
+1. <change> — tests: ✅ N/N
 
-### No verificado / fuera de alcance
-- <qué requiere navegador, medición o decisión del usuario>
+### Not verified / out of scope
+- <what needs a browser, a measurement or a user decision>
 ```
 
-## 📚 Referencias
+## 📚 References
 
-- [Estado, efectos y datos remotos](references/react-state-effects.md)
-- [Formularios y validación](references/forms-and-data.md)
-- [Accesibilidad](references/accessibility.md)
-- [Rendimiento](references/performance.md)
-- [Seguridad en el frontend](references/security-frontend.md)
-- [Ejemplo de revisión completa](examples/review-user-list.md)
+- [State, effects and remote data](references/react-state-effects.md)
+- [Forms and validation](references/forms-and-data.md)
+- [Accessibility](references/accessibility.md)
+- [Performance](references/performance.md)
+- [Frontend security](references/security-frontend.md)
+- [Full review example](examples/review-user-list.md)

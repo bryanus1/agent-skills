@@ -1,26 +1,26 @@
-# Patrones estructurales
+# Structural Patterns
 
-## Contenido
+## Contents
 
-1. [Adapter (puerto y adaptador)](#adapter-puerto-y-adaptador)
+1. [Adapter (port and adapter)](#adapter-port-and-adapter)
 2. [Decorator](#decorator)
 3. [Facade](#facade)
 
-## Adapter (puerto y adaptador)
+## Adapter (port and adapter)
 
-**Problema:** el código de negocio depende de la forma de un SDK, API o librería de terceros; cambiar de proveedor o probar sin red obliga a editar la lógica.
+**Problem:** the business code depends on the shape of a third-party SDK, API or library; switching vendors or testing without the network forces you to edit the logic.
 
-**Cuándo sí:** integraciones externas (pagos, correo, almacenamiento, IA, APIs de terceros), formatos de datos de otro sistema que no quieres propagar.
+**When yes:** external integrations (payments, email, storage, AI, third-party APIs), data formats from another system that you don't want to spread.
 
-**Cuándo no:** librerías estables y de utilidad (`lodash`, `date-fns`) que no justifican un envoltorio.
+**When not:** stable utility libraries (`lodash`, `date-fns`) that don't justify a wrapper.
 
 ```ts
-// Puerto: lo define el dominio, con su lenguaje
+// Port: defined by the domain, in its own language
 export interface EmailSender {
   send(input: { to: string; subject: string; html: string }): Promise<void>;
 }
 
-// Adaptador: traduce al SDK concreto
+// Adapter: translates to the concrete SDK
 export class SendGridEmailSender implements EmailSender {
   constructor(private readonly client: MailService) {}
   async send({ to, subject, html }: { to: string; subject: string; html: string }) {
@@ -29,15 +29,15 @@ export class SendGridEmailSender implements EmailSender {
 }
 ```
 
-Reglas: la interfaz habla el idioma del negocio, **no copia la API del SDK**; el adaptador es el único archivo que importa el SDK; los errores del SDK se traducen a errores del dominio. Es la base de DIP (ver `solid-principles`).
+Rules: the interface speaks the business language and **does not copy the SDK's API**; the adapter is the only file that imports the SDK; SDK errors are translated into domain errors. It is the basis of DIP (see `solid-principles`).
 
-**Adaptador de datos (anticorruption layer):** convierte la respuesta de una API externa al modelo de tu dominio en un único sitio (`toUser(dto)`), para que el resto no dependa de nombres de campo ajenos.
+**Data adapter (anticorruption layer):** converts an external API's response into your domain model in a single place (`toUser(dto)`), so the rest of the code does not depend on foreign field names.
 
 ## Decorator
 
-**Problema:** añadir un comportamiento transversal (caché, logs, métricas, reintentos, autorización) sin modificar ni heredar del original.
+**Problem:** add cross-cutting behavior (cache, logs, metrics, retries, authorization) without modifying or inheriting from the original.
 
-**En TS/JS casi siempre es una función de orden superior o un objeto que envuelve a otro con la misma interfaz.**
+**In TS/JS it is almost always a higher-order function or an object that wraps another with the same interface.**
 
 ```ts
 interface UserRepository { findById(id: string): Promise<User | null>; }
@@ -51,10 +51,10 @@ class CachedUserRepository implements UserRepository {
   }
 }
 
-// composición: new CachedUserRepository(new PgUserRepository(db))
+// composition: new CachedUserRepository(new PgUserRepository(db))
 ```
 
-Versión funcional:
+Functional version:
 
 ```ts
 const withRetry = <A extends unknown[], R>(fn: (...a: A) => Promise<R>, retries = 2) =>
@@ -65,13 +65,13 @@ const withRetry = <A extends unknown[], R>(fn: (...a: A) => Promise<R>, retries 
   };
 ```
 
-**Variantes que ya son Decorator:** middleware de Express/Koa/Nest (guards, interceptors), HOCs y wrappers de React, `withAuth(handler)`. **Evita** apilar más de 3 decoradores sin tests de la composición (el orden importa: ¿reintento dentro o fuera de la caché?).
+**Variants that already are Decorators:** Express/Koa/Nest middleware (guards, interceptors), React HOCs and wrappers, `withAuth(handler)`. **Avoid** stacking more than 3 decorators without tests of the composition (order matters: retry inside or outside the cache?).
 
 ## Facade
 
-**Problema:** un subsistema con muchas piezas obliga al cliente a conocer el orden y los detalles de cada una.
+**Problem:** a subsystem with many pieces forces the client to know the order and the details of each one.
 
-**Cuándo sí:** un caso de uso que coordina 3+ servicios y se repite en varios sitios; una API simple sobre una librería compleja.
+**When yes:** a use case that coordinates 3+ services and is repeated in several places; a simple API over a complex library.
 
 ```ts
 export class CheckoutFacade {
@@ -85,4 +85,4 @@ export class CheckoutFacade {
 }
 ```
 
-**Cuándo no:** si solo reenvía llamadas sin simplificar (capa vacía), o si se convierte en un "dios" que acumula lógica de negocio: la fachada **orquesta**, no decide.
+**When not:** if it only forwards calls without simplifying (an empty layer), or if it becomes a "god" that piles up business logic: the facade **orchestrates**, it does not decide.

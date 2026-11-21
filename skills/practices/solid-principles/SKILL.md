@@ -1,19 +1,21 @@
 ---
 name: solid-principles
-version: 1.0.0
+version: 1.1.0
 description: >-
-  Aplica y revisa los principios SOLID (SRP, OCP, LSP, ISP, DIP) a nivel de clase, módulo y componente, en backend y frontend: detecta violaciones, refactoriza con tests y decide cuándo NO aplicarlos. Úsala al diseñar o revisar clases, servicios, hooks o componentes con demasiadas responsabilidades o acoplamiento.
+  Apply and review the SOLID principles (SRP, OCP, LSP, ISP, DIP) at the class, module and component level, in backend and frontend: detect violations, refactor with tests and decide when NOT to apply them. Use it when designing or reviewing classes, services, hooks or components with too many responsibilities or too much coupling.
 tags: [solid, srp, ocp, lsp, isp, dip, design, refactoring, best-practices]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
   - solid
   - principios solid
+  - solid principles
   - single responsibility
   - responsabilidad única
   - open closed
   - inversión de dependencias
   - dependency inversion
   - esta clase hace demasiado
+  - this class does too much
   - este servicio tiene demasiadas responsabilidades
   - refactor to solid
 requirements:
@@ -22,109 +24,110 @@ requirements:
 
 # SOLID Principles
 
-## 🎯 Propósito
+## 🎯 Purpose
 
-Aplicar SOLID como **herramienta de diagnóstico y de decisión**, no como ritual. Cada principio responde a un dolor concreto (cambios que se propagan, tests imposibles, extensiones que obligan a editar código existente). Si ese dolor no existe, aplicar el principio solo añade capas.
+Apply SOLID as a **diagnosis and decision tool**, not as a ritual. Each principle answers a concrete pain (changes that ripple, impossible tests, extensions that force you to edit existing code). If that pain does not exist, applying the principle only adds layers.
 
-Esta skill opera a nivel de **clase, módulo y componente**. Para legibilidad dentro de una función usa `clean-code`; para elegir un patrón concreto (Strategy, Adapter, Repository…) usa `design-patterns`; para la estructura de carpetas del proyecto, las skills de arquitectura.
+This skill works at the **class, module and component** level. For readability inside a function use `clean-code`; to choose a specific pattern (Strategy, Adapter, Repository…) use `design-patterns`; for the project's folder structure, the architecture skills.
 
-## ⚡ Cuándo Activar esta Skill
+## ⚡ When to Trigger
 
-- El usuario menciona SOLID o uno de sus principios, o pide "aplicar principios de diseño".
-- Una clase, servicio, hook o componente "hace demasiado", es difícil de testear o cambia por motivos no relacionados.
-- Añadir una variante (otro método de pago, otro proveedor, otro tipo de usuario) obliga a editar un `if`/`switch` en varios sitios.
-- Se revisa código nuevo con dependencias creadas dentro de la clase (`new Stripe()`, `fetch` directo en la lógica de negocio).
+- The user mentions SOLID or one of its principles, or asks to "apply design principles".
+- A class, service, hook or component "does too much", is hard to test or changes for unrelated reasons.
+- Adding a variant (another payment method, another provider, another user type) forces you to edit an `if`/`switch` in several places.
+- New code is being reviewed with dependencies created inside the class (`new Stripe()`, direct `fetch` in the business logic).
 
-## 📋 Flujo de Trabajo Paso a Paso
+## 📋 Workflow
 
-### 1. Delimitar y leer
+### 1. Set the scope and read
 
-Identifica el alcance (un archivo, un módulo, un componente). Lee el código y sus tests, y las convenciones del proyecto: cómo inyecta dependencias, si usa contenedor DI (NestJS, Angular, tsyringe) o composición manual, estilo funcional o de clases. **Las convenciones del proyecto ganan**: en React o en código funcional, los principios se expresan con funciones, hooks y composición, no con jerarquías de clases.
+Identify the scope (a file, a module, a component). Read the code and its tests, and the project's conventions: how it injects dependencies, whether it uses a DI container (NestJS, Angular, tsyringe) or manual composition, functional or class style. **The project's conventions win**: in React or functional code, the principles are expressed with functions, hooks and composition, not with class hierarchies.
 
-### 2. Diagnosticar por señales, no por etiquetas
+### 2. Diagnose by signals, not by labels
 
-Recorre la tabla y anota solo lo que encuentres con evidencia concreta (`archivo:línea`).
+Go through the table and note only what you find with concrete evidence (`file:line`).
 
-| Principio | Señal de violación | Pregunta de diagnóstico |
+| Principle | Violation signal | Diagnostic question |
 |---|---|---|
-| **SRP** | Descripción con "y" (`valida Y guarda Y envía email`); imports de capas distintas (HTTP, SQL, SDK de terceros); el archivo cambia por motivos ajenos entre sí | ¿Cuántas razones (actores o decisiones) tienen para cambiar esta unidad? |
-| **OCP** | `switch`/`if` sobre un tipo repetido en varios sitios; añadir una variante obliga a editar código estable | ¿Puedo añadir un caso nuevo sin tocar lo existente? |
-| **LSP** | Subclase que lanza `NotImplemented`, que ignora un método o que endurece precondiciones; `instanceof` en el código cliente | ¿Funciona el cliente igual con cualquier implementación? |
-| **ISP** | Interfaz o props con muchos miembros de los que cada cliente usa pocos; mocks enormes en tests; métodos que lanzan "no soportado" | ¿Depende cada cliente solo de lo que usa? |
-| **DIP** | `new` de infraestructura dentro de la lógica de negocio; el dominio importa del ORM, del SDK o de `process.env` | ¿La regla de negocio puede probarse sin red ni BD? |
+| **SRP** | A description with "and" (`validates AND saves AND sends email`); imports from different layers (HTTP, SQL, third-party SDK); the file changes for reasons unrelated to each other | How many reasons (actors or decisions) does this unit have to change? |
+| **OCP** | A `switch`/`if` on a type repeated in several places; adding a variant forces you to edit stable code | Can I add a new case without touching the existing ones? |
+| **LSP** | A subclass that throws `NotImplemented`, ignores a method or tightens preconditions; `instanceof` in the client code | Does the client work the same with any implementation? |
+| **ISP** | An interface or props with many members, of which each client uses few; huge mocks in tests; methods that throw "not supported" | Does each client depend only on what it uses? |
+| **DIP** | `new` of infrastructure inside the business logic; the domain imports from the ORM, the SDK or `process.env` | Can the business rule be tested without the network or a DB? |
 
-Detalles, ejemplos de backend y frontend y refactors por principio: [SRP](references/srp.md), [OCP](references/ocp.md), [LSP](references/lsp.md), [ISP](references/isp.md), [DIP](references/dip.md).
+Details, backend and frontend examples and refactors per principle: [SRP](references/srp.md), [OCP](references/ocp.md), [LSP](references/lsp.md), [ISP](references/isp.md), [DIP](references/dip.md).
 
-### 3. Decidir si merece la pena (obligatorio)
+### 3. Decide whether it is worth it (mandatory)
 
-Para cada violación, antes de tocar nada, responde:
+For each violation, before touching anything, answer:
 
-1. **¿Duele hoy?** ¿Cambios que se propagan, bugs repetidos, tests imposibles, conflictos de merge constantes? Si no, y no hay una segunda variante a la vista, **no apliques el principio**; anótalo como observación.
-2. **¿Cuántas variantes reales hay?** Una sola implementación no justifica una interfaz. Con dos, considera abstraer; con tres, abstrae (regla de tres).
-3. **¿Cuál es la solución más simple?** Muchas veces basta extraer una función o mover un parámetro; una jerarquía de clases es el último recurso.
-4. **¿Qué coste añade?** Más archivos, más indirección, más cosas que leer. Debe pagar por sí mismo.
+1. **Does it hurt today?** Changes that ripple, repeated bugs, impossible tests, constant merge conflicts? If not, and there is no second variant in sight, **don't apply the principle**; note it as an observation.
+2. **How many real variants are there?** A single implementation does not justify an interface. With two, consider abstracting; with three, abstract (rule of three).
+3. **What is the simplest solution?** Often extracting a function or moving a parameter is enough; a class hierarchy is the last resort.
+4. **What cost does it add?** More files, more indirection, more to read. It must pay for itself.
 
-Resume la decisión: **Aplicar**, **Aplazar** (esperar a la segunda variante) o **No aplicar** (con la razón).
+Summarize the decision: **Apply**, **Defer** (wait for the second variant) or **Don't apply** (with the reason).
 
-### 4. Red de seguridad
+### 4. Safety net
 
-Un refactor de diseño cambia la estructura, no el comportamiento. Ejecuta los tests existentes y anota el estado de partida. Si no cubren el código afectado, escribe tests de caracterización antes (si la skill `tdd-workflow` está disponible, sigue su Flujo C). Sin tests, limita el cambio a movimientos mecánicos y avisa del riesgo.
+A design refactor changes the structure, not the behavior. Run the existing tests and note the starting state. If they don't cover the affected code, write characterization tests first (if the `tdd-workflow` skill is available, follow its Flow C). Without tests, limit the change to mechanical moves and warn about the risk.
 
-### 5. Refactorizar en pasos pequeños
+### 5. Refactor in small steps
 
-- Un principio y una violación cada vez; tests entre pasos.
-- Empieza por el cambio que más aísla: normalmente **extraer una dependencia detrás de una interfaz pequeña** (DIP + ISP) o **extraer una responsabilidad** (SRP).
-- Mantén la API pública (exports, firmas, rutas, props) salvo que el usuario lo pida; si un cambio la rompe, avísalo antes.
-- Las interfaces las define **el consumidor** y con lo que necesita, no copiando la API de la implementación.
-- La composición se concentra en un punto (la raíz de la aplicación, el módulo de DI, el proveedor de contexto), no se reparte por el código.
+- One principle and one violation at a time; tests between steps.
+- Start with the change that isolates the most: usually **extracting a dependency behind a small interface** (DIP + ISP) or **extracting a responsibility** (SRP).
+- Keep the public API (exports, signatures, routes, props) unless the user asks otherwise; if a change breaks it, say so first.
+- Interfaces are defined by **the consumer**, with what it needs, not by copying the implementation's API.
+- Composition lives in one place (the application root, the DI module, the context provider), not scattered through the code.
 
-### 6. Verificar y reportar
+### 6. Verify and report
 
-Ejecuta tests, typecheck y lint si el proyecto los tiene. Reporta con el formato de la sección "Reporte" e incluye también las decisiones de **No aplicar** y **Aplazar**: son parte del valor de la revisión.
+Run tests, typecheck and lint if the project has them. Report using the format in the "Report" section, and include the **Don't apply** and **Defer** decisions too: they are part of the review's value.
 
-## 🚫 Cuándo NO aplicar SOLID
+## 🚫 When NOT to Apply SOLID
 
-- **Una sola implementación sin razón para variar**: `interface PaymentGateway` con una única clase `StripeGateway` y sin segundo proveedor en el horizonte es ruido, salvo que la interfaz sea la costura necesaria para testear.
-- **Scripts, prototipos y código de usar y tirar.**
-- **Funciones puras pequeñas**: ya cumplen SRP y DIP por construcción.
-- **Cuando el framework ya impone la forma** (un controlador de Nest, una página de Next): no luches contra la convención para satisfacer un principio.
-- **Para reducir líneas**: SOLID suele aumentar el número de archivos; si el único objetivo es "menos código", usa `clean-code`.
+- **A single implementation with no reason to vary**: `interface PaymentGateway` with a single `StripeGateway` class and no second provider on the horizon is noise, unless the interface is the seam needed for testing.
+- **Scripts, prototypes and throwaway code.**
+- **Small pure functions**: they already satisfy SRP and DIP by construction.
+- **When the framework already dictates the shape** (a Nest controller, a Next page): don't fight the convention to satisfy a principle.
+- **To reduce lines**: SOLID usually increases the number of files; if the only goal is "less code", use `clean-code`.
 
-## ⚠️ Reglas Críticas
+## ⚠️ Critical Rules
 
-- **No añadas abstracciones sin una razón concreta** (variación real, costura de test o un dolor demostrable). Cita la razón en el reporte.
-- **Refactorizar no cambia el comportamiento.** Sin tests que lo respalden, no lo afirmes; ejecuta los tests antes y después e informa del resultado real.
-- **No cambies la API pública sin avisar** y sin confirmación.
-- **No fuerces jerarquías de clases en código funcional** (React, hooks, módulos de funciones): usa composición y funciones.
-- **No instales dependencias** (contenedores DI, librerías) sin confirmación; la inyección por constructor o por parámetro basta casi siempre.
-- **No toques lo que no se pidió**: lo demás va a "Fuera de alcance".
-- **Los principios se justifican por su efecto**, no por su nombre. "Esto viola SRP" no es un hallazgo; "este archivo cambia por tres motivos distintos, ver commits X e Y" sí lo es.
+- **Reply in the user's language**, even though this skill is written in English.
+- **Do not add abstractions without a concrete reason** (real variation, a test seam or a demonstrable pain). Cite the reason in the report.
+- **Refactoring does not change behavior.** Without tests to back it, don't claim it; run the tests before and after and report the real result.
+- **Do not change the public API without warning** and without confirmation.
+- **Do not force class hierarchies into functional code** (React, hooks, function modules): use composition and functions.
+- **Do not install dependencies** (DI containers, libraries) without confirmation; constructor or parameter injection is almost always enough.
+- **Do not touch what was not requested**: everything else goes under "Out of scope".
+- **Principles are justified by their effect**, not by their name. "This violates SRP" is not a finding; "this file changes for three different reasons, see commits X and Y" is.
 
-## 📤 Reporte
+## 📤 Report
 
 ```markdown
-### Resumen
-<1–2 frases: estado del diseño y las 1–3 violaciones de más impacto>
+### Summary
+<1–2 sentences: state of the design and the 1–3 highest-impact violations>
 
-### Diagnóstico
-| Principio | Ubicación | Evidencia | ¿Duele hoy? | Decisión |
+### Diagnosis
+| Principle | Location | Evidence | Hurts today? | Decision |
 |---|---|---|---|---|
-| SRP | src/orders/order.service.ts:12-90 | Valida, calcula impuestos, persiste y envía email; cambió por 3 motivos en 3 commits | Sí | Aplicar |
-| DIP | src/orders/order.service.ts:8 | `new SmtpMailer()` dentro del servicio; el test envía correos reales | Sí | Aplicar |
-| OCP | src/pricing.ts:30 | `switch (tier)` solo en un sitio, 3 casos estables | No | No aplicar |
+| SRP | src/orders/order.service.ts:12-90 | Validates, computes taxes, persists and sends email; changed for 3 reasons in 3 commits | Yes | Apply |
+| DIP | src/orders/order.service.ts:8 | `new SmtpMailer()` inside the service; the test sends real emails | Yes | Apply |
+| OCP | src/pricing.ts:30 | `switch (tier)` in a single place, 3 stable cases | No | Don't apply |
 
-### Cambios aplicados
+### Changes applied
 1. <refactor> — tests: ✅ N/N
 
-### Aplazado / fuera de alcance
-- <qué esperar a que exista una segunda variante, bugs vistos, decisiones para el usuario>
+### Deferred / out of scope
+- <what to wait on until a second variant exists, bugs seen, decisions for the user>
 ```
 
-## 📚 Referencias
+## 📚 References
 
-- [SRP: responsabilidad única](references/srp.md)
-- [OCP: abierto/cerrado](references/ocp.md)
-- [LSP: sustitución de Liskov](references/lsp.md)
-- [ISP: segregación de interfaces](references/isp.md)
-- [DIP: inversión de dependencias](references/dip.md)
-- [Ejemplo completo: servicio de pedidos](examples/order-service.md)
+- [SRP: single responsibility](references/srp.md)
+- [OCP: open/closed](references/ocp.md)
+- [LSP: Liskov substitution](references/lsp.md)
+- [ISP: interface segregation](references/isp.md)
+- [DIP: dependency inversion](references/dip.md)
+- [Full example: order service](examples/order-service.md)

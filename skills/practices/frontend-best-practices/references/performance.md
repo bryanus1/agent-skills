@@ -1,23 +1,23 @@
-# Rendimiento
+# Performance
 
-**Mide primero.** Sin una métrica o un perfil, una optimización es una hipótesis. Herramientas: React DevTools Profiler, Lighthouse, WebPageTest, `web-vitals` en producción. Métricas clave: **LCP** (< 2,5 s), **INP** (< 200 ms), **CLS** (< 0,1).
+**Measure first.** Without a metric or a profile, an optimization is a hypothesis. Tools: React DevTools Profiler, Lighthouse, WebPageTest, `web-vitals` in production. Key metrics: **LCP** (< 2.5 s), **INP** (< 200 ms), **CLS** (< 0.1).
 
-## Carga (lo que suele pesar más)
+## Loading (usually the heaviest part)
 
-- **Imágenes**: formato moderno (WebP/AVIF), tamaños responsivos (`srcset`/`sizes` o el componente de imagen del framework), `width`/`height` para evitar saltos de diseño, `loading="lazy"` fuera de pantalla y prioridad solo a la imagen principal (LCP).
-- **JavaScript**: dividir por ruta y cargar bajo demanda lo pesado (editores, gráficos, mapas) con `import()`/`lazy`; revisar el bundle (analizador) antes de añadir librerías grandes; importar solo lo que se usa (evita `import _ from 'lodash'`).
-- **Fuentes**: `font-display: swap`, subconjunto de caracteres, precarga de la fuente crítica.
-- **Datos**: no pedir más de lo que se muestra; paginar; cachear; en SSR, evitar cascadas de peticiones secuenciales (lanzarlas en paralelo).
-- **Terceros** (analítica, chats): cargarlos diferidos; cada uno cuesta.
+- **Images**: modern format (WebP/AVIF), responsive sizes (`srcset`/`sizes` or the framework's image component), `width`/`height` to avoid layout shifts, `loading="lazy"` off-screen and priority only for the main image (LCP).
+- **JavaScript**: split by route and load heavy pieces on demand (editors, charts, maps) with `import()`/`lazy`; check the bundle (an analyzer) before adding large libraries; import only what you use (avoid `import _ from 'lodash'`).
+- **Fonts**: `font-display: swap`, character subsets, preload the critical font.
+- **Data**: don't request more than you show; paginate; cache; in SSR, avoid waterfalls of sequential requests (run them in parallel).
+- **Third parties** (analytics, chats): load them deferred; each one costs.
 
-## Renderizado
+## Rendering
 
-- **Listas largas** (cientos+): paginación o virtualización (TanStack Virtual, react-window).
-- **Renders innecesarios**: primero corrige la causa (estado demasiado alto, valores recreados que se pasan a hijos memoizados, contexto con un valor que cambia siempre). Solo entonces `memo`, `useMemo`, `useCallback`, y comprueba con el Profiler que mejoró.
-- **Trabajo costoso** en el hilo principal (ordenar, filtrar miles de elementos, parsear): `useDeferredValue`/`startTransition` para mantener la entrada fluida, o mover a un Web Worker.
-- **Inputs con búsqueda**: debounce de las peticiones, no del estado del input.
-- **Layout**: evita leer y escribir el DOM alternadamente (layout thrashing); anima `transform`/`opacity`, no `width`/`top`.
+- **Long lists** (hundreds+): pagination or virtualization (TanStack Virtual, react-window).
+- **Unnecessary renders**: fix the cause first (state held too high, values recreated and passed to memoized children, a context with a value that always changes). Only then `memo`, `useMemo`, `useCallback`, and check with the Profiler that it improved.
+- **Expensive work** on the main thread (sorting, filtering thousands of items, parsing): `useDeferredValue`/`startTransition` to keep input smooth, or move it to a Web Worker.
+- **Search inputs**: debounce the requests, not the input state.
+- **Layout**: avoid alternating DOM reads and writes (layout thrashing); animate `transform`/`opacity`, not `width`/`top`.
 
-## Cuándo no optimizar
+## When not to optimize
 
-Componentes que renderizan en menos de unos milisegundos, pantallas con pocos elementos, código que se ejecuta una vez. La complejidad de memoización mal mantenida suele costar más que lo que ahorra.
+Components that render in under a few milliseconds, screens with few elements, code that runs once. Poorly maintained memoization usually costs more than it saves.

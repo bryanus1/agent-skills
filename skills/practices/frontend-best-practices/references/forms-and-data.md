@@ -1,18 +1,18 @@
-# Formularios y validación
+# Forms and Validation
 
-## Comprobaciones
+## Checks
 
-- **Validar en cliente y en servidor.** La validación del cliente es ergonomía; la del servidor es seguridad. Comparte el esquema (Zod) si el stack lo permite.
-- **Errores junto a su campo**, asociados con `aria-describedby` y `aria-invalid`, con texto que diga cómo corregir; no solo cambiar el color del borde.
-- **Estado de envío**: deshabilita o ignora el segundo envío mientras la petición está en curso; muestra progreso.
-- **No pierdas lo que escribió el usuario** si el envío falla; conserva los valores y muestra el error.
-- **Etiquetas visibles** (`<label htmlFor>`), tipos y `autocomplete` correctos (`type="email"`, `autocomplete="email"`), `inputMode` en móviles.
-- **Éxito y error del servidor** comunicados (mensaje, foco), no solo con un toast que desaparece.
-- Evita validar en cada pulsación campos que el usuario aún está escribiendo; valida al salir del campo y al enviar, y revalida en vivo después de un error.
+- **Validate on the client and on the server.** Client validation is ergonomics; server validation is security. Share the schema (Zod) if the stack allows it.
+- **Errors next to their field**, linked with `aria-describedby` and `aria-invalid`, with text that says how to fix it; not just a change in border color.
+- **Submitting state**: disable or ignore the second submit while the request is in flight; show progress.
+- **Don't lose what the user typed** if the submit fails; keep the values and show the error.
+- **Visible labels** (`<label htmlFor>`), correct types and `autocomplete` (`type="email"`, `autocomplete="email"`), `inputMode` on mobile.
+- **Server success and errors** communicated (a message, focus), not only with a toast that disappears.
+- Avoid validating on every keystroke fields the user is still typing; validate on blur and on submit, and revalidate live after an error.
 
-## Controlado vs no controlado
+## Controlled vs uncontrolled
 
-Con muchos campos, prefiere la librería del proyecto (React Hook Form) o formularios no controlados con `FormData` antes que un `useState` por campo con renders en cada tecla.
+With many fields, prefer the project's library (React Hook Form) or uncontrolled forms with `FormData` over a `useState` per field with a render on every key.
 
 ```tsx
 async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -25,6 +25,6 @@ async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
 }
 ```
 
-## Subidas y datos sensibles
+## Uploads and sensitive data
 
-Valida tipo y tamaño de archivo antes de subir (y de nuevo en el servidor). No registres en consola ni en analítica valores de campos sensibles (contraseñas, tarjetas).
+Validate file type and size before uploading (and again on the server). Don't log sensitive field values (passwords, cards) to the console or analytics.

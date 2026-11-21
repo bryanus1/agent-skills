@@ -1,17 +1,20 @@
 ---
 name: code-quality-review
-version: 1.0.0
+version: 1.1.0
 description: >-
-  Revisión de calidad de un cambio (rama, PR o rutas) que orquesta las skills de practices: delimita el alcance, elige las lentes según lo que cambió (clean-code, SOLID, patrones, TDD, frontend, backend) y entrega un único informe priorizado y sin duplicados. Por defecto solo revisa; no modifica.
+  Quality review of a change (branch, PR or paths) that orchestrates the practices skills: it sets the scope, picks the lenses that fit what changed (clean-code, SOLID, patterns, TDD, frontend, backend) and delivers a single prioritized, deduplicated report. Review only by default; it does not modify code.
 tags: [code-review, quality, review, orchestrator, best-practices]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
   - revisa mi código
+  - review my code
   - revisión de calidad
   - code quality review
   - review this branch
   - revisa este pr
+  - review this pr
   - antes de abrir el pr
+  - before opening the pr
   - revisión completa del cambio
   - quality review
 requirements:
@@ -22,130 +25,131 @@ requirements:
 
 # Code Quality Review
 
-## 🎯 Propósito
+## 🎯 Purpose
 
-Dar **una sola revisión coherente** de un cambio, aplicando solo las lentes que corresponden a lo que se tocó y sin repetir el mismo hallazgo desde tres ángulos. Esta skill no añade criterios propios: **decide qué lentes usar, en qué orden, y fusiona sus resultados** en un informe priorizado.
+Give **one coherent review** of a change, applying only the lenses that fit what was touched and without repeating the same finding from three angles. This skill adds no criteria of its own: **it decides which lenses to use, in what order, and merges their results** into a prioritized report.
 
-Es de **solo lectura por defecto**. Corrige únicamente si el usuario lo pide, y entonces delega la corrección en la skill dueña del hallazgo (con sus tests y su reporte).
+It is **read-only by default**. It fixes things only if the user asks, and then it delegates the fix to the skill that owns the finding (with its tests and its report).
 
-Las lentes son las skills hermanas de `practices`. Si alguna no está instalada, sigue con las demás y dilo en el informe.
+The lenses are the sibling skills in `practices`. If one is not installed, carry on with the rest and say so in the report.
 
-## ⚡ Cuándo Activar esta Skill
+## ⚡ When to Trigger
 
-- "Revisa mi rama / mi PR / estos archivos" o "antes de abrir el PR".
-- Se pide una revisión general sin decir qué aspecto (limpieza, diseño, seguridad…).
-- Quieres un informe único en lugar de invocar cada skill por separado.
+- "Review my branch / my PR / these files" or "before opening the PR".
+- A general review is requested without naming an aspect (cleanliness, design, security…).
+- You want a single report instead of invoking each skill separately.
 
-**No la uses** si el usuario pide un aspecto concreto ("¿cumple SOLID?", "¿es seguro este endpoint?"): activa directamente esa skill.
+**Do not use it** if the user asks about one specific aspect ("does it follow SOLID?", "is this endpoint secure?"): trigger that skill directly.
 
-## 📋 Flujo de Trabajo Paso a Paso
+## 📋 Workflow
 
-### 1. Delimitar el alcance
+### 1. Set the scope
 
 ```bash
-node <skill-dir>/scripts/collect-scope.mjs                 # rama actual contra main/master/develop + cambios sin commitear
-node <skill-dir>/scripts/collect-scope.mjs --working       # solo lo que aún no está commiteado
+node <skill-dir>/scripts/collect-scope.mjs                 # current branch vs main/master/develop + uncommitted changes
+node <skill-dir>/scripts/collect-scope.mjs --working       # only what is not committed yet
 node <skill-dir>/scripts/collect-scope.mjs --base origin/main --json
-node <skill-dir>/scripts/collect-scope.mjs -- src/orders   # sin git: clasifica las rutas indicadas
+node <skill-dir>/scripts/collect-scope.mjs -- src/orders   # without git: classifies the given paths
 ```
 
-El script (solo lectura) lista los archivos por área, las líneas cambiadas, las lentes recomendadas y avisos (código sin tests, cambio enorme). Confirma el alcance con lo que pidió el usuario; **no revises archivos fuera de él**. Si el script no detecta cambios (por ejemplo, los archivos están ignorados por git o el directorio no es el repositorio del cambio) pero el usuario indicó archivos o rutas, trabaja con esas rutas tal cual y dilo en el informe. Si el cambio supera ~800 líneas, propón revisarlo por áreas.
+The script (read-only) lists the files by area, the changed lines, the recommended lenses and warnings (code without tests, a huge change). Check the scope against what the user asked; **do not review files outside it**. If the script detects no changes (for example, the files are git-ignored or the directory is not the change's repository) but the user named files or paths, work with those paths as given and say so in the report. If the change goes over ~800 lines, propose reviewing it by area.
 
-### 2. Elegir las lentes
+### 2. Pick the lenses
 
-Usa la tabla de [lens-routing](references/lens-routing.md). Resumen:
+Use the [lens-routing](references/lens-routing.md) table. Summary:
 
-| Si el cambio… | Lente |
+| If the change… | Lens |
 |---|---|
-| toca código fuente | `clean-code` (siempre) |
-| toca interfaz (componentes, hooks, páginas, estilos) | `frontend-best-practices` |
-| toca endpoints, servicios, consultas o migraciones | `backend-best-practices` |
-| añade o cambia varias clases/módulos/dependencias | `solid-principles` |
-| introduce una variante, integración o patrón (o lo necesita) | `design-patterns` |
-| cambia comportamiento | `tdd-workflow` (¿hay tests que lo cubran?) |
+| touches source code | `clean-code` (always) |
+| touches the UI (components, hooks, pages, styles) | `frontend-best-practices` |
+| touches endpoints, services, queries or migrations | `backend-best-practices` |
+| adds or changes several classes/modules/dependencies | `solid-principles` |
+| introduces a variant, integration or pattern (or needs one) | `design-patterns` |
+| changes behavior | `tdd-workflow` (are there tests that cover it?) |
 
-No apliques una lente "por completitud": cada una que se añade debe estar justificada por algo del cambio.
+Do not apply a lens "for completeness": every lens you add must be justified by something in the change.
 
-### 3. Recoger evidencia objetiva primero
+### 3. Gather objective evidence first
 
-Antes de opinar, ejecuta lo que el proyecto ya tiene (solo lectura sobre el código):
+Before giving opinions, run what the project already has (read-only on the code):
 
-- Tests: usa `node <skill-dir>/../tdd-workflow/scripts/detect-test-runner.mjs` para saber el comando y ejecútalo. Anota el resultado real; si fallan o no se pueden ejecutar, es un hallazgo.
-- Typecheck y lint si existen.
-- Señales de limpieza: `node <skill-dir>/../clean-code/scripts/detect-smells.mjs <archivos del alcance>`. Son pistas heurísticas, no veredictos.
+- Tests: use `node <skill-dir>/../tdd-workflow/scripts/detect-test-runner.mjs` to find the command, then run it. Note the real result; if tests fail or cannot run, that is a finding.
+- Typecheck and lint if they exist.
+- Cleanliness signals: `node <skill-dir>/../clean-code/scripts/detect-smells.mjs <files in scope>`. They are heuristic hints, not verdicts.
 
-### 4. Aplicar cada lente sobre el alcance
+### 4. Apply each lens to the scope
 
-Para cada lente elegida, sigue **su** SKILL.md (sus tablas de comprobación, severidades y reglas de "cuándo no") pero solo para **diagnosticar**, no para modificar. Lee el código completo de los archivos en el alcance, no solo el diff: muchos defectos están en cómo el cambio interactúa con lo que ya existía.
+For each chosen lens, follow **its** SKILL.md (its check tables, severities and "when not to" rules), but only to **diagnose**, not to modify. Read the full code of the files in scope, not just the diff: many defects lie in how the change interacts with what already existed.
 
-### 5. Fusionar, deduplicar y priorizar
+### 5. Merge, deduplicate and prioritize
 
-Sigue [severity-and-report](references/severity-and-report.md):
+Follow [severity-and-report](references/severity-and-report.md):
 
-- **Un hallazgo, un dueño**: si dos lentes ven lo mismo (p. ej. una función enorme es smell y también viola SRP), repórtalo una vez, en la lente cuya acción lo resuelve, y menciona la otra como contexto.
-- **Orden global** por severidad, no por lente ni por archivo: todos los Críticos primero (seguridad, pérdida de datos, bloqueo de usuarios), luego todos los Importantes, luego los Menores. Numera después de ordenar.
-- **Máximo útil**: si hay más de ~15 hallazgos, muestra los 10 mejores y agrupa el resto por tema.
-- **Lo que está bien** se dice en una línea; "sin hallazgos relevantes" es un resultado válido.
-- **Contradicciones entre lentes** (p. ej. `design-patterns` sugiere abstraer, `clean-code` pide simplicidad): decide con la regla de proporcionalidad (¿duele hoy? ¿hay segunda variante?) y explica la decisión.
+- **One finding, one owner**: if two lenses see the same thing (e.g. a huge function is a smell and also violates SRP), report it once, under the lens whose action resolves it, and mention the other as context.
+- **Global order** by severity, not by lens or file: all Critical findings first (security, data loss, users blocked), then all Important, then Minor. Number them after sorting.
+- **Useful maximum**: if there are more than ~15 findings, show the top 10 and group the rest by theme.
+- **What is good** gets one line; "no relevant findings" is a valid result.
+- **Contradictions between lenses** (e.g. `design-patterns` suggests abstracting, `clean-code` asks for simplicity): decide with the proportionality rule (does it hurt today? is there a second variant?) and explain the decision.
 
-### 6. Reportar y ofrecer siguientes pasos
+### 6. Report and offer next steps
 
-Entrega el informe de abajo. Cierra con un **plan de correcciones ordenado** (qué skill arreglaría cada grupo) y pregunta qué aplicar. No modifiques nada sin confirmación.
+Deliver the report below. Close with an **ordered fix plan** (which skill would fix each group) and ask what to apply. Do not modify anything without confirmation.
 
-## 🚫 Cuándo NO usar esta skill
+## 🚫 When NOT to Use This Skill
 
-- Aspecto único y claro: usa la skill específica.
-- Cambios triviales (typo, texto, versión): basta una lectura rápida; di "sin hallazgos".
-- Si el usuario quiere implementar, no revisar: usa las skills de arquitectura o `tdd-workflow`.
+- A single, clear aspect: use the specific skill.
+- Trivial changes (typo, copy, version): a quick read is enough; say "no findings".
+- If the user wants to implement, not review: use the architecture skills or `tdd-workflow`.
 
-## ⚠️ Reglas Críticas
+## ⚠️ Critical Rules
 
-- **Solo lectura por defecto**: no edites, no commitees, no hagas push; no ejecutes nada que modifique datos o dependencias.
-- **Alcance estricto**: revisa lo que cambió (y lo necesario para entenderlo); lo preexistente va a "Fuera de alcance", salvo que sea crítico para seguridad.
-- **Evidencia**: cada hallazgo con `archivo:línea`, efecto concreto y su lente. Nada de "podría mejorarse".
-- **Los resultados de tests y linters son los reales**: si no pudiste ejecutarlos, dilo; no los supongas.
-- **Sin duplicados ni relleno**: no repitas el hallazgo de otra lente ni listes comprobaciones que pasaron.
-- **Seguridad no se silencia**: un hallazgo crítico se reporta aunque la revisión pidiera otro aspecto.
-- **Proporcionalidad**: no propongas patrones, capas ni abstracciones que la skill dueña desaconseja (ver sus secciones "Cuándo NO").
-- **No instales dependencias** ni cambies configuración sin confirmación.
+- **Reply in the user's language**, even though this skill is written in English.
+- **Read-only by default**: do not edit, commit or push; do not run anything that changes data or dependencies.
+- **Strict scope**: review what changed (and what is needed to understand it); pre-existing problems go under "Out of scope", unless they are security-critical.
+- **Evidence**: every finding with `file:line`, a concrete effect and its lens. No "could be improved".
+- **Test and linter results are the real ones**: if you could not run them, say so; do not assume them.
+- **No duplicates or filler**: do not repeat another lens's finding or list checks that passed.
+- **Security is never silenced**: a critical finding is reported even if the review asked about something else.
+- **Proportionality**: do not propose patterns, layers or abstractions that the owning skill advises against (see its "When NOT" sections).
+- **Do not install dependencies** or change configuration without confirmation.
 
-## 📤 Informe
+## 📤 Report
 
 ```markdown
-### Veredicto
-<Listo para PR | Listo con cambios menores | Requiere cambios> — <1–2 frases>
+### Verdict
+<Ready for PR | Ready with minor changes | Changes required> — <1–2 sentences>
 
-### Alcance y evidencia
-- Alcance: <rama contra main | rutas>, <N archivos, +X −Y>
-- Lentes aplicadas: clean-code, backend-best-practices (omitidas: frontend — no hay cambios de UI)
-- Tests: ✅ 12/12 (`npm test`) | ❌ 2 fallan | no ejecutados (motivo)
-- Typecheck / lint: ✅ | no configurado
+### Scope and evidence
+- Scope: <branch vs main | paths>, <N files, +X −Y>
+- Lenses applied: clean-code, backend-best-practices (skipped: frontend — no UI changes)
+- Tests: ✅ 12/12 (`npm test`) | ❌ 2 failing | not run (reason)
+- Typecheck / lint: ✅ | not configured
 
-### Hallazgos (por prioridad)
-| # | Sev. | Lente | Ubicación | Problema y efecto | Corrección sugerida |
+### Findings (by priority)
+| # | Sev. | Lens | Location | Problem and effect | Suggested fix |
 |---|---|---|---|---|---|
-| 1 | Crítico | backend | src/orders.ts:21 | SQL por interpolación: inyección | Consulta parametrizada |
-| 2 | Importante | tdd | src/orders.ts | Cambia el cálculo de impuestos sin test nuevo | Añadir test del caso exento |
-| 3 | Menor | clean-code | src/utils.ts:8 | Nombre `data2` poco descriptivo | Renombrar |
+| 1 | Critical | backend | src/orders.ts:21 | SQL built by interpolation: injection | Parameterized query |
+| 2 | Important | tdd | src/orders.ts | Changes the tax calculation without a new test | Add a test for the exempt case |
+| 3 | Minor | clean-code | src/utils.ts:8 | Name `data2` is not descriptive | Rename |
 
-### Bien hecho
-<una línea>
+### Done well
+<one line>
 
-### Fuera de alcance / no verificado
-- <preexistente, necesita navegador, medición o decisión del usuario>
+### Out of scope / not verified
+- <pre-existing, needs a browser, a measurement or a user decision>
 
-### Plan de correcciones sugerido
-1. <hallazgos 1 → backend-best-practices>
-2. <hallazgo 2 → tdd-workflow>
-¿Aplico alguno?
+### Suggested fix plan
+1. <finding 1 → backend-best-practices>
+2. <finding 2 → tdd-workflow>
+Shall I apply any of them?
 ```
 
-## 📚 Referencias
+## 📚 References
 
-- [Enrutado de lentes y fusión](references/lens-routing.md)
-- [Severidad, deduplicación y formato del informe](references/severity-and-report.md)
-- [Ejemplo de revisión completa](examples/review-orders-branch.md)
+- [Lens routing and merging](references/lens-routing.md)
+- [Severity, deduplication and report format](references/severity-and-report.md)
+- [Full review example](examples/review-orders-branch.md)
 
 ## 🛠️ Scripts
 
-- `scripts/collect-scope.mjs`: clasifica los archivos cambiados y recomienda lentes (solo lectura; `--help` para opciones).
+- `scripts/collect-scope.mjs`: classifies the changed files and recommends lenses (read-only; `--help` for options).

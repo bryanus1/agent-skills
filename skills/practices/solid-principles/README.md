@@ -1,26 +1,26 @@
 # 🧱 SOLID Principles (`solid-principles`)
 
-> **Aplica y revisa SRP, OCP, LSP, ISP y DIP a nivel de clase, módulo y componente en backend y frontend: diagnostica por señales concretas, refactoriza con tests y decide explícitamente cuándo NO aplicarlos (sin una razón real, una abstracción es solo ruido).**
+> **Apply and review SRP, OCP, LSP, ISP and DIP at the class, module and component level in backend and frontend: diagnose by concrete signals, refactor with tests and explicitly decide when NOT to apply them (without a real reason, an abstraction is just noise).**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `solid-principles` |
-| **Categoría** | `practices` |
-| **Versión** | `1.0.0` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Name** | `solid-principles` |
+| **Category** | `practices` |
+| **Version** | `1.1.0` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
 ```bash
-# En el proyecto actual:
+# In the current project:
 npx skills add bryanus1/agent-skills --skill solid-principles
 
 # Global:
 npx skills add bryanus1/agent-skills --skill solid-principles -g
 
-# Recomendadas junto a esta:
+# Recommended together with this one:
 npx skills add bryanus1/agent-skills --skill tdd-workflow
 npx skills add bryanus1/agent-skills --skill clean-code
 npx skills add bryanus1/agent-skills --skill design-patterns
@@ -28,27 +28,27 @@ npx skills add bryanus1/agent-skills --skill design-patterns
 
 ---
 
-## 💡 Ejemplos de Uso con Agentes de IA
+## 💡 Usage Examples with AI Agents
 
-* **Refactor de un servicio con demasiadas responsabilidades**:
-  > *"Este `OrderService` valida, calcula precios, guarda en BD y envía el email. Aplícale SOLID."*
+* **Refactoring a service with too many responsibilities**:
+  > *"This `OrderService` validates, computes prices, saves to the DB and sends the email. Apply SOLID to it."*
   >
-  > 🤖 Diagnóstico por principio con evidencia (`archivo:línea`), decisión *Aplicar / Aplazar / No aplicar* para cada uno, refactor en pasos pequeños con tests entre pasos y reporte final.
+  > 🤖 A per-principle diagnosis with evidence (`file:line`), an *Apply / Defer / Don't apply* decision for each, a refactor in small steps with tests between steps, and a final report.
 
-* **Revisión sin cambios**:
-  > *"Revisa esta jerarquía de clases y dime si hay problemas de diseño."*
+* **Review without changes**:
+  > *"Review this class hierarchy and tell me whether there are design problems."*
   >
-  > 🤖 Detecta violaciones (p. ej. una subclase que lanza `read-only` en un método heredado) y propone la separación de interfaces, sin tocar archivos.
+  > 🤖 Detects violations (e.g. a subclass that throws `read-only` in an inherited method) and proposes splitting the interfaces, without touching files.
 
-* **Frenar la sobreingeniería**:
-  > *"Aplica OCP a este `switch` de tres casos."*
+* **Stopping over-engineering**:
+  > *"Apply OCP to this three-case `switch`."*
   >
-  > 🤖 Explica por qué un `switch` pequeño, estable y en un solo sitio no necesita abstracción.
+  > 🤖 Explains why a small, stable `switch` in a single place needs no abstraction.
 
 ---
 
-## 📚 Documentación
+## 📚 Documentation
 
-- **[`SKILL.md`](SKILL.md)**: flujo, tabla de señales y reglas para el agente.
-- Referencias: **[SRP](references/srp.md)**, **[OCP](references/ocp.md)**, **[LSP](references/lsp.md)**, **[ISP](references/isp.md)**, **[DIP](references/dip.md)**.
-- **[Ejemplo completo: servicio de pedidos](examples/order-service.md)**.
+- **[`SKILL.md`](SKILL.md)**: workflow, signal table and rules for the agent.
+- References: **[SRP](references/srp.md)**, **[OCP](references/ocp.md)**, **[LSP](references/lsp.md)**, **[ISP](references/isp.md)**, **[DIP](references/dip.md)**.
+- **[Full example: order service](examples/order-service.md)**.

@@ -1,94 +1,94 @@
-# Catálogo de code smells
+# Code Smell Catalog
 
-Cada smell lleva: cómo reconocerlo, por qué importa y el refactor habitual (ver [refactorings](refactorings.md)). La columna **Script** indica si `detect-smells.mjs` lo señala.
+Each smell comes with how to recognize it, why it matters and the usual refactor (see [refactorings](refactorings.md)). The **Script** column says whether `detect-smells.mjs` flags it.
 
-## Contenido
+## Contents
 
-1. [Funciones](#funciones)
-2. [Nombres](#nombres)
-3. [Condicionales y flujo](#condicionales-y-flujo)
-4. [Datos](#datos)
-5. [Errores](#errores)
-6. [Acoplamiento y cambios](#acoplamiento-y-cambios)
+1. [Functions](#functions)
+2. [Names](#names)
+3. [Conditionals and flow](#conditionals-and-flow)
+4. [Data](#data)
+5. [Errors](#errors)
+6. [Coupling and change](#coupling-and-change)
 7. [Frontend](#frontend)
 8. [Tests](#tests)
 
-## Funciones
+## Functions
 
-| Smell | Reconocerlo | Por qué importa | Refactor | Script |
+| Smell | Recognize it | Why it matters | Refactor | Script |
 |---|---|---|---|---|
-| Función larga | No cabe en una pantalla; tiene "secciones" con comentarios | Obliga a retener demasiado contexto | Extraer función | ✅ `long-function` |
-| Demasiados parámetros | > 3, o varios del mismo tipo seguidos (`(string, string, string)`) | Llamadas ilegibles y fáciles de equivocar | Objeto de parámetros, preservar objeto entero | ✅ `too-many-params` |
-| Argumento bandera | `fn(data, true)` cambia lo que hace la función | Son dos funciones disfrazadas | Separar en dos funciones u opción con nombre | — |
-| Niveles de abstracción mezclados | `sendInvoice()` junto a manipulación de bytes de PDF | Cuesta ver la intención | Extraer función por nivel | — |
-| Efecto secundario oculto | Un `get`/`is`/`calculate` que también escribe | El nombre miente; causa bugs al reordenar llamadas | Separar consulta y comando, renombrar | — |
-| Código muerto | Funciones, ramas o parámetros sin uso; código comentado | Ruido y falsas pistas | Eliminar | parcial (`todo-comment`) |
+| Long function | Does not fit on one screen; has "sections" with comments | Forces you to hold too much context | Extract function | ✅ `long-function` |
+| Too many parameters | > 3, or several of the same type in a row (`(string, string, string)`) | Unreadable calls that are easy to get wrong | Parameter object, preserve whole object | ✅ `too-many-params` |
+| Flag argument | `fn(data, true)` changes what the function does | Two functions in disguise | Split into two functions or a named option | — |
+| Mixed abstraction levels | `sendInvoice()` next to PDF byte manipulation | The intent is hard to see | Extract a function per level | — |
+| Hidden side effect | A `get`/`is`/`calculate` that also writes | The name lies; causes bugs when calls are reordered | Separate query and command, rename | — |
+| Dead code | Unused functions, branches or parameters; commented-out code | Noise and false leads | Delete | partial (`todo-comment`) |
 
-## Nombres
+## Names
 
-| Smell | Reconocerlo | Refactor |
+| Smell | Recognize it | Refactor |
 |---|---|---|
-| Nombre genérico | `data`, `info`, `item`, `tmp`, `handle`, `manager`, `utils` en un alcance amplio | Renombrar con el concepto de dominio |
-| Nombre engañoso | `users` es un `Map`; `isValid` lanza excepciones; `getX` hace I/O | Renombrar o cambiar comportamiento para que coincida |
-| Codificación de tipos | `strName`, `IUserInterface`, `arrItems` (salvo convención del proyecto) | Renombrar |
-| Inconsistencia | `fetchUser`, `getOrder`, `retrieveInvoice` para la misma operación | Unificar vocabulario |
-| Booleano negativo | `isNotDisabled`, `!notFound` | Nombre positivo (`isEnabled`) |
+| Generic name | `data`, `info`, `item`, `tmp`, `handle`, `manager`, `utils` in a wide scope | Rename with the domain concept |
+| Misleading name | `users` is a `Map`; `isValid` throws; `getX` does I/O | Rename, or change the behavior to match |
+| Type encoding | `strName`, `IUserInterface`, `arrItems` (unless it is the project's convention) | Rename |
+| Inconsistency | `fetchUser`, `getOrder`, `retrieveInvoice` for the same operation | Unify the vocabulary |
+| Negative boolean | `isNotDisabled`, `!notFound` | Positive name (`isEnabled`) |
 
-## Condicionales y flujo
+## Conditionals and flow
 
-| Smell | Reconocerlo | Refactor | Script |
+| Smell | Recognize it | Refactor | Script |
 |---|---|---|---|
-| Anidamiento profundo | `if` dentro de `for` dentro de `if`… (flecha hacia la derecha) | Guard clauses, extraer función | ✅ `deep-nesting` |
-| Condición compleja | `if (a && (b \|\| !c) && d.length > 0)` | Extraer variable o función con nombre | — |
-| Ternario anidado | `a ? b : c ? d : e` | `if`/`switch`, tabla de búsqueda | ✅ `nested-ternary` |
-| `switch` repetido por tipo | El mismo `switch (kind)` en varios sitios | Polimorfismo o mapa de estrategias (ver skill de patrones) | — |
-| Bucle que hace varias cosas | Un `for` que filtra, transforma y acumula a la vez | Pipeline `filter`/`map`/`reduce` o dividir el bucle | — |
+| Deep nesting | `if` inside `for` inside `if`… (arrow pointing right) | Guard clauses, extract function | ✅ `deep-nesting` |
+| Complex condition | `if (a && (b \|\| !c) && d.length > 0)` | Extract a named variable or function | — |
+| Nested ternary | `a ? b : c ? d : e` | `if`/`switch`, lookup table | ✅ `nested-ternary` |
+| Repeated `switch` on type | The same `switch (kind)` in several places | Polymorphism or a strategy map (see the patterns skill) | — |
+| Loop that does several things | A `for` that filters, transforms and accumulates at once | `filter`/`map`/`reduce` pipeline or split the loop | — |
 
-## Datos
+## Data
 
-| Smell | Reconocerlo | Refactor | Script |
+| Smell | Recognize it | Refactor | Script |
 |---|---|---|---|
-| Número/cadena mágica | `if (status === 3)`, `* 0.21`, `'ADMIN'` repetido | Constante con nombre, enum, unión de literales | ✅ `magic-number` |
-| Obsesión por primitivos | Emails, importes y fechas como `string`/`number` sueltos con validación repetida | Value object o tipo con marca (`type Email = string & { __brand }`) | — |
-| Grupo de datos | Los mismos 3 campos viajan juntos por varias funciones | Extraer tipo u objeto | — |
-| Mutación de argumentos | La función modifica el objeto recibido | Devolver una copia nueva | — |
-| Estado global mutable | Variables de módulo modificadas desde varias funciones | Encapsular, inyectar | — |
+| Magic number/string | `if (status === 3)`, `* 0.21`, repeated `'ADMIN'` | Named constant, enum, union of literals | ✅ `magic-number` |
+| Primitive obsession | Emails, amounts and dates as loose `string`/`number` with repeated validation | Value object or branded type (`type Email = string & { __brand }`) | — |
+| Data clump | The same 3 fields travel together through several functions | Extract a type or object | — |
+| Argument mutation | The function modifies the object it receives | Return a new copy | — |
+| Mutable global state | Module variables modified from several functions | Encapsulate, inject | — |
 
-## Errores
+## Errors
 
-| Smell | Reconocerlo | Refactor |
+| Smell | Recognize it | Refactor |
 |---|---|---|
-| Error tragado | `catch {}`, `catch (e) { console.log(e) }` y seguir como si nada | Manejar, relanzar con contexto o dejar subir |
-| Error genérico | `throw new Error('error')`, `return -1` como fallo | Errores de dominio específicos o tipo `Result` |
-| Null ambiguo | `return null` significa "no encontrado", "error" o "no autorizado" según el caso | Distinguir con tipos o errores explícitos |
-| Validación dispersa | La misma comprobación en cada capa | Validar en el borde, tipos fuertes dentro |
+| Swallowed error | `catch {}`, `catch (e) { console.log(e) }` and carry on as if nothing happened | Handle, rethrow with context or let it propagate |
+| Generic error | `throw new Error('error')`, `return -1` as failure | Specific domain errors or a `Result` type |
+| Ambiguous null | `return null` means "not found", "error" or "unauthorized" depending on the case | Tell them apart with types or explicit errors |
+| Scattered validation | The same check in every layer | Validate at the edge, strong types inside |
 
-## Acoplamiento y cambios
+## Coupling and change
 
-| Smell | Reconocerlo | Refactor |
+| Smell | Recognize it | Refactor |
 |---|---|---|
-| Código duplicado | La misma lógica en 3+ sitios (regla de tres) | Extraer función/módulo |
-| Cambio divergente | Un archivo cambia por motivos no relacionados (UI y reglas de precio) | Separar por responsabilidad (ver SOLID/SRP) |
-| Cirugía de escopeta | Un cambio pequeño obliga a tocar muchos archivos | Reunir la lógica relacionada |
-| Envidia de funcionalidad | Una función usa más datos de otro objeto que del suyo | Mover la función a donde están los datos |
-| Cadena de mensajes | `order.customer.address.country.code` | Ocultar delegado, método con intención |
-| Archivo largo | Cientos de líneas con varios conceptos | Dividir por concepto | 
+| Duplicated code | The same logic in 3+ places (rule of three) | Extract function/module |
+| Divergent change | One file changes for unrelated reasons (UI and pricing rules) | Split by responsibility (see SOLID/SRP) |
+| Shotgun surgery | A small change forces you to touch many files | Bring the related logic together |
+| Feature envy | A function uses more data from another object than from its own | Move the function to where the data is |
+| Message chain | `order.customer.address.country.code` | Hide delegate, method with intent |
+| Long file | Hundreds of lines with several concepts | Split by concept |
 
 ## Frontend
 
-| Smell | Reconocerlo | Refactor |
+| Smell | Recognize it | Refactor |
 |---|---|---|
-| Componente dios | Fetch, estado, validación, formato y layout en un componente de 300 líneas | Extraer hooks, funciones puras y subcomponentes |
-| Estado derivado en estado | `useState` + `useEffect` para algo calculable desde props/estado | Calcular en el render (`useMemo` si es costoso) |
-| Prop drilling | Props que atraviesan 3+ niveles sin usarse | Composición (`children`), contexto acotado |
-| Lógica en JSX | Ternarios y `map` con lógica de negocio dentro del markup | Extraer a variables o funciones antes del `return` |
-| Efectos sin limpieza | `useEffect` con suscripciones o timers sin cleanup | Devolver la función de limpieza |
+| God component | Fetch, state, validation, formatting and layout in a 300-line component | Extract hooks, pure functions and subcomponents |
+| Derived state in state | `useState` + `useEffect` for something computable from props/state | Compute during render (`useMemo` if expensive) |
+| Prop drilling | Props that cross 3+ levels without being used | Composition (`children`), scoped context |
+| Logic in JSX | Ternaries and `map` with business logic inside the markup | Extract to variables or functions before the `return` |
+| Effects without cleanup | `useEffect` with subscriptions or timers and no cleanup | Return the cleanup function |
 
 ## Tests
 
-| Smell | Reconocerlo | Refactor |
+| Smell | Recognize it | Refactor |
 |---|---|---|
-| Test que prueba implementación | Verifica llamadas internas o estado privado | Probar comportamiento observable |
-| Test con lógica | `if`/`for` dentro del test | Casos separados o tabla de casos (`it.each`) |
-| Datos irrelevantes | 30 campos de fixture para probar uno | Builder con valores por defecto |
-| Test frágil por tiempo | Depende de `Date.now()` o `setTimeout` reales | Reloj inyectado o fake timers |
+| Test that checks implementation | Verifies internal calls or private state | Test observable behavior |
+| Test with logic | `if`/`for` inside the test | Separate cases or a case table (`it.each`) |
+| Irrelevant data | 30 fixture fields to test one | Builder with default values |
+| Time-fragile test | Depends on real `Date.now()` or `setTimeout` | Injected clock or fake timers |

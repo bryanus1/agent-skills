@@ -1,20 +1,20 @@
 # 🔴🟢🔵 TDD Workflow (`tdd-workflow`)
 
-> **Desarrollo guiado por tests para frontend y backend: lista de tests, ciclos Red → Green → Refactor con evidencia real de ejecución, reproducción de bugs con un test que falla y tests de caracterización antes de tocar código legacy.**
+> **Test-driven development for frontend and backend: a test list, Red → Green → Refactor cycles with real run evidence, bugs reproduced with a failing test, and characterization tests before touching legacy code.**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `tdd-workflow` |
-| **Categoría** | `practices` |
-| **Versión** | `1.0.0` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Name** | `tdd-workflow` |
+| **Category** | `practices` |
+| **Version** | `1.1.0` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
 ```bash
-# En el proyecto actual:
+# In the current project:
 npx skills add bryanus1/agent-skills --skill tdd-workflow
 
 # Global:
@@ -23,40 +23,40 @@ npx skills add bryanus1/agent-skills --skill tdd-workflow -g
 
 ---
 
-## 💡 Ejemplos de Uso con Agentes de IA
+## 💡 Usage Examples with AI Agents
 
-* **Feature nueva con TDD**:
-  > *"Con TDD, implementa `calculateShipping(order)`: envío gratis desde 50 €, si no 4,99 €, y 10 € extra en zonas remotas."*
+* **New feature with TDD**:
+  > *"With TDD, implement `calculateShipping(order)`: free shipping from €50, otherwise €4.99, and €10 extra in remote zones."*
   >
-  > 🤖 El agente detecta el runner, escribe la lista de tests, avanza ciclo a ciclo mostrando cada rojo real y termina con la suite completa en verde y una tabla de ciclos.
+  > 🤖 The agent detects the runner, writes the test list, goes cycle by cycle showing each real red, and ends with the full suite green and a cycle table.
 
-* **Corregir un bug**:
-  > *"`parseDuration('90s')` devuelve 0. Arréglalo."*
+* **Fixing a bug**:
+  > *"`parseDuration('90s')` returns 0. Fix it."*
   >
-  > 🤖 Primero un test que reproduce el bug y falla; después la corrección mínima; al final la suite completa.
+  > 🤖 First a test that reproduces the bug and fails; then the smallest fix; finally the full suite.
 
-* **Cambiar código legacy sin tests**:
-  > *"Necesito cambiar el cálculo de comisiones de `billing.js`, pero no tiene tests."*
+* **Changing legacy code without tests**:
+  > *"I need to change the commission calculation in `billing.js`, but it has no tests."*
   >
-  > 🤖 Tests de caracterización que fijan el comportamiento actual, y luego el ciclo TDD para el cambio.
+  > 🤖 Characterization tests that pin down the current behavior, then the TDD cycle for the change.
 
 ---
 
 ## 🛠️ Script
 
 ```bash
-# Desde la raíz del proyecto (o del paquete en un monorepo):
+# From the project root (or the package root in a monorepo):
 node <skill-dir>/scripts/detect-test-runner.mjs
 node <skill-dir>/scripts/detect-test-runner.mjs --json
 node <skill-dir>/scripts/detect-test-runner.mjs --cwd packages/api
 ```
 
-Detecta vitest, jest, mocha, `node:test`, playwright, cypress, pytest, `go test` y `cargo test`; el gestor de paquetes; los comandos para ejecutar todo, un archivo o en modo watch; y la convención de nombres de los tests existentes. Es de solo lectura.
+Detects vitest, jest, mocha, `node:test`, playwright, cypress, pytest, `go test` and `cargo test`; the package manager; the commands to run everything, a single file or watch mode; and the naming convention of the existing tests. Read-only.
 
 ---
 
-## 📚 Documentación
+## 📚 Documentation
 
-- **[`SKILL.md`](SKILL.md)**: flujo completo para el agente.
+- **[`SKILL.md`](SKILL.md)**: the full workflow for the agent.
 - **[Test doubles](references/test-doubles.md)**, **[Frontend](references/frontend-testing.md)**, **[Backend](references/backend-testing.md)**.
-- **[Ejemplo de sesión TDD](examples/tdd-session.md)**.
+- **[TDD session example](examples/tdd-session.md)**.

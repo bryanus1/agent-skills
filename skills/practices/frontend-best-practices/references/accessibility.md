@@ -1,27 +1,27 @@
-# Accesibilidad
+# Accessibility
 
-Objetivo mínimo razonable: **WCAG 2.2 AA**. Lo más rentable es el HTML semántico correcto.
+A reasonable minimum target: **WCAG 2.2 AA**. Correct semantic HTML gives the best return.
 
-## Comprobaciones por prioridad
+## Checks by priority
 
-1. **Semántica antes que ARIA.** `<button>` para acciones, `<a href>` para navegación, `<label>`, `<nav>`, `<main>`, `<h1..h6>` en orden. Un `<div onClick>` no es enfocable ni responde a Enter/Espacio: cámbialo por `<button type="button">`.
-2. **Teclado**: todo lo interactivo se alcanza con Tab, se activa con Enter/Espacio y tiene **foco visible**. No quites `outline` sin sustituirlo. No uses `tabIndex` positivo.
-3. **Nombres accesibles**: botones solo con icono llevan `aria-label` (o texto oculto visualmente); campos con `<label>`; enlaces con texto que tenga sentido fuera de contexto (no "haz clic aquí").
-4. **Imágenes**: `alt` descriptivo si aportan información; `alt=""` si son decorativas. Nunca omitir el atributo.
-5. **Color y contraste**: texto 4.5:1 (3:1 si es grande); la información no se transmite solo por color (errores, estados).
-6. **Foco y anuncios**: al abrir un diálogo, mueve el foco dentro, atrápalo y devuélvelo al cerrar; usa `<dialog>` o una librería headless (Radix, React Aria) en vez de implementarlo a mano. Los cambios dinámicos importantes (errores de formulario, resultados) se anuncian con `role="status"` / `aria-live="polite"`.
-7. **Navegación entre rutas** en SPAs: mueve el foco al encabezado principal o anuncia el cambio de título.
-8. **Movimiento y tiempos**: respeta `prefers-reduced-motion`; no cortes sesiones sin aviso.
-9. **Objetivos táctiles** de al menos 24×24 px (WCAG 2.2), mejor 44 px en móvil.
+1. **Semantics before ARIA.** `<button>` for actions, `<a href>` for navigation, `<label>`, `<nav>`, `<main>`, `<h1..h6>` in order. A `<div onClick>` is not focusable and does not respond to Enter/Space: replace it with `<button type="button">`.
+2. **Keyboard**: everything interactive is reachable with Tab, activated with Enter/Space and has a **visible focus**. Don't remove `outline` without replacing it. Don't use a positive `tabIndex`.
+3. **Accessible names**: icon-only buttons get an `aria-label` (or visually hidden text); fields get a `<label>`; links have text that makes sense out of context (not "click here").
+4. **Images**: a descriptive `alt` if they carry information; `alt=""` if they are decorative. Never omit the attribute.
+5. **Color and contrast**: text 4.5:1 (3:1 if large); information is not conveyed by color alone (errors, states).
+6. **Focus and announcements**: when a dialog opens, move focus inside, trap it and return it on close; use `<dialog>` or a headless library (Radix, React Aria) instead of building it by hand. Important dynamic changes (form errors, results) are announced with `role="status"` / `aria-live="polite"`.
+7. **Route navigation** in SPAs: move focus to the main heading or announce the title change.
+8. **Motion and timing**: respect `prefers-reduced-motion`; don't end sessions without warning.
+9. **Touch targets** of at least 24×24 px (WCAG 2.2), preferably 44 px on mobile.
 
-## ARIA: reglas
+## ARIA: rules
 
-- La primera regla de ARIA es no usar ARIA si existe un elemento nativo.
-- Si usas un rol (`role="tablist"`), debes implementar su patrón de teclado completo. Un rol a medias es peor que ninguno.
-- `aria-hidden="true"` nunca en elementos enfocables.
+- The first rule of ARIA is not to use ARIA if a native element exists.
+- If you use a role (`role="tablist"`), you must implement its full keyboard pattern. A half-implemented role is worse than none.
+- Never put `aria-hidden="true"` on focusable elements.
 
-## Cómo verificar
+## How to verify
 
-- Automático (axe, `eslint-plugin-jsx-a11y`, Lighthouse) detecta ~30-40 % de los problemas: úsalo, pero no basta.
-- Manual: recorre la pantalla solo con teclado; prueba con un lector de pantalla (VoiceOver, NVDA); amplía el zoom al 200 %.
-- Si no puedes ejecutar estas pruebas, **dilo en el reporte** en lugar de afirmar que cumple.
+- Automated tools (axe, `eslint-plugin-jsx-a11y`, Lighthouse) catch ~30-40% of the problems: use them, but they are not enough.
+- Manual: go through the screen with the keyboard only; try a screen reader (VoiceOver, NVDA); zoom to 200%.
+- If you cannot run these checks, **say so in the report** instead of claiming it complies.

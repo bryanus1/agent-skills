@@ -1,8 +1,8 @@
-# Ejemplo: de `switch` repetido a estrategias (y cuándo quedarse en una tabla)
+# Example: from a repeated `switch` to strategies (and when to stay with a table)
 
-**Pedido:** "Tenemos transportistas y cada vez que añadimos uno hay que tocar medio código. Aplica el patrón Strategy."
+**Request:** "We have carriers, and every time we add one we have to touch half the code. Apply the Strategy pattern."
 
-## Problema
+## Problem
 
 ```ts
 // shipping.ts
@@ -19,28 +19,28 @@ export function etaDays(o: Order) {
 }
 // labels.ts
 export function carrierLabel(o: Order) {
-  switch (o.carrier) { case 'standard': return 'Estándar'; case 'express': return 'Exprés'; case 'pickup': return 'Recogida'; }
+  switch (o.carrier) { case 'standard': return 'Standard'; case 'express': return 'Express'; case 'pickup': return 'Pickup'; }
 }
 ```
 
-- **Qué duele:** el mismo `switch` en tres archivos; un transportista nuevo exige editar los tres y es fácil olvidar uno.
-- **Qué varía:** coste, plazo y etiqueta por transportista. **Qué es estable:** el modelo `Order` y quién consume estos datos.
-- **Variantes reales:** 3 hoy, 2 más previstas este trimestre.
-- **Convenciones del proyecto:** TypeScript funcional, sin contenedor DI.
+- **What hurts:** the same `switch` in three files; a new carrier means editing all three, and it is easy to forget one.
+- **What varies:** cost, delivery time and label per carrier. **What is stable:** the `Order` model and who consumes this data.
+- **Real variants:** 3 today, 2 more planned this quarter.
+- **Project conventions:** functional TypeScript, no DI container.
 
-## Decisión
+## Decision
 
-| Candidato | Alternativa simple | Veredicto | Razón |
+| Candidate | Simple alternative | Verdict | Reason |
 |---|---|---|---|
-| Strategy con clases (`ExpressShipping implements ShippingStrategy`) | Tabla de funciones `Record<Carrier, CarrierRule>` | **Tabla** | Las variantes no tienen estado ni dependencias; el proyecto es funcional. Las clases añadirían 4 archivos sin beneficio. |
-| Factory para elegir la estrategia | `CARRIERS[order.carrier]` | **No aplicar** | La tabla ya es la selección. |
+| Strategy with classes (`ExpressShipping implements ShippingStrategy`) | Function table `Record<Carrier, CarrierRule>` | **Table** | The variants have no state or dependencies; the project is functional. Classes would add 4 files with no benefit. |
+| Factory to choose the strategy | `CARRIERS[order.carrier]` | **Don't apply** | The table already is the selection. |
 
-Se **reevaluará** pasar a clases si algún transportista necesita llamar a una API externa (estado o dependencias propias): entonces cada regla se convierte en una clase que recibe su cliente por constructor y la tabla se compone en `main.ts`.
+Moving to classes will be **reassessed** if a carrier needs to call an external API (its own state or dependencies): then each rule becomes a class that receives its client through the constructor, and the table is composed in `main.ts`.
 
-## Resultado
+## Result
 
 ```ts
-// carriers.ts: un único lugar que conoce a los transportistas
+// carriers.ts: the only place that knows about carriers
 export interface CarrierRule {
   label: string;
   cost(order: Order): number;
@@ -48,9 +48,9 @@ export interface CarrierRule {
 }
 
 export const CARRIERS: Record<Carrier, CarrierRule> = {
-  standard: { label: 'Estándar', cost: () => 4.99, etaDays: 5 },
-  express: { label: 'Exprés', cost: (o) => 9.99 + o.weightKg * 2, etaDays: 1 },
-  pickup: { label: 'Recogida', cost: () => 0, etaDays: 2 },
+  standard: { label: 'Standard', cost: () => 4.99, etaDays: 5 },
+  express: { label: 'Express', cost: (o) => 9.99 + o.weightKg * 2, etaDays: 1 },
+  pickup: { label: 'Pickup', cost: () => 0, etaDays: 2 },
 };
 
 export const shippingCost = (o: Order) => CARRIERS[o.carrier].cost(o);
@@ -58,11 +58,11 @@ export const etaDays = (o: Order) => CARRIERS[o.carrier].etaDays;
 export const carrierLabel = (o: Order) => CARRIERS[o.carrier].label;
 ```
 
-Añadir `drone` es una entrada en `CARRIERS`; el tipo `Record<Carrier, …>` hace que el compilador avise si falta. Los tests existentes de `shippingCost` siguen pasando sin cambios (mismo comportamiento, misma API).
+Adding `drone` is one entry in `CARRIERS`; the `Record<Carrier, …>` type makes the compiler warn if one is missing. The existing `shippingCost` tests keep passing unchanged (same behavior, same API).
 
-## Reporte (resumen)
+## Report (summary)
 
-- **Cambios aplicados:** tabla `CARRIERS`; los tres `switch` delegan en ella. Tests: ✅ 12/12.
-- **No aplicado:** clases Strategy y Factory (justificado arriba).
-- **Aplazado:** reevaluar clases cuando un transportista requiera una API externa.
-- **Fuera de alcance:** el redondeo de `weightKg * 2` con decimales y la ausencia de validación de peso negativo.
+- **Changes applied:** a `CARRIERS` table; the three `switch`es delegate to it. Tests: ✅ 12/12.
+- **Not applied:** Strategy classes and Factory (justified above).
+- **Deferred:** reassess classes when a carrier needs an external API.
+- **Out of scope:** rounding of `weightKg * 2` with decimals and the missing validation for negative weight.

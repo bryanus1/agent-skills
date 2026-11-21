@@ -8,25 +8,25 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const HELP = `detect-smells: detector heurístico de code smells para JS/TS (solo lectura).
+const HELP = `detect-smells: heuristic code smell detector for JS/TS (read-only).
 
-Uso:
-  node <skill-dir>/scripts/detect-smells.mjs [rutas...] [opciones]
+Usage:
+  node <skill-dir>/scripts/detect-smells.mjs [paths...] [options]
 
-Rutas: archivos o directorios. Por defecto, src/ si existe; si no, el directorio actual.
+Paths: files or directories. Defaults to src/ if it exists; otherwise the current directory.
 
-Opciones:
-  --json                 Salida JSON.
-  --max-lines <n>        Líneas máximas por función (por defecto 40).
-  --max-depth <n>        Anidamiento máximo de bloques de control por función (por defecto 3).
-  --max-params <n>       Parámetros máximos por función (por defecto 3).
-  --max-file-lines <n>   Líneas máximas por archivo (por defecto 300).
-  --fail-on-findings     Sale con código 1 si hay hallazgos.
-  -h, --help             Muestra esta ayuda.
+Options:
+  --json                 JSON output.
+  --max-lines <n>        Maximum lines per function (default 40).
+  --max-depth <n>        Maximum nesting of control blocks per function (default 3).
+  --max-params <n>       Maximum parameters per function (default 3).
+  --max-file-lines <n>   Maximum lines per file (default 300).
+  --fail-on-findings     Exit with code 1 if there are findings.
+  -h, --help             Show this help.
 
-Reglas: long-function, deep-nesting, too-many-params, long-file, magic-number,
-nested-ternary, todo-comment. Son señales para revisar, no veredictos.
-Códigos de salida: 0 informe generado, 1 hallazgos con --fail-on-findings, 2 error de uso.`;
+Rules: long-function, deep-nesting, too-many-params, long-file, magic-number,
+nested-ternary, todo-comment. They are signals to review, not verdicts.
+Exit codes: 0 report generated, 1 findings with --fail-on-findings, 2 usage error.`;
 
 const EXTENSIONS = new Set(['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs', '.mts', '.cts']);
 const SKIP_DIRS = new Set(['node_modules', 'dist', 'build', 'coverage', 'out', 'vendor']);
@@ -47,9 +47,9 @@ function parseArgs(argv) {
     else if (arg === '--fail-on-findings') opts.failOnFindings = true;
     else if (numeric[arg]) {
       const value = Number(argv[++i]);
-      if (!Number.isInteger(value) || value < 0) throw new Error(`${arg} requiere un entero >= 0`);
+      if (!Number.isInteger(value) || value < 0) throw new Error(`${arg} requires an integer >= 0`);
       opts[numeric[arg]] = value;
-    } else if (arg.startsWith('-')) throw new Error(`Opción desconocida: ${arg}`);
+    } else if (arg.startsWith('-')) throw new Error(`Unknown option: ${arg}`);
     else opts.paths.push(arg);
   }
   return opts;
@@ -306,13 +306,13 @@ function analyzeFunctions(code, starts, opts, findings, file) {
       const lines = lineOf(starts, i) - lineOf(starts, entry.open) + 1;
       const symbol = entry.name;
       if (lines > opts.maxLines) {
-        findings.push({ file, line, rule: 'long-function', symbol, value: lines, max: opts.maxLines, message: `${symbol}: ${lines} líneas (máx. ${opts.maxLines})` });
+        findings.push({ file, line, rule: 'long-function', symbol, value: lines, max: opts.maxLines, message: `${symbol}: ${lines} lines (max ${opts.maxLines})` });
       }
       if (entry.maxDepth > opts.maxDepth) {
-        findings.push({ file, line, rule: 'deep-nesting', symbol, value: entry.maxDepth, max: opts.maxDepth, message: `${symbol}: anidamiento ${entry.maxDepth} (máx. ${opts.maxDepth})` });
+        findings.push({ file, line, rule: 'deep-nesting', symbol, value: entry.maxDepth, max: opts.maxDepth, message: `${symbol}: nesting ${entry.maxDepth} (max ${opts.maxDepth})` });
       }
       if (entry.params > opts.maxParams) {
-        findings.push({ file, line, rule: 'too-many-params', symbol, value: entry.params, max: opts.maxParams, message: `${symbol}: ${entry.params} parámetros (máx. ${opts.maxParams})` });
+        findings.push({ file, line, rule: 'too-many-params', symbol, value: entry.params, max: opts.maxParams, message: `${symbol}: ${entry.params} parameters (max ${opts.maxParams})` });
       }
     }
   }
@@ -338,7 +338,7 @@ function analyzeFile(file, opts) {
 
   const totalLines = rawLines.length - (src.endsWith('\n') ? 1 : 0);
   if (totalLines > opts.maxFileLines) {
-    findings.push({ file: rel, line: 1, rule: 'long-file', symbol: null, value: totalLines, max: opts.maxFileLines, message: `${totalLines} líneas (máx. ${opts.maxFileLines})` });
+    findings.push({ file: rel, line: 1, rule: 'long-file', symbol: null, value: totalLines, max: opts.maxFileLines, message: `${totalLines} lines (max ${opts.maxFileLines})` });
   }
 
   analyzeFunctions(code, starts, opts, findings, rel);
@@ -351,7 +351,7 @@ function analyzeFile(file, opts) {
     if (i === code.length || ch === ';' || ch === '{' || ch === '}') {
       if (ternaries >= 2) {
         const line = lineOf(starts, statementStart + code.slice(statementStart).search(/\S/));
-        findings.push({ file: rel, line, rule: 'nested-ternary', symbol: null, value: ternaries, max: 1, message: `${ternaries} ternarios encadenados en una expresión` });
+        findings.push({ file: rel, line, rule: 'nested-ternary', symbol: null, value: ternaries, max: 1, message: `${ternaries} chained ternaries in one expression` });
       }
       ternaries = 0;
       statementStart = i + 1;
@@ -375,20 +375,20 @@ function analyzeFile(file, opts) {
         if (ALLOWED_NUMBERS.has(m[1])) continue;
         // array index access like items[3] is reported too: it hides meaning
         if (magic < MAX_MAGIC_PER_FILE) {
-          findings.push({ file: rel, line: index + 1, rule: 'magic-number', symbol: null, value: Number(m[1]), max: null, message: `número mágico ${m[1]}` });
+          findings.push({ file: rel, line: index + 1, rule: 'magic-number', symbol: null, value: Number(m[1]), max: null, message: `magic number ${m[1]}` });
           magic++;
         } else skipped++;
       }
     });
     if (skipped) {
-      findings.push({ file: rel, line: 1, rule: 'magic-number', symbol: null, value: skipped, max: null, message: `y ${skipped} números mágicos más (no listados)` });
+      findings.push({ file: rel, line: 1, rule: 'magic-number', symbol: null, value: skipped, max: null, message: `and ${skipped} more magic numbers (not listed)` });
     }
   }
 
   // TODO / FIXME markers.
   rawLines.forEach((text, index) => {
     const marker = text.match(/(?:\/\/|\/\*|\*)\s*(TODO|FIXME|HACK|XXX)\b/);
-    if (marker) findings.push({ file: rel, line: index + 1, rule: 'todo-comment', symbol: null, value: marker[1], max: null, message: `marcador ${marker[1]} pendiente` });
+    if (marker) findings.push({ file: rel, line: index + 1, rule: 'todo-comment', symbol: null, value: marker[1], max: null, message: `pending ${marker[1]} marker` });
   });
 
   return findings.sort((a, b) => a.line - b.line || a.rule.localeCompare(b.rule));
@@ -407,8 +407,8 @@ function printHuman(result) {
     lines.push('');
   }
   const counts = Object.entries(result.summary).map(([rule, n]) => `${rule}: ${n}`).join(', ');
-  lines.push(`${result.findings.length} hallazgos en ${byFile.size} de ${result.scanned} archivos analizados${counts ? ` (${counts})` : ''}.`);
-  lines.push('Son señales heurísticas: confirma cada una leyendo el código antes de refactorizar.');
+  lines.push(`${result.findings.length} findings in ${byFile.size} of ${result.scanned} scanned files${counts ? ` (${counts})` : ''}.`);
+  lines.push('These are heuristic signals: confirm each one by reading the code before refactoring.');
   console.log(lines.join('\n'));
 }
 
@@ -421,7 +421,7 @@ try {
   const targets = opts.paths.length ? opts.paths : [fs.existsSync('src') ? 'src' : '.'];
   const files = [];
   for (const target of targets) {
-    if (!fs.existsSync(target)) throw new Error(`No existe la ruta: ${target}`);
+    if (!fs.existsSync(target)) throw new Error(`Path does not exist: ${target}`);
     collectFiles(path.resolve(target), files);
   }
   const findings = files.flatMap((file) => analyzeFile(file, opts));
@@ -437,6 +437,6 @@ try {
   process.exit(opts.failOnFindings && findings.length ? 1 : 0);
 } catch (error) {
   console.error(`Error: ${error.message}`);
-  console.error('Usa --help para ver las opciones.');
+  console.error('Use --help to see the options.');
   process.exit(2);
 }

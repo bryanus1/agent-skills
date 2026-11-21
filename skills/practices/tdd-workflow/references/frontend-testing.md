@@ -1,42 +1,42 @@
-# TDD en frontend
+# TDD in the Frontend
 
-## Qué probar en cada nivel
+## What to test at each level
 
-| Nivel | Herramienta típica | Qué cubre |
+| Level | Typical tool | What it covers |
 |---|---|---|
-| Unitario | Vitest / Jest | Funciones puras: formateo, validación, reducers, selectores, cálculos |
-| Componente / hook | Testing Library (`@testing-library/react`, `/vue`, `/svelte`) + Vitest/Jest con `jsdom` o `happy-dom` | Lo que el usuario ve y hace: render, interacción, estados de carga y error |
-| Red | MSW (Mock Service Worker) | Respuestas HTTP simuladas a nivel de red, sin mockear `fetch` a mano |
-| E2E | Playwright / Cypress | Flujos críticos completos (login, checkout). Pocos y estables |
+| Unit | Vitest / Jest | Pure functions: formatting, validation, reducers, selectors, calculations |
+| Component / hook | Testing Library (`@testing-library/react`, `/vue`, `/svelte`) + Vitest/Jest with `jsdom` or `happy-dom` | What the user sees and does: rendering, interaction, loading and error states |
+| Network | MSW (Mock Service Worker) | Simulated HTTP responses at the network level, without mocking `fetch` by hand |
+| E2E | Playwright / Cypress | Complete critical flows (login, checkout). Few and stable |
 
-Empieza el ciclo TDD por el nivel más bajo que pueda expresar el comportamiento. Extraer la lógica de un componente a una función pura suele hacerla trivial de testear.
+Start the TDD cycle at the lowest level that can express the behavior. Extracting a component's logic into a pure function often makes it trivial to test.
 
-## Componentes: probar como el usuario
+## Components: test like the user
 
-- Busca elementos por rol y nombre accesible: `getByRole('button', { name: /guardar/i })`. Después por label (`getByLabelText`) y por texto. `getByTestId` es el último recurso.
-- Interactúa con `@testing-library/user-event` (`await user.click(...)`, `await user.type(...)`), no con `fireEvent` salvo casos especiales.
-- Para contenido asíncrono usa `findBy*` o `waitFor`, nunca `setTimeout` en el test.
-- No compruebes estado interno, props de hijos, nombres de clases CSS ni llamadas a hooks. Si un refactor visualmente idéntico rompe el test, el test estaba acoplado a la implementación.
-- Los *snapshots* no sirven como primer test de TDD: no expresan un comportamiento y se aceptan sin leer. Úsalos, si acaso, para salidas serializadas estables y pequeñas.
+- Query elements by role and accessible name: `getByRole('button', { name: /save/i })`. Then by label (`getByLabelText`) and by text. `getByTestId` is the last resort.
+- Interact with `@testing-library/user-event` (`await user.click(...)`, `await user.type(...)`), not `fireEvent` except in special cases.
+- For async content use `findBy*` or `waitFor`, never `setTimeout` in the test.
+- Do not check internal state, child props, CSS class names or hook calls. If a visually identical refactor breaks the test, the test was coupled to the implementation.
+- *Snapshots* do not work as a first TDD test: they express no behavior and get accepted without being read. Use them, if at all, for small, stable serialized outputs.
 
 ```tsx
-it('muestra un error cuando el email no es válido', async () => {
+it('shows an error when the email is invalid', async () => {
   const user = userEvent.setup();
   render(<SignupForm onSubmit={vi.fn()} />);
 
-  await user.type(screen.getByLabelText(/email/i), 'no-es-email');
-  await user.click(screen.getByRole('button', { name: /crear cuenta/i }));
+  await user.type(screen.getByLabelText(/email/i), 'not-an-email');
+  await user.click(screen.getByRole('button', { name: /create account/i }));
 
-  expect(await screen.findByRole('alert')).toHaveTextContent(/email no válido/i);
+  expect(await screen.findByRole('alert')).toHaveTextContent(/invalid email/i);
 });
 ```
 
 ## Hooks
 
-Prueba hooks con `renderHook` solo si contienen lógica propia (debounce, máquinas de estado). Si el hook solo compone otros, prueba el componente que lo usa.
+Test hooks with `renderHook` only if they hold their own logic (debounce, state machines). If the hook only composes others, test the component that uses it.
 
 ```ts
-it('devuelve el valor tras el retardo', () => {
+it('returns the value after the delay', () => {
   vi.useFakeTimers();
   const { result, rerender } = renderHook(({ value }) => useDebouncedValue(value, 300), { initialProps: { value: 'a' } });
 
@@ -48,13 +48,13 @@ it('devuelve el valor tras el retardo', () => {
 });
 ```
 
-## Datos remotos
+## Remote data
 
-- Con MSW define handlers por test (`server.use(http.get('/api/users', () => HttpResponse.json([...])))`) para cubrir éxito, vacío y error.
-- Prueba los tres estados: cargando, datos y error. El estado de error es el que más se olvida.
+- With MSW, define handlers per test (`server.use(http.get('/api/users', () => HttpResponse.json([...])))`) to cover success, empty and error.
+- Test all three states: loading, data and error. The error state is the one most often forgotten.
 
 ## E2E (Playwright)
 
-- Un test por flujo de negocio crítico, no por pantalla.
-- Selectores por rol (`page.getByRole`), esperas implícitas de los locators; nada de `waitForTimeout`.
-- Datos aislados por test (usuario creado vía API en el `beforeEach`), para poder ejecutar en paralelo.
+- One test per critical business flow, not per screen.
+- Role-based selectors (`page.getByRole`) and the locators' implicit waits; no `waitForTimeout`.
+- Isolated data per test (a user created through the API in `beforeEach`), so tests can run in parallel.

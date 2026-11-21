@@ -4,37 +4,38 @@
     {
       "id": 1,
       "prompt": "Revisa evals/inputs/user-list/src/UserList.tsx y aplica buenas prácticas de frontend. Corrige lo que haga falta.",
-      "expected_output": "Tabla de hallazgos priorizada con archivo:línea. Críticos: dangerouslySetInnerHTML con bio (XSS) y li con onClick no operable con teclado. Importantes: fetch en efecto sin cancelación ni manejo de error/carga, estado derivado en useEffect (visible), key={index}, img sin alt. Corrige con cambios mínimos (texto en lugar de HTML, button, AbortController, derivar en el render, key=id, alt), sin introducir librerías nuevas ni useMemo sin evidencia. Declara qué no pudo verificar sin navegador.",
+      "expected_output": "A prioritized findings table with file:line. Critical: dangerouslySetInnerHTML with bio (XSS) and an li with onClick that cannot be operated by keyboard. Important: fetch in an effect without cancellation or error/loading handling, derived state in useEffect (visible), key={index}, img without alt. Fixes with minimal changes (text instead of HTML, button, AbortController, derive during render, key=id, alt), without introducing new libraries or useMemo without evidence. States what it could not verify without a browser. The reply is in Spanish.",
       "files": [
         "evals/inputs/user-list/README.md",
         "evals/inputs/user-list/src/UserList.tsx"
       ],
       "assertions": [
-        "Identifica dangerouslySetInnerHTML como riesgo de XSS y lo marca como crítico",
-        "Corrige el elemento clicable para que sea operable con teclado (button o equivalente)",
-        "El efecto de datos usa cancelación (AbortController o equivalente) y trata error o carga",
-        "El estado `visible` deja de ser un estado sincronizado con useEffect",
-        "key usa el id del usuario, no el índice",
-        "La imagen tiene atributo alt",
-        "No añade dependencias nuevas ni useMemo/memo injustificados",
-        "Indica qué no pudo verificar (lector de pantalla, navegador) o cómo comprobarlo",
-        "Cita archivo:línea en los hallazgos"
+        "Identifies dangerouslySetInnerHTML as an XSS risk and marks it as critical",
+        "Fixes the clickable element so it can be operated by keyboard (button or equivalent)",
+        "The data effect uses cancellation (AbortController or equivalent) and handles error or loading",
+        "The `visible` state is no longer state synced with useEffect",
+        "key uses the user's id, not the index",
+        "The image has an alt attribute",
+        "Adds no new dependencies or unjustified useMemo/memo",
+        "States what it could not verify (screen reader, browser) or how to check it",
+        "Cites file:line in the findings",
+        "Replies in Spanish"
       ]
     },
     {
       "id": 2,
-      "prompt": "Aplica buenas prácticas de frontend a evals/inputs/search-box/src/SearchBox.tsx, quiero que quede perfecto.",
-      "expected_output": "Revisa las seis áreas y concluye que el componente ya cumple (label asociado con useId, type=search, role=search, botón submit, estado local mínimo, sin efectos). No añade memo, useCallback, debounce ni librerías; si propone algo, lo marca como opcional con su condición (p. ej. debounce solo si onSearch dispara peticiones por tecla, lo cual aquí no ocurre). El archivo queda sin cambios o con cambios mínimos justificados.",
+      "prompt": "Apply frontend best practices to evals/inputs/search-box/src/SearchBox.tsx, I want it to be perfect.",
+      "expected_output": "Reviews the six areas and concludes that the component already complies (label linked with useId, type=search, role=search, submit button, minimal local state, no effects). Adds no memo, useCallback, debounce or libraries; if it proposes something, it marks it as optional with its condition (e.g. debounce only if onSearch fires requests per keystroke, which does not happen here). The file stays unchanged or with minimal justified changes.",
       "files": [
         "evals/inputs/search-box/README.md",
         "evals/inputs/search-box/src/SearchBox.tsx"
       ],
       "assertions": [
-        "Declara explícitamente que no hay hallazgos relevantes o que el componente ya cumple",
-        "No añade memo, useMemo ni useCallback",
-        "No añade debounce, librerías ni abstracciones",
-        "Cualquier mejora sugerida se presenta como opcional con su condición",
-        "El archivo queda sin cambios o con un cambio mínimo justificado"
+        "Explicitly states that there are no relevant findings or that the component already complies",
+        "Adds no memo, useMemo or useCallback",
+        "Adds no debounce, libraries or abstractions",
+        "Any suggested improvement is presented as optional with its condition",
+        "The file stays unchanged or with a minimal justified change"
       ]
     }
   ]
