@@ -620,8 +620,8 @@
     },
     {
       "name": "ssh-connect",
-      "version": "1.0.0",
-      "description": "Gestión, conexión y ejecución remota en servidores SSH con ssh-connect. Soporta llaves .pem con permisos asegurados, contraseñas automatizadas (Keychain) y multiplexación persistente sin bloqueos de TTY.",
+      "version": "1.1.0",
+      "description": "Manages, connects to and runs commands on SSH servers with ssh-connect. Supports .pem keys with locked-down permissions, automated passwords (Keychain) and persistent multiplexing with no TTY hangs. Use to connect to, diagnose or transfer files with a remote server.",
       "category": "tooling",
       "path": "skills/tooling/ssh-connect/SKILL.md",
       "readme": "skills/tooling/ssh-connect/README.md",
@@ -649,14 +649,17 @@
         "ejecutar en el servidor",
         "servidor remoto",
         "archivo .pem",
-        "ssh server"
+        "ssh server",
+        "connect to server",
+        "run on remote server",
+        "remote server"
       ],
       "requires": []
     },
     {
       "name": "ts-import-organizer",
-      "version": "1.1.1",
-      "description": "Organiza imports en TypeScript/JavaScript (.ts, .tsx, .js, .jsx). Se aplica siempre DESPUÉS de formatear el código. Agrupa: builtins → externos → path aliases → side-effects. Ordena líneas y miembros ({ ... }) por longitud, elimina unused y convierte rutas relativas a aliases. Activa al ordenar imports o escribir código.",
+      "version": "1.2.0",
+      "description": "Organizes imports in TypeScript/JavaScript (.ts, .tsx, .js, .jsx), always AFTER the code is formatted. Groups: builtins → external → path aliases → side effects. Sorts lines and members ({ ... }) by length, removes unused imports and turns deep relative paths into aliases. Use when sorting imports or writing code.",
       "category": "tooling",
       "path": "skills/tooling/ts-import-organizer/SKILL.md",
       "readme": "skills/tooling/ts-import-organizer/README.md",

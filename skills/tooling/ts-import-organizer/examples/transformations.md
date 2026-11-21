@@ -1,8 +1,8 @@
-# Ejemplos de Transformación — ts-import-organizer
+# Transformation Examples — ts-import-organizer
 
-## Ejemplo 1: Archivo React con imports mezclados
+## Example 1: React file with mixed imports
 
-### Antes
+### Before
 
 ```tsx
 import { useCallback } from "react";
@@ -16,7 +16,7 @@ import { fetchDashboardData } from "../../services/dashboard";
 import "reflect-metadata";
 ```
 
-### Después
+### After
 
 ```tsx
 import axios from "axios";
@@ -31,19 +31,19 @@ import "reflect-metadata";
 import styles from "./Dashboard.module.css";
 ```
 
-**Cambios aplicados:**
+**Changes applied:**
 
-- ✅ `useState` y `useEffect` consolidados con `useCallback` en una sola línea
-- ✅ `DashboardProps` convertido a `import type`
-- ✅ Rutas `../../../` convertidas a `@/`
-- ✅ Side-effects (`reflect-metadata`, CSS module) movidos al grupo 4
-- ✅ Ordenado por longitud dentro de cada grupo
+- ✅ `useState` and `useEffect` merged with `useCallback` into a single line
+- ✅ `DashboardProps` converted to `import type`
+- ✅ `../../../` paths converted to `@/`
+- ✅ Side effects (`reflect-metadata`, CSS module) moved to group 4
+- ✅ Sorted by length within each group
 
 ---
 
-## Ejemplo 2: Archivo Node.js con built-ins mezclados
+## Example 2: Node.js file with mixed built-ins
 
-### Antes
+### Before
 
 ```ts
 import express from "express";
@@ -55,7 +55,7 @@ import helmet from "helmet";
 import { Router } from "express";
 ```
 
-### Después
+### After
 
 ```ts
 import fs from "node:fs";
@@ -69,17 +69,17 @@ import { Router } from "express";
 import express from "express";
 ```
 
-**Cambios aplicados:**
+**Changes applied:**
 
-- ✅ Built-ins movidos al grupo 1 con prefijo `node:`
-- ✅ Dependencias externas en grupo 2, ordenadas por longitud
-- ✅ `Router` y `express` en el mismo grupo (mismo proveedor pero módulos distintos)
+- ✅ Built-ins moved to group 1 with the `node:` prefix
+- ✅ External dependencies in group 2, sorted by length
+- ✅ `Router` and `express` in the same group (same package, different imports)
 
 ---
 
-## Ejemplo 3: Solo ordenar (sin conversiones)
+## Example 3: Sort only (no conversions)
 
-### Antes
+### Before
 
 ```ts
 import { z } from "zod";
@@ -89,7 +89,7 @@ import { validateUser } from "../middleware/auth";
 import { ApiError } from "./errors";
 ```
 
-### Después
+### After
 
 ```ts
 import { z } from "zod";
@@ -100,17 +100,17 @@ import { ApiError } from "./errors";
 import { validateUser } from "../middleware/auth";
 ```
 
-**Cambios aplicados:**
+**Changes applied:**
 
-- ✅ `import type` ya estaba correcto, se conservó
-- ✅ `./` y `../` (un nivel) se respetan, no se convierten
-- ✅ Reordenados por longitud dentro del grupo de aliases/relativos
+- ✅ `import type` was already correct and is kept
+- ✅ `./` and `../` (one level) are left alone, not converted
+- ✅ Reordered by length within the aliases/relative group
 
 ---
 
-## Ejemplo 4: Flujo post-formateo con Prettier / Biome y multilínea
+## Example 4: Post-formatting flow with Prettier / Biome and multi-line imports
 
-### 1. Archivo inicial (código desordenado e imports caóticos)
+### 1. Starting file (messy code and chaotic imports)
 
 ```ts
 import {
@@ -135,9 +135,9 @@ export function Checkout({ items }: { items: CartItem[] }) {
 }
 ```
 
-### 2. Paso 1: Se formatea el código primero con Prettier
+### 2. Step 1: Format the code first with Prettier
 
-> El formateador arregla la indentación del código, pero al exceder `printWidth` rompe el import largo en múltiples líneas y deja los imports desorganizados:
+> The formatter fixes the code's indentation, but because the long import exceeds `printWidth` it splits it over several lines and leaves the imports unordered:
 
 ```ts
 import {
@@ -164,9 +164,9 @@ export function Checkout({ items }: { items: CartItem[] }) {
 }
 ```
 
-### 3. Paso 2: Aplicación final de `ts-import-organizer` (Post-formateo)
+### 3. Step 2: Final pass of `ts-import-organizer` (after formatting)
 
-> Se eliminan `unused` (`processPayment`, `validateCart`, `applyDiscount`, `formatCurrency`), consolidando el import en una sola línea. Se convierte `CartItem` a `import type`, rutas relativas a `@/`, se consolidan hooks de React y se ordenan por longitud ascendente:
+> The unused imports (`processPayment`, `validateCart`, `applyDiscount`, `formatCurrency`) are removed, which collapses the services import to one line. `CartItem` becomes `import type`, relative paths become `@/`, the React hooks are merged, and everything is sorted by ascending length:
 
 ```ts
 import { useState, useEffect } from "react";
@@ -188,17 +188,17 @@ export function Checkout({ items }: { items: CartItem[] }) {
 }
 ```
 
-**Beneficio obtenido:**
+**Result:**
 
-- ✅ El formateador normalizó el cuerpo del código primero sin riesgo de romper el bloque de imports posteriormente.
-- ✅ Al eliminar los specifiers `unused` tras el formateo, la declaración multilínea de servicios se simplificó limpiamente a una sola línea.
-- ✅ El bloque de imports queda sellado y listo en su orden canónico.
+- ✅ The formatter normalized the code body first, so it cannot break the import block afterwards.
+- ✅ Removing the unused specifiers after formatting collapsed the multi-line services import into a single line.
+- ✅ The import block is locked in its canonical order.
 
 ---
 
-## Ejemplo 5: Ordenamiento multilínea primero y miembros por longitud (NestJS)
+## Example 5: Multi-line first and members by length (NestJS)
 
-### Antes (monolínea antes de multilínea y especificadores desordenados)
+### Before (single-line before multi-line, unordered specifiers)
 ```ts
 import { Controller, Get, Param, Query, VERSION_NEUTRAL } from '@nestjs/common';
 import {
@@ -211,7 +211,7 @@ import {
 } from '@nestjs/swagger';
 ```
 
-### Después (multilínea PRIMERO con miembros ordenados; monolínea DESPUÉS con miembros ordenados)
+### After (multi-line FIRST with sorted members; single-line AFTER with sorted members)
 ```ts
 import {
   ApiTags,
@@ -224,8 +224,8 @@ import {
 import { Get, Param, Query, Controller, VERSION_NEUTRAL } from '@nestjs/common';
 ```
 
-**Cambios aplicados:**
-- ✅ El import multilínea (`@nestjs/swagger`) se ubica **al inicio del grupo** de dependencias externas.
-- ✅ Los especificadores de `@nestjs/swagger` quedan ordenados de menor a mayor (`7 → 8 → 12 → 13 → 19 → 21` caracteres).
-- ✅ El import de una sola línea (`@nestjs/common`) se ubica **después** de los multilínea.
-- ✅ Los miembros dentro de `@nestjs/common` también se ordenan por longitud ascendente (`Get` [3] → `Param` [5] → `Query` [5] → `Controller` [10] → `VERSION_NEUTRAL` [15]).
+**Changes applied:**
+- ✅ The multi-line import (`@nestjs/swagger`) goes **at the start** of the external dependencies group.
+- ✅ The `@nestjs/swagger` specifiers are sorted shortest to longest (`7 → 8 → 12 → 13 → 19 → 21` characters).
+- ✅ The single-line import (`@nestjs/common`) goes **after** the multi-line ones.
+- ✅ The members of `@nestjs/common` are also sorted by ascending length (`Get` [3] → `Param` [5] → `Query` [5] → `Controller` [10] → `VERSION_NEUTRAL` [15]).
