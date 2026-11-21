@@ -1,89 +1,91 @@
-# Plantilla de la Ficha (IDD Explore)
+# Spec Template (IDD Explore)
 
-Esta plantilla define la estructura canónica que genera la skill `idd-explore` para documentar issues en cualquier tracker (Linear, GitHub, GitLab, Jira) o notas locales.
+This template defines the canonical structure `idd-explore` produces to document issues in any tracker (Linear, GitHub, GitLab, Jira) or in local notes.
+
+Keep the `##` headings exactly as written: `idd-plan` and `idd-apply` look for them (see the IDD markers in [adapters.md](adapters.md#-idd-markers)). Write the content under them in the user's language.
 
 ---
 
-## 📄 Plantilla Markdown (Copiar / Persistir)
+## 📄 Markdown Template (copy / persist)
 
 ```markdown
-## 🎯 Objetivo
-<!-- Descripción concisa del problema que se resuelve y por qué es necesario ahora. -->
+## 🎯 Goal
+<!-- Short description of the problem being solved and why it is needed now. -->
 
-## 🛡️ Restricciones Arquitectónicas
-<!-- Restricciones de capa (ej. backend vs frontend), seguridad, persistencia o rendimiento. -->
-- **Ubicación:** 
-- **Límites de capa:** 
-- **Seguridad / Permisos:** 
+## 🛡️ Architectural Constraints
+<!-- Layer constraints (e.g. backend vs frontend), security, persistence or performance. -->
+- **Location:** 
+- **Layer boundaries:** 
+- **Security / Permissions:** 
 
-## 📋 Reglas de Negocio Clave
-<!-- Criterios funcionales específicos, fórmulas, casos de borde y consideraciones de dominio. -->
-- **Regla 1:** 
-- **Casos de borde:** 
+## 📋 Key Business Rules
+<!-- Specific functional criteria, formulas, edge cases and domain considerations. -->
+- **Rule 1:** 
+- **Edge cases:** 
 
-## 🧭 Contexto Técnico en el Repo
-<!-- Archivos, módulos, tablas o funciones existentes identificados durante la inspección. -->
-- **Archivos / Módulos:** `path/to/module`
-- **Patrón existente:** 
-- **Dependencias involucradas:** 
+## 🧭 Technical Context in the Repo
+<!-- Existing files, modules, tables or functions found during the inspection. -->
+- **Files / Modules:** `path/to/module`
+- **Existing pattern:** 
+- **Dependencies involved:** 
 
-## 📦 Alcance Propuesto
-### Dentro del alcance (In Scope)
-- [ ] Entregable o funcionalidad 1
-- [ ] Entregable o funcionalidad 2
+## 📦 Proposed Scope
+### In Scope
+- [ ] Deliverable or feature 1
+- [ ] Deliverable or feature 2
 
-### Fuera de alcance (Out of Scope)
-- Exclusiones deliberadas para esta fase o ticket.
+### Out of Scope
+- Deliberate exclusions for this phase or ticket.
 
-## 🗓️ Metadatos & Planificación
-<!-- Preservación obligatoria de notas de tracking que venían en el ticket original. -->
-- **Estimación:** 
-- **Ventana temporal / Hito:** 
-- **Fase / Epic:** 
-- **Prioridad / Etiquetas:** 
+## 🗓️ Metadata & Planning
+<!-- Mandatory: keep the tracking notes that came with the original ticket. -->
+- **Estimate:** 
+- **Time window / Milestone:** 
+- **Phase / Epic:** 
+- **Priority / Labels:** 
 
-## ❓ Preguntas / Decisiones Abiertas
-<!-- Dudas pendientes para alinear con el equipo antes o durante la especificación. -->
+## ❓ Open Questions / Decisions
+<!-- Pending questions to settle with the team before or during the specification. -->
 - 
 ```
 
 ---
 
-## 📌 Ejemplo Realista
+## 📌 Realistic Example
 
 ```markdown
-## 🎯 Objetivo
-Calcular plazos y términos (días hábiles/calendario, horas, meses y años) con trazabilidad de reglas y versiones, centralizado exclusivamente en el backend.
+## 🎯 Goal
+Compute deadlines and terms (business/calendar days, hours, months and years) with traceable rules and versions, centralized exclusively in the backend.
 
-## 🛡️ Restricciones Arquitectónicas
-- **Ubicación:** Backend (Edge Function TypeScript/Deno o función Postgres).
-- **Límites de capa:** La app web y móvil son solo consumidoras; ninguna regla de fechas corre en el cliente.
-- **Trazabilidad:** Guardar junto a la fecha calculada el fundamento y versión de la regla aplicada.
+## 🛡️ Architectural Constraints
+- **Location:** Backend (TypeScript/Deno Edge Function or Postgres function).
+- **Layer boundaries:** The web and mobile apps only consume it; no date rule runs on the client.
+- **Traceability:** Store the basis and version of the applied rule alongside the computed date.
 
-## 📋 Reglas de Negocio Clave
-- Distinción estricta entre días hábiles vs. días calendario (feriados y fines de semana).
-- Cálculo de meses: un mes no equivale a 30 días calendario fijos.
-- Suite de pruebas automatizadas con casos de borde y fechas reales.
+## 📋 Key Business Rules
+- Strict distinction between business days and calendar days (holidays and weekends).
+- Month calculation: a month is not a fixed 30 calendar days.
+- Automated test suite with edge cases and real dates.
 
-## 🧭 Contexto Técnico en el Repo
-- **Módulos detectados:** `supabase/functions/terms-calculator/` y migraciones en `supabase/migrations/`.
-- **Librería de fechas actual:** `date-fns` en dependencias del proyecto.
+## 🧭 Technical Context in the Repo
+- **Modules found:** `supabase/functions/terms-calculator/` and migrations in `supabase/migrations/`.
+- **Current date library:** `date-fns` in the project dependencies.
 
-## 📦 Alcance Propuesto
-### Dentro del alcance (In Scope)
-- [ ] Endpoint backend para cálculo de plazos temporales.
-- [ ] Persistencia de metadatos de regla y fundamento en la respuesta/registro.
-- [ ] Suite de tests unitarios e integración para años bisiestos y feriados.
+## 📦 Proposed Scope
+### In Scope
+- [ ] Backend endpoint to compute time limits.
+- [ ] Persist the rule and basis metadata in the response/record.
+- [ ] Unit and integration test suite for leap years and holidays.
 
-### Fuera de alcance (Out of Scope)
-- Sincronización en tiempo real vía WebSockets.
+### Out of Scope
+- Real-time sync over WebSockets.
 
-## 🗓️ Metadatos & Planificación
-- **Estimación:** 16 h
-- **Ventana temporal:** 16 nov → 19 nov 2026
-- **Fase:** F4 · Términos y agenda
-- **Slug sugerido:** `bs-521-calculo-terminos`
+## 🗓️ Metadata & Planning
+- **Estimate:** 16 h
+- **Time window:** Nov 16 → Nov 19, 2026
+- **Phase:** F4 · Terms and calendar
+- **Suggested slug:** `bs-521-terms-calculation`
 
-## ❓ Preguntas / Decisiones Abiertas
-- ¿La lista de feriados nacionales se gestiona en tabla Postgres o archivo de configuración estático?
+## ❓ Open Questions / Decisions
+- Is the list of national holidays managed in a Postgres table or a static config file?
 ```

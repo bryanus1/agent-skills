@@ -1,73 +1,101 @@
-# Adaptadores de Proveedores (IDD)
+# Provider Adapters (IDD)
 
-Comandos y herramientas para leer y escribir ítems en cada proveedor. Los usan las tres fases del flujo IDD (`idd-explore`, `idd-plan`, `idd-apply`).
+Commands and tools to read and write items in each provider. All three phases of the IDD flow (`idd-explore`, `idd-plan`, `idd-apply`) use them.
 
-**Prioridad:** el tracker es la fuente de verdad. El archivo local solo se usa si no hay tracker disponible.
+**Priority:** the tracker is the source of truth. The local file is used only when no tracker is available.
 
 ---
 
-## 🔍 Detección del Proveedor
+## 🔍 Detecting the Provider
 
-| Entrada del usuario | Proveedor | Herramienta |
+| User input | Provider | Tool |
 |---|---|---|
-| `https://www.notion.so/...`, ID de página | **Notion** | Notion MCP |
+| `https://www.notion.so/...`, page ID | **Notion** | Notion MCP |
 | `ENG-104`, `https://linear.app/...` | **Linear** | Linear MCP |
 | `#42`, `owner/repo#42`, `https://github.com/<o>/<r>/issues/42` | **GitHub Issues** | `gh issue` |
 | `https://github.com/orgs/<o>/projects/N`, `https://github.com/users/<u>/projects/N` | **GitHub Projects** | `gh project` + `gh issue` |
-| Ruta `.md`, texto pegado, Jira u otro sin integración | **Local** | sistema de archivos |
+| `.md` path, pasted text, Jira or anything without an integration | **Local** | file system |
 
-Si la entrada no es un ítem de tracker, comprobar qué tracker está disponible (MCP de Notion/Linear conectado, o `gh auth status` correcto) y **ofrecer** crear el ítem ahí antes de recurrir al archivo local.
+If the input is not a tracker item, check which tracker is available (Notion/Linear MCP connected, or `gh auth status` OK) and **offer** to create the item there before falling back to the local file.
 
 ---
 
 ## 1. Notion
 
-- **Leer:** `notion-fetch` con la URL o el ID de la página.
-- **Actualizar el cuerpo:** `notion-update-page` con el contenido Markdown (añadir o reemplazar la sección correspondiente; conservar el resto).
-- **Crear:** `notion-create-pages` en la base de datos o página padre que indique el usuario (preguntar si no se conoce).
-- **Comentar:** `notion-create-comment` en la página (progreso de `idd-apply`).
-- **Casillas:** las tareas se escriben como to-dos (`- [ ]`); se consolidan editando la página al cerrar.
+- **Read:** `notion-fetch` with the page URL or ID.
+- **Update the body:** `notion-update-page` with the Markdown content (add or replace the relevant section; keep the rest).
+- **Create:** `notion-create-pages` in the database or parent page the user names (ask if it is not known).
+- **Comment:** `notion-create-comment` on the page (`idd-apply` progress).
+- **Checkboxes:** tasks are written as to-dos (`- [ ]`); they are consolidated by editing the page at the end.
 
 ## 2. Linear
 
-- **Leer:** `get_issue` con `{ "id": "ENG-104" }`; el detalle está en `description`. Para comentarios, `list_comments`.
-- **Actualizar:** `save_issue` con `{ "id": "ENG-104", "description": "<markdown completo>" }`. En descripciones largas, usar el modo `patch` si está disponible.
-- **Crear:** `save_issue` sin `id`, con `team` (obligatorio) y `title`. Revisar antes con `list_issues` que no exista uno igual.
-- **Comentar:** `save_comment` con `issueId` y `body` (progreso de `idd-apply`).
+- **Read:** `get_issue` with `{ "id": "ENG-104" }`; the details are in `description`. For comments, `list_comments`.
+- **Update:** `save_issue` with `{ "id": "ENG-104", "description": "<full markdown>" }`. For long descriptions, use `patch` mode if available.
+- **Create:** `save_issue` without `id`, with `team` (required) and `title`. Check first with `list_issues` that no matching issue exists.
+- **Comment:** `save_comment` with `issueId` and `body` (`idd-apply` progress).
 
 ## 3. GitHub Issues
 
 ```bash
-gh issue view 42 --json number,title,body,state,labels       # leer
-gh issue edit 42 --body-file <tmp-body.md>                    # reemplazar el cuerpo
-gh issue create --title "<título>" --body-file <tmp-body.md>  # crear
-gh issue comment 42 --body-file <tmp-comment.md>              # comentar (progreso de idd-apply)
-gh issue view 42 --comments                                   # leer comentarios al retomar
+gh issue view 42 --json number,title,body,state,labels       # read
+gh issue edit 42 --body-file <tmp-body.md>                    # replace the body
+gh issue create --title "<title>" --body-file <tmp-body.md>   # create
+gh issue comment 42 --body-file <tmp-comment.md>              # comment (idd-apply progress)
+gh issue view 42 --comments                                   # read comments when resuming
 ```
 
-Usar siempre `--body-file` (evita problemas de escape). Escribir el archivo temporal fuera del repo y borrarlo al terminar.
+Always use `--body-file` (it avoids escaping problems). Write the temporary file outside the repo and delete it when done.
 
 ## 4. GitHub Projects
 
 ```bash
-gh project item-list <N> --owner <owner> --format json        # localizar el ítem
-gh project item-add <N> --owner <owner> --url <issue-url>     # añadir una issue nueva al proyecto
+gh project item-list <N> --owner <owner> --format json        # find the item
+gh project item-add <N> --owner <owner> --url <issue-url>     # add a new issue to the project
 ```
 
-- Si el ítem tiene issue enlazada, leer y escribir esa issue con los comandos de GitHub Issues.
-- Si es un *draft item*, editarlo con `gh project item-edit --id <item-id> --title "<título>" --body "<markdown>"` (no admite `--body-file`). Para cuerpos largos, proponer antes convertirlo en issue.
-- Requiere el scope `project` en `gh` (`gh auth refresh -s project`); si falta, indicárselo al usuario en vez de ejecutarlo.
+- If the item has a linked issue, read and write that issue with the GitHub Issues commands.
+- If it is a *draft item*, edit it with `gh project item-edit --id <item-id> --title "<title>" --body "<markdown>"` (no `--body-file` support). For long bodies, offer to convert it into an issue first.
+- Requires the `project` scope in `gh` (`gh auth refresh -s project`); if it is missing, tell the user instead of running it.
 
-## 5. Local (respaldo)
+## 5. Local (fallback)
 
-- **Un archivo por cambio:** `docs/specs/<YYYY-MM-DD>-<slug>.md` (slug en kebab-case derivado del título).
-- `idd-explore` lo crea con la ficha; `idd-plan` añade debajo `## 🛠️ Plan de Implementación`; `idd-apply` marca las casillas.
-- Para Jira u otros trackers sin integración: además de guardar el archivo, mostrar el bloque Markdown listo para copiar.
+- **One file per change:** `docs/specs/<YYYY-MM-DD>-<slug>.md` (kebab-case slug derived from the title).
+- `idd-explore` creates it with the spec; `idd-plan` appends `## 🛠️ Implementation Plan` below it; `idd-apply` ticks the checkboxes.
+- For Jira or other trackers without an integration: besides saving the file, show the Markdown block ready to copy.
 
 ---
 
-## ✍️ Regla común de escritura
+## 🏷️ IDD Markers
 
-Antes de escribir en cualquier proveedor: mostrar el contenido completo, decir **dónde** se va a escribir y esperar la confirmación explícita del usuario. Al actualizar, conservar las secciones existentes que no son de esta fase.
+The phases find each other's output through these literal markers. **Write** the English marker. **Read** both: items created by earlier versions of the skills use the Spanish one. When you update an item that already uses the Spanish markers, keep them in Spanish so the item does not mix languages.
 
-La mayoría de proveedores **reemplazan el cuerpo completo** (`gh issue edit`, `save_issue`). Por eso: volver a leer el cuerpo actual justo antes de escribir, cambiar solo la sección propia (ficha, `## 🛠️ Plan de Implementación` o sus casillas) y enviar el cuerpo entero. Si el cuerpo cambió desde la última lectura, partir de la versión nueva.
+| Written by | English marker (write) | Legacy Spanish marker (also read) |
+|---|---|---|
+| `idd-explore` | `## 🎯 Goal` | `## 🎯 Objetivo` |
+| `idd-explore` | `## 🛡️ Architectural Constraints` | `## 🛡️ Restricciones Arquitectónicas` |
+| `idd-explore` | `## 📋 Key Business Rules` | `## 📋 Reglas de Negocio Clave` |
+| `idd-explore` | `## 🧭 Technical Context in the Repo` | `## 🧭 Contexto Técnico en el Repo` |
+| `idd-explore` | `## 📦 Proposed Scope` | `## 📦 Alcance Propuesto` |
+| `idd-explore` | `## 🗓️ Metadata & Planning` | `## 🗓️ Metadatos & Planificación` |
+| `idd-explore` | `## ❓ Open Questions / Decisions` | `## ❓ Preguntas / Decisiones Abiertas` |
+| `idd-plan` | `## 🛠️ Implementation Plan` | `## 🛠️ Plan de Implementación` |
+| `idd-plan` | `### Tasks` | `### Tareas` |
+| `idd-plan` | `### Verification` | `### Verificación` |
+| `idd-plan` / `idd-apply` | `Status: planned` | `Estado: planificado` |
+| `idd-apply` | `Status: in progress` | `Estado: en progreso` |
+| `idd-apply` | `Status: blocked — <reason>` | `Estado: bloqueado — <motivo>` |
+| `idd-apply` | `Status: implemented · <YYYY-MM-DD>` | `Estado: implementado · <YYYY-MM-DD>` |
+| `idd-apply` | `🔄 IDD Progress` (comment) | `🔄 Progreso IDD` |
+| `idd-apply` | `✅ IDD — implemented` (comment) | `✅ IDD — implementado` |
+| `idd-apply` | `### Deviations` | `### Desviaciones` |
+
+To find pending local plans, search `docs/specs/*.md` for both `Status: planned|in progress` and `Estado: planificado|en progreso`.
+
+---
+
+## ✍️ Common Write Rule
+
+Before writing to any provider: show the full content, say **where** it will be written and wait for the user's explicit confirmation. When updating, keep the existing sections that do not belong to this phase.
+
+Most providers **replace the whole body** (`gh issue edit`, `save_issue`). So: read the current body again right before writing, change only your own section (the spec, `## 🛠️ Implementation Plan` or its checkboxes) and send the whole body. If the body changed since your last read, start from the new version.

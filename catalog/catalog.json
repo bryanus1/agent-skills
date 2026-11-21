@@ -710,8 +710,8 @@
     },
     {
       "name": "explain-change",
-      "version": "1.0.0",
-      "description": "Tras implementar un cambio con IA (/opsx:apply, idd-apply o cualquier plan), contrasta el diff real contra la propuesta original y resume qué decisiones tomó la IA que no estaban especificadas: supuestos, alcance extra, contratos, dependencias y atajos. Solo lectura.",
+      "version": "1.1.0",
+      "description": "After an AI implements a change (/opsx:apply, idd-apply or any plan), compares the real diff against the original proposal and sums up the decisions the AI made that were not specified: assumptions, extra scope, contracts, dependencies and shortcuts. Read-only.",
       "category": "workflow",
       "path": "skills/workflow/explain-change/SKILL.md",
       "readme": "skills/workflow/explain-change/README.md",
@@ -739,14 +739,16 @@
         "después de /opsx:apply",
         "auditar cambios contra la propuesta",
         "explain change",
-        "undeclared decisions"
+        "undeclared decisions",
+        "what did the ai decide",
+        "audit change against the plan"
       ],
       "requires": []
     },
     {
       "name": "idd-apply",
-      "version": "1.0.0",
-      "description": "Fase Apply del flujo IDD (Issue-Driven Development). Implementa el plan guardado en Notion, Linear, GitHub Issues/Projects o un .md local: ejecuta las tareas en orden, marca cada casilla al verificarla, se detiene ante desviaciones y cierra con la verificación del plan.",
+      "version": "1.1.0",
+      "description": "Apply phase of the IDD (Issue-Driven Development) flow. Implements the plan saved in Notion, Linear, GitHub Issues/Projects or a local .md: runs the tasks in order, ticks each checkbox once verified, stops on deviations and closes with the plan's verification.",
       "category": "workflow",
       "path": "skills/workflow/idd-apply/SKILL.md",
       "readme": "skills/workflow/idd-apply/README.md",
@@ -772,6 +774,7 @@
         "apply plan",
         "implement the plan",
         "continúa el plan",
+        "continue the plan",
         "idd apply"
       ],
       "requires": [
@@ -781,8 +784,8 @@
     },
     {
       "name": "idd-explore",
-      "version": "2.0.0",
-      "description": "Fase Explore del flujo IDD (Issue-Driven Development). Refina issues de Notion, Linear, GitHub Issues/Projects o notas locales con solo título o ideas sueltas: explora el repo, extrae restricciones y reglas, preserva estimaciones y deja una ficha lista para idd-plan.",
+      "version": "2.1.0",
+      "description": "Explore phase of the IDD (Issue-Driven Development) flow. Refines Notion, Linear, GitHub Issues/Projects items or local notes that only have a title or loose ideas: explores the repo, extracts constraints and rules, keeps estimates and leaves a spec ready for idd-plan.",
       "category": "workflow",
       "path": "skills/workflow/idd-explore/SKILL.md",
       "readme": "skills/workflow/idd-explore/README.md",
@@ -809,8 +812,11 @@
         "refinar issue",
         "refine issue",
         "analizar ticket",
+        "analyze ticket",
         "preparar ticket",
+        "prepare ticket",
         "explorar requerimiento",
+        "explore requirement",
         "linear triage",
         "github issue triage",
         "idd explore"
@@ -819,8 +825,8 @@
     },
     {
       "name": "idd-plan",
-      "version": "1.0.0",
-      "description": "Fase Plan del flujo IDD (Issue-Driven Development). Convierte un ítem de Notion, Linear, GitHub Issues/Projects o un .md local en un plan de implementación detallado: requisitos con escenarios, diseño, archivos verificados, tareas y verificación. No toca código.",
+      "version": "1.1.0",
+      "description": "Plan phase of the IDD (Issue-Driven Development) flow. Turns a Notion, Linear, GitHub Issues/Projects item or a local .md into a detailed implementation plan: requirements with scenarios, design, verified files, tasks and verification. Does not touch code.",
       "category": "workflow",
       "path": "skills/workflow/idd-plan/SKILL.md",
       "readme": "skills/workflow/idd-plan/README.md",
@@ -845,6 +851,7 @@
         "planifica el issue",
         "crear plan de implementación",
         "plan this issue",
+        "create implementation plan",
         "spec this",
         "idd plan"
       ],

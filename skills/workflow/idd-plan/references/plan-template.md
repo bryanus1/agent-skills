@@ -1,180 +1,182 @@
-# Plantilla del Plan (IDD Plan)
+# Plan Template (IDD Plan)
 
-Estructura canónica que genera `idd-plan`. Se añade como sección `## 🛠️ Plan de Implementación` debajo de la ficha de `idd-explore`, en el mismo ítem del tracker o en el mismo `.md` local.
+Canonical structure produced by `idd-plan`. It is added as a `## 🛠️ Implementation Plan` section below the `idd-explore` spec, in the same tracker item or the same local `.md`.
+
+Keep the headings and the `> Status: …` line exactly as written: `idd-apply` looks for them. Items created by earlier versions use the Spanish markers (`## 🛠️ Plan de Implementación`, `Estado: planificado`…); the full list is in `<skill-dir>/../idd-explore/references/adapters.md` under "IDD Markers". Write the content in the user's language.
 
 ---
 
-## Dónde se guarda
+## Where it is saved
 
-| Situación | Destino |
+| Situation | Destination |
 |---|---|
-| La entrada es un ítem de Notion, Linear, GitHub Issues o GitHub Projects | La descripción del ítem o el cuerpo de la página |
-| La entrada es texto o `.md` y hay un tracker conectado | Ofrecer crear el ítem en el tracker |
-| No hay tracker | `docs/specs/<YYYY-MM-DD>-<slug>.md` |
+| The input is a Notion, Linear, GitHub Issues or GitHub Projects item | The item's description or the page body |
+| The input is text or a `.md` and a tracker is connected | Offer to create the item in the tracker |
+| No tracker | `docs/specs/<YYYY-MM-DD>-<slug>.md` |
 
-Comandos de cada proveedor: `<skill-dir>/../idd-explore/references/adapters.md`.
-
----
-
-## Reglas de redacción
-
-- **Requisitos** con lenguaje normativo: "El sistema DEBE…", "NO DEBE…". Numerados `R1`, `R2`…
-- **Delta, no especificación completa**: agrupar en `ADDED` (nuevo), `MODIFIED` (cambia un comportamiento existente; indicar el antes) y `REMOVED` (indicar motivo y migración). Omitir los grupos vacíos.
-- **Escenarios** en *Dado / Cuando / Entonces*, observables desde fuera (respuesta, UI, archivo, registro), no detalles internos.
-- **Tareas** de 15 min a 2 h cada una, en orden de ejecución, con un verbo al inicio y su requisito (`→ R1`). Agrupar por área (`1.` datos, `2.` lógica, `3.` UI, `4.` tests…).
-- **Verificación** ejecutable: comandos reales del proyecto y qué escenario cubre cada uno.
-- **Rutas** solo si se comprobó que existen; las nuevas llevan `(nuevo)`.
+Commands for each provider: `<skill-dir>/../idd-explore/references/adapters.md`.
 
 ---
 
-## 📄 Plantilla
+## Writing rules
+
+- **Requirements** in normative language: "The system MUST…", "MUST NOT…". Numbered `R1`, `R2`…
+- **Delta, not a full specification**: group into `ADDED` (new), `MODIFIED` (changes existing behavior; state the before) and `REMOVED` (state the reason and the migration). Omit empty groups.
+- **Scenarios** in *Given / When / Then*, observable from outside (response, UI, file, record), not internal details.
+- **Tasks** of 15 min to 2 h each, in execution order, starting with a verb and naming their requirement (`→ R1`). Group by area (`1.` data, `2.` logic, `3.` UI, `4.` tests…).
+- **Verification** that can be run: the project's real commands and which scenario each one covers.
+- **Paths** only if you checked that they exist; new ones carry `(new)`.
+
+---
+
+## 📄 Template
 
 ```markdown
-## 🛠️ Plan de Implementación
+## 🛠️ Implementation Plan
 
-> Estado: planificado · Fuente: <enlace o ruta> · Fecha: <YYYY-MM-DD>
+> Status: planned · Source: <link or path> · Date: <YYYY-MM-DD>
 
-### Contexto
-<!-- Problema, motivo y resultado esperado, en 2–5 líneas. -->
+### Context
+<!-- Problem, reason and expected result, in 2–5 lines. -->
 
-### Requisitos
+### Requirements
 
 #### ADDED
-- **R1.** El sistema DEBE …
-  - **Escenario:** <nombre>
-    - **Dado** …
-    - **Cuando** …
-    - **Entonces** …
+- **R1.** The system MUST …
+  - **Scenario:** <name>
+    - **Given** …
+    - **When** …
+    - **Then** …
 
 #### MODIFIED
-- **R2.** <comportamiento> DEBE … (antes: …)
-  - **Escenario:** …
+- **R2.** <behavior> MUST … (before: …)
+  - **Scenario:** …
 
 #### REMOVED
-- **R3.** Se elimina … — Motivo: … — Migración: …
+- **R3.** Removes … — Reason: … — Migration: …
 
-### Diseño y decisiones
-- **Enfoque:** …
-- **Reutiliza:** `path/to/util.ts` (`funcionExistente`)
-- **Descartado:** <alternativa> — <motivo en una línea>
+### Design and decisions
+- **Approach:** …
+- **Reuses:** `path/to/util.ts` (`existingFunction`)
+- **Discarded:** <alternative> — <one-line reason>
 
-### Archivos afectados
-- `src/...` — <qué cambia>
-- `src/...` (nuevo) — <para qué>
+### Affected files
+- `src/...` — <what changes>
+- `src/...` (new) — <what for>
 
-### Tareas
-1. **<Área>**
-   - [ ] 1.1 <Verbo> … → R1
+### Tasks
+1. **<Area>**
+   - [ ] 1.1 <Verb> … → R1
    - [ ] 1.2 … → R1
 2. **Tests**
    - [ ] 2.1 … → R1, R2
 
-### Verificación
-- [ ] `<comando de test>` — cubre R1 (escenario …)
-- [ ] `<comando de lint/build>`
-- [ ] Comprobación manual: … — cubre R2
+### Verification
+- [ ] `<test command>` — covers R1 (scenario …)
+- [ ] `<lint/build command>`
+- [ ] Manual check: … — covers R2
 
-### Fuera de alcance
+### Out of scope
 - …
 
-### Supuestos
+### Assumptions
 - …
 
-### Preguntas abiertas
-- … (vacío si no hay ninguna)
+### Open questions
+- … (empty if there are none)
 
-### Metadatos
-- **Estimación:** … · **Fase:** … · **Ventana:** …
+### Metadata
+- **Estimate:** … · **Phase:** … · **Window:** …
 ```
 
 ---
 
-## ⚡ Plan corto
+## ⚡ Short plan
 
-Para cambios pequeños (un solo módulo, hasta 3 tareas, sin cambios de datos, API pública ni dependencias). Mismas reglas de redacción, menos secciones:
+For small changes (one module, up to 3 tasks, no data, public API or dependency changes). Same writing rules, fewer sections:
 
 ```markdown
-## 🛠️ Plan de Implementación
+## 🛠️ Implementation Plan
 
-> Estado: planificado · Fuente: <enlace o ruta> · Fecha: <YYYY-MM-DD> · Plan corto
+> Status: planned · Source: <link or path> · Date: <YYYY-MM-DD> · Short plan
 
-### Contexto
-<!-- 1–2 líneas. -->
+### Context
+<!-- 1–2 lines. -->
 
-### Requisitos
-- **R1.** El sistema DEBE …
-  - **Escenario:** **Dado** … **Cuando** … **Entonces** …
+### Requirements
+- **R1.** The system MUST …
+  - **Scenario:** **Given** … **When** … **Then** …
 
-### Tareas
-- [ ] 1 <Verbo> … en `src/...` → R1
-- [ ] 2 Test de … → R1
+### Tasks
+- [ ] 1 <Verb> … in `src/...` → R1
+- [ ] 2 Test for … → R1
 
-### Verificación
-- [ ] `<comando de test>` — cubre R1
+### Verification
+- [ ] `<test command>` — covers R1
 ```
 
-Si al redactarlo aparecen decisiones de diseño, más de 3 tareas o dudas abiertas, pasar al plan completo.
+If design decisions, more than 3 tasks or open questions come up while writing it, switch to the full plan.
 
-## ✂️ Cuándo dividir
+## ✂️ When to split
 
-Si el plan supera unas 12 tareas o contiene entregables que se pueden entregar por separado, proponer un ítem por entregable. Cada ítem lleva su propio plan y una línea `Relacionado: <enlace>` en Metadatos. El ítem original queda como índice con la lista de los nuevos.
+If the plan goes beyond about 12 tasks or holds deliverables that can ship separately, propose one item per deliverable. Each item gets its own plan and a `Related: <link>` line in Metadata. The original item stays as an index listing the new ones.
 
 ---
 
-## 📌 Ejemplo
+## 📌 Example
 
 ```markdown
-## 🛠️ Plan de Implementación
+## 🛠️ Implementation Plan
 
-> Estado: planificado · Fuente: ENG-104 · Fecha: 2026-11-12
+> Status: planned · Source: ENG-104 · Date: 2026-11-12
 
-### Contexto
-Los usuarios de facturación necesitan descargar el listado filtrado de facturas en CSV para conciliarlo en su hoja de cálculo. Hoy solo pueden verlo en pantalla.
+### Context
+Billing users need to download the filtered invoice list as CSV to reconcile it in their spreadsheet. Today they can only see it on screen.
 
-### Requisitos
+### Requirements
 
 #### ADDED
-- **R1.** El endpoint `GET /invoices/export` DEBE devolver un CSV con los mismos filtros que `GET /invoices`.
-  - **Escenario:** exportación filtrada
-    - **Dado** 3 facturas, 2 con estado `paid`
-    - **Cuando** se llama a `/invoices/export?status=paid`
-    - **Entonces** la respuesta es `text/csv` con cabecera y 2 filas
-- **R2.** El endpoint NO DEBE exportar más de 10 000 filas.
-  - **Escenario:** límite superado
-    - **Dado** un filtro con 12 000 resultados
-    - **Cuando** se exporta
-    - **Entonces** responde 422 con el mensaje `EXPORT_TOO_LARGE`
+- **R1.** The `GET /invoices/export` endpoint MUST return a CSV with the same filters as `GET /invoices`.
+  - **Scenario:** filtered export
+    - **Given** 3 invoices, 2 with status `paid`
+    - **When** `/invoices/export?status=paid` is called
+    - **Then** the response is `text/csv` with a header and 2 rows
+- **R2.** The endpoint MUST NOT export more than 10,000 rows.
+  - **Scenario:** limit exceeded
+    - **Given** a filter with 12,000 results
+    - **When** it is exported
+    - **Then** it responds 422 with the message `EXPORT_TOO_LARGE`
 
-### Diseño y decisiones
-- **Enfoque:** reutilizar `InvoiceQueryService.find` y serializar con el helper `toCsv` existente.
-- **Reutiliza:** `src/shared/csv.ts` (`toCsv`)
-- **Descartado:** generar el CSV en el cliente — el listado está paginado y no tiene todas las filas.
+### Design and decisions
+- **Approach:** reuse `InvoiceQueryService.find` and serialize with the existing `toCsv` helper.
+- **Reuses:** `src/shared/csv.ts` (`toCsv`)
+- **Discarded:** generating the CSV on the client — the list is paginated and does not have every row.
 
-### Archivos afectados
-- `src/invoices/invoices.controller.ts` — nueva ruta `export`
-- `src/invoices/invoices.controller.spec.ts` — tests de R1 y R2
+### Affected files
+- `src/invoices/invoices.controller.ts` — new `export` route
+- `src/invoices/invoices.controller.spec.ts` — tests for R1 and R2
 
-### Tareas
+### Tasks
 1. **Backend**
-   - [ ] 1.1 Añadir la ruta `GET /invoices/export` que reutiliza los filtros → R1
-   - [ ] 1.2 Validar el límite de 10 000 filas y devolver 422 → R2
+   - [ ] 1.1 Add the `GET /invoices/export` route that reuses the filters → R1
+   - [ ] 1.2 Validate the 10,000-row limit and return 422 → R2
 2. **Tests**
-   - [ ] 2.1 Test de exportación filtrada → R1
-   - [ ] 2.2 Test del límite → R2
+   - [ ] 2.1 Test the filtered export → R1
+   - [ ] 2.2 Test the limit → R2
 
-### Verificación
-- [ ] `pnpm test invoices` — cubre R1 y R2
+### Verification
+- [ ] `pnpm test invoices` — covers R1 and R2
 - [ ] `pnpm lint`
 
-### Fuera de alcance
-- Exportación a Excel o PDF.
+### Out of scope
+- Export to Excel or PDF.
 
-### Supuestos
-- El separador es coma y la codificación UTF-8.
+### Assumptions
+- The separator is a comma and the encoding is UTF-8.
 
-### Preguntas abiertas
-- (ninguna)
+### Open questions
+- (none)
 
-### Metadatos
-- **Estimación:** 4 h · **Fase:** F2 · Reportes
+### Metadata
+- **Estimate:** 4 h · **Phase:** F2 · Reports
 ```
