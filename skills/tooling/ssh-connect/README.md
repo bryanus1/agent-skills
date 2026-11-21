@@ -1,35 +1,35 @@
-# 🖥️ Conexión y Operación en Servidores Remotos (`ssh-connect`)
+# 🖥️ Connecting to and Operating Remote Servers (`ssh-connect`)
 
-> **Gestión, conexión y ejecución remota en servidores SSH con `ssh-connect`. Soporta llaves `.pem` con permisos asegurados (`chmod 600`), contraseñas automatizadas (Keychain) y multiplexación persistente (`ControlMaster`) sin bloqueos de TTY.**
+> **Manages, connects to and runs commands on SSH servers with `ssh-connect`. Supports `.pem` keys with locked-down permissions (`chmod 600`), automated passwords (Keychain) and persistent multiplexing (`ControlMaster`) with no TTY hangs.**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `ssh-connect` |
-| **Categoría** | `tooling` |
-| **Versión** | `1.0.0` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
-| **Requisitos** | `ssh-connect`, `ssh`, `bash` |
+| **Name** | `ssh-connect` |
+| **Category** | `tooling` |
+| **Version** | `1.1.0` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Requirements** | `ssh-connect`, `ssh`, `bash` |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
-### Vía `skills.sh` CLI (Recomendado)
+### With the `skills.sh` CLI (recommended)
 
 ```bash
-# Instalar en el proyecto actual:
+# Install into the current project:
 npx skills add bryanus1/agent-skills --skill ssh-connect
 
-# Instalar globalmente en tu máquina:
+# Install globally on your machine:
 npx skills add bryanus1/agent-skills --skill ssh-connect -g
 ```
 
-### Vía Enlace Simbólico Local
+### With a local symlink
 
 ```bash
 # Google Antigravity:
 mkdir -p .agents/skills
-ln -s /ruta/a/agent-skills/skills/tooling/ssh-connect .agents/skills/ssh-connect
+ln -s /path/to/agent-skills/skills/tooling/ssh-connect .agents/skills/ssh-connect
 
 # Claude Code:
 mkdir -p .claude/skills
@@ -38,27 +38,29 @@ ln -s ../../.agents/skills/ssh-connect .claude/skills/ssh-connect
 
 ---
 
-## 💡 Ejemplos de Uso con Agentes de IA
+## 💡 Usage Examples with AI Agents
 
-* **Diagnosticar un servidor sin bloquear el TTY**:
-  > *"Conéctate al servidor prod-api y dime el uso de disco y memoria"*
-  >
-  > 🤖 **El agente ejecutará**: `ssh-connect --exec prod-api "df -h && free -m"`  
-  > ➔ Consulta sin prompts interactivos, valida permisos de llave `.pem` o credenciales Keychain y reutiliza el socket `ControlMaster` para ejecuciones instantáneas.
+The skill replies in the user's language, so you can ask in English or Spanish.
 
-* **Descargar logs remotos**:
-  > *"Descarga los logs de error de Nginx de prod-api a mi máquina"*
+* **Diagnose a server without blocking the TTY**:
+  > *"Connect to the prod-api server and tell me its disk and memory usage"*
   >
-  > 🤖 **El agente ejecutará**: `ssh-connect --download prod-api /var/log/nginx/error.log ./logs/`
+  > 🤖 **The agent runs**: `ssh-connect --exec prod-api "df -h && free -m"`  
+  > ➔ No interactive prompts: it checks the `.pem` key permissions or Keychain credentials and reuses the `ControlMaster` socket for instant runs.
 
-* **Registrar un nuevo servidor con llave `.pem`**:
-  > *"Registra el servidor prod-api con IP 54.123.45.67, usuario ubuntu y la llave ~/.ssh/aws.pem"*
+* **Download remote logs**:
+  > *"Download the Nginx error logs from prod-api to my machine"*
   >
-  > 🤖 **El agente ejecutará**: `ssh-connect --add --alias prod-api --host 54.123.45.67 --user ubuntu --port 22 --type pem --key ~/.ssh/aws.pem`
+  > 🤖 **The agent runs**: `ssh-connect --download prod-api /var/log/nginx/error.log ./logs/`
+
+* **Register a new server with a `.pem` key**:
+  > *"Register the prod-api server with IP 54.123.45.67, user ubuntu and the key ~/.ssh/aws.pem"*
+  >
+  > 🤖 **The agent runs**: `ssh-connect --add --alias prod-api --host 54.123.45.67 --user ubuntu --port 22 --type pem --key ~/.ssh/aws.pem`
 
 ---
 
-## 📚 Documentación y Referencias
+## 📚 Documentation and References
 
-- **[`SKILL.md`](SKILL.md)**: Especificación operativa completa, flujo de 6 pasos y reglas críticas de seguridad no interactiva.
-- **[CheatSheet de Comandos y Diagnóstico Remoto](references/commands_cheatsheet.md)**: Recetas de diagnóstico para Docker, systemd, bases de datos y red.
+- **[`SKILL.md`](SKILL.md)**: Full operating spec, the 6-step workflow and the critical rules for safe, non-interactive use.
+- **[Remote Commands and Diagnostics Cheat Sheet](references/commands_cheatsheet.md)**: Diagnostic recipes for Docker, systemd, databases and network.

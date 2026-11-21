@@ -1,8 +1,8 @@
 ---
 name: ssh-connect
-version: 1.0.0
+version: 1.1.0
 description: >-
-  Gestión, conexión y ejecución remota en servidores SSH con ssh-connect. Soporta llaves .pem con permisos asegurados, contraseñas automatizadas (Keychain) y multiplexación persistente sin bloqueos de TTY.
+  Manages, connects to and runs commands on SSH servers with ssh-connect. Supports .pem keys with locked-down permissions, automated passwords (Keychain) and persistent multiplexing with no TTY hangs. Use to connect to, diagnose or transfer files with a remote server.
 tags: [ssh, devops, servers, remote, pem, deployment, sysadmin, cli]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
@@ -13,133 +13,137 @@ triggers:
   - servidor remoto
   - archivo .pem
   - ssh server
+  - connect to server
+  - run on remote server
+  - remote server
 requirements:
   tools: [run_command, view_file]
   bins: [ssh-connect, ssh, bash]
 ---
 
-# 🖥️ Conexión y Operación en Servidores Remotos (`ssh-connect`)
+# 🖥️ Connecting to and Operating Remote Servers (`ssh-connect`)
 
-## 🎯 Propósito
+## 🎯 Purpose
 
-Permitir al agente conectarse, inspeccionar y ejecutar tareas en servidores remotos de forma confiable, no interactiva y segura mediante `ssh-connect`. Maneja automáticamente la autenticación por archivo `.pem` (corrigiendo permisos `chmod 600`), contraseñas almacenadas en el Keychain de macOS o archivos protegidos, y multiplexación de sesiones OpenSSH (`ControlMaster`) para ejecuciones consecutivas instantáneas.
+Lets the agent connect to, inspect and run tasks on remote servers reliably, non-interactively and safely through `ssh-connect`. It handles `.pem` key authentication automatically (fixing permissions with `chmod 600`), passwords stored in the macOS Keychain or protected files, and OpenSSH session multiplexing (`ControlMaster`) so consecutive runs are instant.
 
-## ⚡ Cuándo Activar esta Skill
+## ⚡ When to Trigger
 
-- Cuando el usuario solicite conectarse, ejecutar comandos o verificar el estado de un servidor remoto por SSH.
-- Cuando se proporcione una IP o dominio con credenciales (usuario, contraseña o archivo `.pem`) para operar un host.
-- Cuando se requiera transferir archivos hacia o desde un servidor remoto (`--upload`, `--download`).
-- Cuando se deba diagnosticar un servicio remoto (Docker, systemd, logs de Nginx, uso de disco o memoria).
+- When the user asks to connect to a remote server over SSH, run commands on it or check its status.
+- When the user gives an IP or domain with credentials (user, password or `.pem` file) to work on a host.
+- When files need to move to or from a remote server (`--upload`, `--download`).
+- When a remote service needs diagnosing (Docker, systemd, Nginx logs, disk or memory usage).
 
-## 📋 Flujo de Trabajo Paso a Paso
+## 📋 Workflow
 
 ```mermaid
 flowchart TD
-    A["Descubrir Servidores\n(ssh-connect --list --json)"] --> B{"¿Servidor registrado?"}
-    B -- "No / Nuevas credenciales" --> C["Registrar perfil con ssh-connect --add\n(no interactivo)"]
-    B -- "Sí" --> D["Probar conectividad\n(ssh-connect --test <alias>)"]
+    A["Discover servers\n(ssh-connect --list --json)"] --> B{"Server registered?"}
+    B -- "No / new credentials" --> C["Register profile with ssh-connect --add\n(non-interactive)"]
+    B -- "Yes" --> D["Test connectivity\n(ssh-connect --test <alias>)"]
     C --> D
-    D --> E{"Tipo de operación"}
-    E -- "Ejecutar comandos" --> F["ssh-connect --exec <alias> '<comando>'\no pasar script por stdin"]
-    E -- "Transferir archivos" --> G["ssh-connect --upload / --download"]
-    E -- "Túnel de puertos" --> H["ssh-connect --tunnel <alias> <puertos>"]
+    D --> E{"Operation type"}
+    E -- "Run commands" --> F["ssh-connect --exec <alias> '<command>'\nor pipe a script on stdin"]
+    E -- "Transfer files" --> G["ssh-connect --upload / --download"]
+    E -- "Port tunnel" --> H["ssh-connect --tunnel <alias> <ports>"]
 ```
 
-### Paso 1: Descubrimiento de Servidores Configurados
+### Step 1: Discover Configured Servers
 
-Consulta los servidores ya registrados sin exponer contraseñas ni rutas sensibles:
+List the registered servers without exposing passwords or sensitive paths:
 
 ```bash
 ssh-connect --list --json
 ```
 
-Si el servidor ya existe, anota su `alias` para las operaciones siguientes.
+If the server already exists, note its `alias` for the next steps.
 
-### Paso 2: Registrar un Nuevo Servidor (si es necesario)
+### Step 2: Register a New Server (if needed)
 
-Si el usuario facilita credenciales nuevas durante la conversación, regístralo sin interacción:
+If the user gives new credentials in the conversation, register the server non-interactively:
 
 ```bash
-# Servidor con archivo .pem / llave privada:
+# Server with a .pem file / private key:
 ssh-connect --add --alias prod-api --host 54.123.45.67 --user ubuntu --port 22 --type pem --key ~/.ssh/aws.pem
 
-# Servidor con contraseña (pasada por stdin para evitar historial):
-printf "%s\n" "MiPasswordSeguro" | ssh-connect --add --alias legacy-vps --host 192.168.1.50 --user root --port 22 --type password --pass-stdin
+# Server with a password (passed on stdin to keep it out of shell history):
+printf "%s\n" "MySecurePassword" | ssh-connect --add --alias legacy-vps --host 192.168.1.50 --user root --port 22 --type password --pass-stdin
 
-# Servidor con agente SSH o llave predeterminada:
+# Server with the SSH agent or the default key:
 ssh-connect --add --alias staging --host staging.example.com --user deploy --type agent
 ```
 
-### Paso 3: Verificar Conectividad
+### Step 3: Check Connectivity
 
-Antes de ejecutar tareas complejas, comprueba que el host responda y la autenticación sea válida:
+Before running complex tasks, check that the host responds and authentication works:
 
 ```bash
 ssh-connect --test <alias>
 ```
 
-Si el servidor tiene llave `.pem`, `ssh-connect` revisará y ajustará automáticamente los permisos a `600` si estaban demasiado permisivos.
+If the server uses a `.pem` key, `ssh-connect` checks its permissions and sets them to `600` if they were too open.
 
-### Paso 4: Ejecución No Interactiva de Comandos
+### Step 4: Run Commands Non-Interactively
 
-**NUNCA** invoques `ssh-connect <alias>` sin comando, ya que abrirá una shell interactiva que congelará el proceso del agente al esperar un TTY.
+**NEVER** run `ssh-connect <alias>` without a command: it opens an interactive shell that freezes the agent while it waits for a TTY.
 
-Usa siempre el modo `--exec`:
+Always use `--exec`:
 
 ```bash
-# Comando simple:
+# Simple command:
 ssh-connect --exec <alias> "uptime && free -h"
 
-# Scripts multilínea complejos mediante stdin:
+# Complex multi-line scripts through stdin:
 ssh-connect --exec <alias> << 'EOF'
 set -euo pipefail
-echo "=== Diagnóstico del sistema ==="
+echo "=== System diagnostic ==="
 df -h /
 docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 systemctl is-active nginx || sudo systemctl restart nginx
 EOF
 ```
 
-Gracias a OpenSSH `ControlMaster`, la primera llamada abre el socket de conexión y las llamadas posteriores durante los siguientes 10 minutos se ejecutan de inmediato sin renegociar la sesión SSH.
+With OpenSSH `ControlMaster`, the first call opens the connection socket and later calls in the next 10 minutes run immediately, without renegotiating the SSH session.
 
-### Paso 5: Transferencia de Archivos
+### Step 5: Transfer Files
 
-Para mover artefactos de despliegue, archivos de configuración o descargar logs remotos:
+To move deployment artifacts or config files, or to download remote logs:
 
 ```bash
-# Subir archivo o carpeta local al servidor:
+# Upload a local file or folder to the server:
 ssh-connect --upload <alias> ./dist/ /var/www/app/
 
-# Descargar logs o respaldos remotos a la máquina local:
+# Download remote logs or backups to the local machine:
 ssh-connect --download <alias> /var/log/nginx/error.log ./logs/
 ```
 
-### Paso 6: Cerrar Sesión Persistente (Opcional)
+### Step 6: Close the Persistent Session (optional)
 
-Al concluir las tareas en el servidor:
+When you are done on the server:
 
 ```bash
 ssh-connect --disconnect <alias>
 ```
 
-## 🛠️ Scripts y Herramientas Auxiliares
+## 🛠️ Helper Scripts
 
-- `ssh-connect`: Comando ejecutable central instalado en el sistema (gestor de perfiles, conector SSH, túneles y SCP).
-- [`references/commands_cheatsheet.md`](references/commands_cheatsheet.md): Referencia rápida de recetas de diagnóstico remoto (Docker, systemd, bases de datos y red).
+- `ssh-connect`: The main executable installed on the system (profile manager, SSH connector, tunnels and SCP).
+- [`references/commands_cheatsheet.md`](references/commands_cheatsheet.md): Quick reference of remote diagnostic recipes (Docker, systemd, databases and network).
 
-## ⚠️ Reglas Críticas
+## ⚠️ Critical Rules
 
-1. **No Interactividad Absoluta**:
-   - Nunca ejecutes `ssh-connect <alias>` sin `--exec` o sin comandos remotos, ya que abrirá una pseudo-terminal interactiva que bloqueará al agente.
-   - Pasa siempre argumentos no interactivos a `ssh-connect --add`.
-2. **Seguridad y Confidencialidad de Credenciales**:
-   - Nunca imprimas contraseñas en texto claro en la consola ni en el chat. Al registrar servidores por contraseña, usa `--pass-stdin` o guárdala en el Keychain del sistema.
-   - Si se requiere una llave privada, solicita al usuario la ruta del archivo `.pem` en su disco local.
-3. **Acciones Remotas Críticas Requieren Confirmación**:
-   - Comandos destructivos como `rm -rf`, reinicio de servidores (`reboot`), formateo de volúmenes o modificaciones irreversibles en bases de datos deben mostrarse primero al usuario para su aprobación explícita.
-4. **Validación Previa con `--test`**:
-   - Verifica la conexión con `ssh-connect --test <alias>` antes de lanzar scripts largos o procesos de despliegue.
+1. **Reply in the user's language**, even though this skill is written in English.
+2. **Never interactive**:
+   - Never run `ssh-connect <alias>` without `--exec` or a remote command: it opens an interactive pseudo-terminal that blocks the agent.
+   - Always pass non-interactive arguments to `ssh-connect --add`.
+3. **Keep credentials secret**:
+   - Never print passwords in plain text in the console or the chat. When registering a password server, use `--pass-stdin` or store it in the system Keychain.
+   - If a private key is needed, ask the user for the path to the `.pem` file on their local disk.
+4. **Critical remote actions need confirmation**:
+   - Show destructive commands such as `rm -rf`, server reboots (`reboot`), volume formatting or irreversible database changes to the user first and wait for their explicit approval.
+5. **Check first with `--test`**:
+   - Verify the connection with `ssh-connect --test <alias>` before running long scripts or deployments.
 
-## 📚 Referencias Adicionales
+## 📚 References
 
-* [CheatSheet de Comandos y Diagnóstico Remoto](references/commands_cheatsheet.md)
+* [Remote Commands and Diagnostics Cheat Sheet](references/commands_cheatsheet.md)

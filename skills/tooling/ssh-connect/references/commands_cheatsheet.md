@@ -1,69 +1,69 @@
-# CheatSheet de Comandos y Diagnóstico Remoto con `ssh-connect`
+# Remote Commands and Diagnostics Cheat Sheet for `ssh-connect`
 
-Guía rápida de recetas para inspección de servidores, contenedores y servicios mediante `ssh-connect --exec <alias>`.
+Quick recipes for inspecting servers, containers and services through `ssh-connect --exec <alias>`.
 
 ---
 
-## 1. Comandos del CLI `ssh-connect`
+## 1. `ssh-connect` CLI Commands
 
-| Tarea | Comando |
+| Task | Command |
 | :--- | :--- |
-| Listar servidores (humano) | `ssh-connect --list` |
-| Listar servidores (agente JSON) | `ssh-connect --list --json` |
-| Probar conectividad | `ssh-connect --test <alias>` |
-| Ejecutar comando no interactivo | `ssh-connect --exec <alias> "<comando>"` |
-| Ejecutar script por stdin | `ssh-connect --exec <alias> << 'EOF' ... EOF` |
-| Subir archivo/directorio | `ssh-connect --upload <alias> <local> <remoto>` |
-| Descargar archivo/directorio | `ssh-connect --download <alias> <remoto> <local>` |
-| Abrir túnel SSH | `ssh-connect --tunnel <alias> 5432:localhost:5432` |
-| Conexión ad-hoc rápida | `ssh-connect --quick user@ip -p 22 -i clave.pem` |
-| Cerrar sesión multiplexada | `ssh-connect --disconnect <alias>` |
+| List servers (human) | `ssh-connect --list` |
+| List servers (agent, JSON) | `ssh-connect --list --json` |
+| Test connectivity | `ssh-connect --test <alias>` |
+| Run a non-interactive command | `ssh-connect --exec <alias> "<command>"` |
+| Run a script through stdin | `ssh-connect --exec <alias> << 'EOF' ... EOF` |
+| Upload a file/directory | `ssh-connect --upload <alias> <local> <remote>` |
+| Download a file/directory | `ssh-connect --download <alias> <remote> <local>` |
+| Open an SSH tunnel | `ssh-connect --tunnel <alias> 5432:localhost:5432` |
+| Quick ad-hoc connection | `ssh-connect --quick user@ip -p 22 -i key.pem` |
+| Close the multiplexed session | `ssh-connect --disconnect <alias>` |
 
 ---
 
-## 2. Recetas Rápidas de Diagnóstico
+## 2. Quick Diagnostic Recipes
 
-### Salud del Sistema (CPU, Memoria, Disco)
+### System Health (CPU, Memory, Disk)
 ```bash
 ssh-connect --exec <alias> << 'EOF'
-echo "=== Tiempo activo y carga ==="
+echo "=== Uptime and load ==="
 uptime
-echo "=== Memoria RAM ==="
+echo "=== RAM ==="
 free -h 2>/dev/null || vm_stat
-echo "=== Espacio en Disco ==="
+echo "=== Disk space ==="
 df -h -x tmpfs -x devtmpfs
 EOF
 ```
 
-### Servicios Systemd
+### Systemd Services
 ```bash
-# Estado de un servicio
+# Status of a service
 ssh-connect --exec <alias> "systemctl status nginx --no-pager"
 
-# Ver últimas 50 líneas de log de un servicio
+# Last 50 log lines of a service
 ssh-connect --exec <alias> "journalctl -u nginx -n 50 --no-pager"
 ```
 
-### Contenedores Docker
+### Docker Containers
 ```bash
-# Contenedores en ejecución
+# Running containers
 ssh-connect --exec <alias> "docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}'"
 
-# Logs de un contenedor específico
+# Logs of a specific container
 ssh-connect --exec <alias> "docker logs --tail 100 <container-id>"
 
-# Uso de recursos por contenedor
+# Resource usage per container
 ssh-connect --exec <alias> "docker stats --no-stream"
 ```
 
 ---
 
-## 3. Resolución de Problemas Comunes
+## 3. Common Problems
 
-### Permisos de Llave Privada (`UNPROTECTED PRIVATE KEY FILE`)
-Si OpenSSH rechaza una llave `.pem` por permisos (`0644` o `0777`):
-- `ssh-connect` detecta esto automáticamente y aplica `chmod 600` a la ruta indicada antes de conectar.
+### Private Key Permissions (`UNPROTECTED PRIVATE KEY FILE`)
+If OpenSSH rejects a `.pem` key because of its permissions (`0644` or `0777`):
+- `ssh-connect` detects it and runs `chmod 600` on that path before connecting.
 
 ### Host Key Verification Failed
-Si el servidor fue reinstalado y su fingerprint cambió:
-- Ejecuta en la máquina local: `ssh-keygen -R <host_o_ip>` para renovar la entrada en `~/.ssh/known_hosts`.
+If the server was reinstalled and its fingerprint changed:
+- Run on the local machine: `ssh-keygen -R <host_or_ip>` to refresh the entry in `~/.ssh/known_hosts`.

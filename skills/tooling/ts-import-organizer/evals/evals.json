@@ -4,26 +4,32 @@
     {
       "id": 1,
       "prompt": "Organiza los imports de este archivo Dashboard.tsx, tiene muchos mezclados, algunos repetidos y algunos que no uso. El archivo de input está en: evals/inputs/Dashboard.tsx",
-      "expected_output": "El bloque de imports del archivo queda reorganizado en 4 grupos (builtins → externos → aliases/relativos → side-effects), separados por línea en blanco. Los imports duplicados de react están consolidados. Las rutas ../../../ están convertidas a @/. El tipo DashboardProps usa import type. Los imports unused son eliminados. El ordenamiento dentro de cada grupo es por longitud de línea ascendente.",
-      "files": ["evals/inputs/Dashboard.tsx"]
+      "expected_output": "The file's import block is reorganized into 4 groups (builtins → external → aliases/relative → side effects), separated by blank lines. The duplicated react imports are merged. The ../../../ paths are converted to @/. The DashboardProps type uses import type. Unused imports are removed. Within each group, imports are sorted by ascending line length. The reply is in Spanish.",
+      "files": [
+        "evals/inputs/Dashboard.tsx"
+      ]
     },
     {
       "id": 2,
-      "prompt": "Escribe un servicio TypeScript llamado UserService.ts para gestionar usuarios vía API REST. Necesita: axios para HTTP, zod para validar respuestas, el tipo User de @/types/user, el tipo ApiResponse de @/types/api, el helper buildHeaders de @/utils/http, y la constante API_BASE_URL de @/config/constants. El servicio debe tener una función getUser(id: string) que llama a GET /users/:id. Guarda el archivo en outputs/UserService.ts",
-      "expected_output": "El archivo generado tiene imports organizados en 2 grupos: externos (axios, zod) y path aliases (@/types, @/utils, @/config), separados por línea en blanco. Los tipos User y ApiResponse usan import type. Orden por longitud dentro del grupo. Comillas simples.",
+      "prompt": "Write a TypeScript service called UserService.ts that manages users through a REST API. It needs: axios for HTTP, zod to validate responses, the User type from @/types/user, the ApiResponse type from @/types/api, the buildHeaders helper from @/utils/http, and the API_BASE_URL constant from @/config/constants. The service must have a getUser(id: string) function that calls GET /users/:id. Save the file to outputs/UserService.ts",
+      "expected_output": "The generated file has its imports organized into 2 groups: external (axios, zod) and path aliases (@/types, @/utils, @/config), separated by a blank line. The User and ApiResponse types use import type. Imports are sorted by length within each group. Single quotes.",
       "files": []
     },
     {
       "id": 3,
       "prompt": "Tengo este archivo authService.ts con muchos imports usando rutas relativas profundas con ../../../, conviértelos todos a path aliases usando @/ y organiza los imports correctamente. El archivo está en: evals/inputs/authService.ts",
-      "expected_output": "Todas las rutas con 2+ niveles (../../..) están convertidas a @/. Las rutas ./ y ../ de un solo nivel se mantienen igual. Los imports quedan en los grupos correctos y ordenados por longitud.",
-      "files": ["evals/inputs/authService.ts"]
+      "expected_output": "Every path with 2+ levels (../../..) is converted to @/. One-level ./ and ../ paths stay as they are. The imports end up in the right groups and sorted by length. The reply is in Spanish.",
+      "files": [
+        "evals/inputs/authService.ts"
+      ]
     },
     {
       "id": 4,
-      "prompt": "Formatea este archivo OrderProcessor.ts y organiza sus imports. Tiene código desalineado, imports sin usar, rutas relativas profundas y tipos sin 'import type'. El archivo está en: evals/inputs/OrderProcessor.ts",
-      "expected_output": "El agente formatea primero el código general del archivo y, como paso final posterior al formateo, aplica ts-import-organizer para consolidar duplicados, eliminar unused, convertir ../../../ a @/, asignar import type, agrupar en los 4 bloques estándar y ordenar por longitud ascendente sin permitir que formateadores posteriores desarmen el bloque.",
-      "files": ["evals/inputs/OrderProcessor.ts"]
+      "prompt": "Format this OrderProcessor.ts file and organize its imports. It has misaligned code, unused imports, deep relative paths and types without 'import type'. The file is at: evals/inputs/OrderProcessor.ts",
+      "expected_output": "The agent first formats the file's code and then, as the final step after formatting, applies ts-import-organizer: merges duplicates, removes unused imports, converts ../../../ to @/, uses import type, groups into the 4 standard blocks and sorts by ascending length, without letting a later formatter undo the block.",
+      "files": [
+        "evals/inputs/OrderProcessor.ts"
+      ]
     }
   ]
 }

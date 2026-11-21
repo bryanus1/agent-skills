@@ -1,8 +1,8 @@
 ---
 name: ts-import-organizer
-version: 1.1.1
+version: 1.2.0
 description: >-
-  Organiza imports en TypeScript/JavaScript (.ts, .tsx, .js, .jsx). Se aplica siempre DESPUÉS de formatear el código. Agrupa: builtins → externos → path aliases → side-effects. Ordena líneas y miembros ({ ... }) por longitud, elimina unused y convierte rutas relativas a aliases. Activa al ordenar imports o escribir código.
+  Organizes imports in TypeScript/JavaScript (.ts, .tsx, .js, .jsx), always AFTER the code is formatted. Groups: builtins → external → path aliases → side effects. Sorts lines and members ({ ... }) by length, removes unused imports and turns deep relative paths into aliases. Use when sorting imports or writing code.
 tags: [typescript, javascript, imports, style, refactor, linting, formatter]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
@@ -30,112 +30,112 @@ requirements:
 
 # TS/JS Import Organizer
 
-## 🎯 Propósito
+## 🎯 Purpose
 
-Estandariza los imports en cualquier archivo TypeScript o JavaScript para que sean legibles, consistentes y libres de ruido.
+Standardizes the imports in any TypeScript or JavaScript file so they are readable, consistent and free of noise.
 
-**Principio rector de ejecución**: Esta skill opera como el **paso final** sobre el archivo, aplicándose **estrictamente DESPUÉS de que el código ha sido formateado** (con Prettier, Biome, ESLint o el formateador del IDE/agente). Esto previene que herramientas de formateo rompan el orden por longitud, reestructuren saltos de línea de imports o invaliden la separación de grupos.
+**Guiding principle**: This skill is the **last step** on a file and runs **strictly AFTER the code has been formatted** (with Prettier, Biome, ESLint or the IDE/agent formatter). That keeps formatters from breaking the length order, re-wrapping import lines or undoing the group separation.
 
-Resuelve: imports desordenados, mezcla de estilos, rutas relativas profundas (`../../..`), duplicados, tipos importados sin `import type` y desalineaciones causadas por formateadores automáticos.
+It fixes: unordered imports, mixed styles, deep relative paths (`../../..`), duplicates, types imported without `import type`, and misalignments caused by automatic formatters.
 
-## ⚡ Cuándo Activar esta Skill
+## ⚡ When to Trigger
 
-- Como **paso final** después de escribir, refactorizar o formatear código TypeScript/JavaScript.
-- El usuario pide "ordenar", "organizar", "limpiar", "formatear" o "arreglar" los imports de un archivo.
-- Se detectan imports desorganizados, duplicados, unused o con rutas relativas profundas (`../../..`).
-- El usuario menciona path aliases, import order, o lint errors relacionados con imports.
+- As the **last step** after writing, refactoring or formatting TypeScript/JavaScript code.
+- The user asks to "sort", "organize", "clean up", "format" or "fix" the imports of a file.
+- You notice unordered, duplicated or unused imports, or deep relative paths (`../../..`).
+- The user mentions path aliases, import order, or lint errors about imports.
 
-Aplica a archivos: `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs`, `.cjs`.
+Applies to: `.ts`, `.tsx`, `.js`, `.jsx`, `.mjs`, `.cjs`.
 
-## 📋 Flujo de Trabajo Paso a Paso
+## 📋 Workflow
 
-### 🚨 Regla Cardinal: Formatear PRIMERO, Organizar Imports DESPUÉS
-Cualquier formateo de sintaxis (Prettier, Biome, ESLint con `--fix`, atajos de IDE o formateadores de agentes) debe ejecutarse **ANTES** de aplicar las reglas de esta skill.
-- **Por qué**: Los formateadores configuran saltos de línea basados en `printWidth`, rompiendo imports largos en varias líneas y reordenando tokens. Si se formatea después, se pierde el orden visual por longitud.
-- **Conclusión**: La reorganización de imports es siempre la **última modificación** que se guarda en el archivo.
+### 🚨 Cardinal Rule: Format FIRST, Organize Imports AFTER
+Any syntax formatting (Prettier, Biome, ESLint with `--fix`, IDE shortcuts or agent formatters) must run **BEFORE** the rules of this skill.
+- **Why**: Formatters wrap lines based on `printWidth`, splitting long imports over several lines and reordering tokens. Formatting afterwards destroys the length order.
+- **Takeaway**: Reorganizing imports is always the **last change** saved to the file.
 
 ---
 
-### Flujo A: Al reorganizar o limpiar imports en archivos existentes
+### Flow A: Reorganizing or cleaning imports in existing files
 
-1. **(Paso Previo) Formatea el archivo primero**:
-   - Si el proyecto cuenta con scripts de formato (`pnpm prettier --write`, `npx @biomejs/biome format --write`, etc.), ejecútalo en el archivo antes de tocar los imports.
-   - Si no hay script CLI, asegúrate de que la indentación y estructura del cuerpo del archivo ya estén formateadas.
+1. **(Prerequisite) Format the file first**:
+   - If the project has format scripts (`pnpm prettier --write`, `npx @biomejs/biome format --write`, etc.), run them on the file before touching the imports.
+   - If there is no CLI script, make sure the indentation and structure of the file body are already formatted.
 
-2. **Lee el archivo completo** con `view_file` para entender el contexto:
-   - Identifica aliases configurados en `tsconfig.json` o `vite.config` (ej. `@/*`).
-   - Identifica el estilo de comillas del proyecto (simples `'` o dobles `"`).
-   - Verifica qué identificadores importados realmente se usan en el cuerpo del código.
+2. **Read the whole file** with `view_file` to understand the context:
+   - Find the aliases configured in `tsconfig.json` or `vite.config` (e.g. `@/*`).
+   - Find the project's quote style (single `'` or double `"`).
+   - Check which imported identifiers the code actually uses.
 
-3. **Identifica y depura imports**:
-   - **Elimina unused**: Quita imports que no se usen en el archivo ya formateado.
-   - **Consolida duplicados**: Si un mismo módulo se importa en varias líneas, únelo en una sola.
-   - **Convierte rutas relativas**: Reemplaza rutas relativas profundas (`../../`, `../../../`) por su path alias correspondiente (`@/`). Las rutas de un solo nivel (`./`, `../`) se conservan.
-   - **Separa tipos**: Usa `import type` para interfaces o tipos puros de TypeScript.
+3. **Find and clean up imports**:
+   - **Remove unused imports**: Drop imports the formatted file does not use.
+   - **Merge duplicates**: If the same module is imported on several lines, merge them into one.
+   - **Convert relative paths**: Replace deep relative paths (`../../`, `../../../`) with the matching path alias (`@/`). One-level paths (`./`, `../`) stay as they are.
+   - **Split types**: Use `import type` for pure TypeScript interfaces or types.
 
-4. **Agrupa y ordena (Toque Final)**:
-   - Clasifica cada import en exactamente uno de los 4 grupos:
+4. **Group and sort (final touch)**:
+   - Put each import in exactly one of the 4 groups:
      1. Node built-ins (`node:fs`, `node:path`)
-     2. Dependencias externas de `node_modules` (`react`, `axios`, `zod`)
-     3. Path aliases del proyecto (`@/components`, `@/services`) e imports relativos locales (`./`, `../`)
-     4. Side-effects (`./styles.css`, `reflect-metadata`)
-   - **Dentro de cada grupo**:
-     1. Ubica los **imports multilínea PRIMERO** (con sus miembros ordenados por longitud de menor a mayor).
-     2. Ubica los **imports de una sola línea DESPUÉS** (ordenados por longitud de línea ascendente, con sus miembros internos `{ ... }` también ordenados por longitud).
-   - Inserta exactamente **una línea en blanco** entre cada grupo.
+     2. External dependencies from `node_modules` (`react`, `axios`, `zod`)
+     3. Project path aliases (`@/components`, `@/services`) and local relative imports (`./`, `../`)
+     4. Side effects (`./styles.css`, `reflect-metadata`)
+   - **Within each group**:
+     1. Place **multi-line imports FIRST** (with their members sorted by length, shortest to longest).
+     2. Place **single-line imports AFTER** them (sorted by ascending line length, with their `{ ... }` members also sorted by length).
+   - Insert exactly **one blank line** between groups.
 
-5. **Aplica y asegura el bloque**:
-   - Reescribe el bloque de imports con `replace_file_content`.
-   - **IMPORTANTE**: No vuelvas a pasar formateadores automáticos sobre el bloque de imports tras este paso.
-
----
-
-### Flujo B: Al escribir código nuevo o refactorizar lógica
-
-1. **Escribe el código y la lógica**: Escribe las funciones, componentes y llamadas preliminares con los imports necesarios.
-2. **Formatea el código generado**: Aplica el formateador del proyecto o dale formato limpio a toda la estructura del archivo.
-3. **Aplica ts-import-organizer como cierre**:
-   - Revisa si quedaron imports huérfanos o duplicados tras la implementación.
-   - Ordena los miembros dentro de `{ ... }` por longitud ascendente.
-   - Agrupa en los 4 bloques, colocando multilíneas primero y monolíneas después ordenadas por longitud, y asegura los `import type`.
+5. **Apply and lock the block**:
+   - Rewrite the import block with `replace_file_content`.
+   - **IMPORTANT**: Do not run automatic formatters over the import block again after this step.
 
 ---
 
-## 📐 Reglas de Organización
+### Flow B: Writing new code or refactoring logic
 
-### Grupos y orden
+1. **Write the code and logic**: Write the functions, components and calls with the imports they need.
+2. **Format the generated code**: Run the project's formatter or cleanly format the whole file.
+3. **Finish with ts-import-organizer**:
+   - Check for orphaned or duplicated imports left by the implementation.
+   - Sort the members inside `{ ... }` by ascending length.
+   - Group into the 4 blocks, with multi-line imports first and single-line imports after (sorted by length), and make sure `import type` is used.
 
-Siempre organiza los imports en exactamente estos 4 grupos, separados por **una línea en blanco** entre cada uno:
+---
+
+## 📐 Organization Rules
+
+### Groups and order
+
+Always organize imports into exactly these 4 groups, with **one blank line** between them:
 
 ```
 1. Node built-ins            → import fs from 'node:fs'
-2. Dependencias externas     → import React from 'react'
-3. Path aliases y relativos  → import { Button } from '@/components/Button'
+2. External dependencies     → import React from 'react'
+3. Path aliases and relative → import { Button } from '@/components/Button'
 4. Side-effect imports       → import './styles.css'
 ```
 
-> Los imports relativos `./` y `../` también van en el grupo 3 (junto a aliases), pero **solo** si son de un nivel: mismo directorio (`./foo`) o un nivel arriba (`../foo`). Rutas más profundas deben convertirse a alias.
+> Relative imports `./` and `../` also go in group 3 (next to aliases), but **only** when they are one level deep: same directory (`./foo`) or one level up (`../foo`). Deeper paths must be converted to an alias.
 
-### Orden dentro de cada grupo
+### Order within each group
 
-Dentro de cada uno de los 4 grupos, la organización sigue estrictamente esta jerarquía:
+Within each of the 4 groups, follow this hierarchy strictly:
 
-1. **Imports Multilínea PRIMERO**: Las declaraciones divididas en varios renglones van siempre al **inicio del grupo**.
-   - Los especificadores internos dentro de sus `{ ... }` se ordenan por longitud ascendente (de menor a mayor), uno por renglón.
-   - Si existen múltiples imports multilínea en el mismo grupo, se ordenan entre sí (por número de líneas o longitud de su línea de cierre `} from '...'`).
+1. **Multi-line imports FIRST**: Declarations split over several lines always go at the **start of the group**.
+   - The specifiers inside their `{ ... }` are sorted by ascending length (shortest to longest), one per line.
+   - If a group has several multi-line imports, sort them among themselves (by number of lines or by the length of their closing `} from '...'` line).
 
-2. **Imports de Una Sola Línea (Monolínea) DESPUÉS**:
-   - Van a continuación de los imports multilínea.
-   - Se ordenan por **longitud total de línea**, de menor a mayor (los imports más cortos primero).
-   - Los miembros dentro de sus `{ ... }` también se ordenan por longitud ascendente (de menor a mayor).
+2. **Single-line imports AFTER**:
+   - They come right after the multi-line imports.
+   - Sort them by **total line length**, shortest to longest (shortest imports first).
+   - The members inside their `{ ... }` are also sorted by ascending length.
 
-### Orden de especificadores dentro de `{ ... }` (Named Imports)
+### Specifier order inside `{ ... }` (named imports)
 
-Tanto en imports de **una sola línea** como en **multilínea**, los identificadores o miembros dentro de las llaves `{ ... }` DEBEN estar ordenados por **longitud de caracteres ascendente (de menor a mayor)**. Si dos identificadores tienen exactamente la misma longitud, se desempata por orden alfabético.
+In both **single-line** and **multi-line** imports, the identifiers inside the braces `{ ... }` MUST be sorted by **ascending character length (shortest to longest)**. When two identifiers have the same length, break the tie alphabetically.
 
-**Ejemplo canónico (Multilínea primero + miembros por longitud; monolínea después + miembros por longitud):**
+**Canonical example (multi-line first + members by length; single-line after + members by length):**
 ```ts
-// ❌ Desordenado
+// ❌ Unordered
 import { Controller, Get, Param, Query, VERSION_NEUTRAL } from '@nestjs/common';
 import {
   ApiParam,
@@ -146,7 +146,7 @@ import {
   ApiNotFoundResponse,
 } from '@nestjs/swagger';
 
-// ✅ Ordenado (Multilínea primero con 7→8→12→13→19→21 chars; monolínea después con 3→5→5→10→15 chars)
+// ✅ Ordered (multi-line first with 7→8→12→13→19→21 chars; single-line after with 3→5→5→10→15 chars)
 import {
   ApiTags,
   ApiParam,
@@ -158,85 +158,86 @@ import {
 import { Get, Param, Query, Controller, VERSION_NEUTRAL } from '@nestjs/common';
 ```
 
-**Ejemplo en una sola línea:**
+**Single-line example:**
 ```ts
-// ❌ Desordenado
+// ❌ Unordered
 import { useCallback, useState, useEffect } from 'react'
 
-// ✅ Ordenado por longitud (8 → 9 → 11 caracteres)
+// ✅ Sorted by length (8 → 9 → 11 characters)
 import { useState, useEffect, useCallback } from 'react'
 ```
 
-### Manejo de imports tras formateo (Monolínea vs Multilínea)
+### Handling imports after formatting (single-line vs multi-line)
 
-Al aplicar esta skill después del formateo:
-1. **Preferir formato en una sola línea**: Si tras consolidar o limpiar specifiers unused la declaración cabe en una sola línea respetando la legibilidad, mantenla en una sola línea y ordena sus miembros `{ a, b, c }` por longitud ascendente.
-2. **Declaraciones multilínea van PRIMERO**: Si un import contiene muchos elementos y fue dividido en múltiples renglones por el formateador:
-   - Ordena cada miembro interno por longitud de identificador ascendente (de menor a mayor, uno por renglón).
-   - Coloca la declaración multilínea **al inicio de su grupo respectivo** (antes de los imports de una sola línea).
-   - Los imports de una sola línea se colocan después, ordenados por longitud de línea ascendente.
+When you apply this skill after formatting:
+1. **Prefer a single line**: If, after merging or removing unused specifiers, the declaration fits on one readable line, keep it on one line and sort its `{ a, b, c }` members by ascending length.
+2. **Multi-line declarations go FIRST**: If an import has many members and the formatter split it over several lines:
+   - Sort each member by ascending identifier length (shortest to longest, one per line).
+   - Place the multi-line declaration **at the start of its group** (before the single-line imports).
+   - Single-line imports follow, sorted by ascending line length.
 
-### Conversión de rutas relativas profundas a path alias
+### Converting deep relative paths to path aliases
 
-Si encuentras una ruta con 2 o más niveles hacia arriba (`../../`, `../../../`...), conviértela al path alias equivalente. Infiere el alias desde el `tsconfig.json` / `vite.config` si está disponible; si no, usa `@/` como convención por defecto.
+If a path goes up 2 or more levels (`../../`, `../../../`...), convert it to the equivalent path alias. Infer the alias from `tsconfig.json` / `vite.config` when available; otherwise use `@/` as the default convention.
 
-**Ejemplo:**
+**Example:**
 ```ts
-// ❌ Antes
+// ❌ Before
 import { formatDate } from '../../../utils/date'
 import { ApiClient } from '../../services/api'
 
-// ✅ Después
-import { ApiClient } from '@/services/api'
+// ✅ After
 import { formatDate } from '@/utils/date'
+import { ApiClient } from '@/services/api'
 ```
 
-`./` y `../` (un solo nivel) están **permitidos** y no se tocan.
+`./` and `../` (one level) are **allowed** and left alone.
 
-### Imports no utilizados (unused)
+### Unused imports
 
-Elimina cualquier import que no se use en el archivo. Si un named import dentro de un `{ A, B, C }` no se usa, quítalo solo a él. Si todos los named imports de un módulo son unused, elimina la línea completa.
+Remove every import the file does not use. If one named import inside `{ A, B, C }` is unused, remove only that one. If all the named imports of a module are unused, remove the whole line.
 
-### Consolidación de duplicados
+### Merging duplicates
 
-Si el mismo módulo aparece importado en más de una línea, combínalos en una sola:
+If the same module is imported on more than one line, merge them into one:
 
 ```ts
-// ❌ Antes
+// ❌ Before
 import { useState } from 'react'
 import { useEffect } from 'react'
 
-// ✅ Después
+// ✅ After
 import { useState, useEffect } from 'react'
 ```
 
-### `import type` para tipos de TypeScript
+### `import type` for TypeScript types
 
-Cuando un import es exclusivamente de tipos (interfaces, types, enums usados solo como tipo), usa `import type`:
+When an import brings only types (interfaces, types, enums used only as types), use `import type`:
 
 ```ts
-// ❌ Antes
+// ❌ Before
 import { User, ApiResponse } from './types'
 
-// ✅ Después
+// ✅ After
 import type { User, ApiResponse } from '@/types'
 ```
 
-Si un módulo mezcla valores y tipos, usa `import` normal o el inline `import { value, type MyType }` de TS 4.5+.
+If a module mixes values and types, use a regular `import` or the inline `import { value, type MyType }` form from TS 4.5+.
 
-### Estilo de comillas
+### Quote style
 
-Respeta el estilo de comillas que ya existe en el archivo (simples `'` o dobles `"`). Si el archivo es nuevo, usa comillas simples por defecto.
+Keep the quote style the file already uses (single `'` or double `"`). For a new file, default to single quotes.
 
-## ⚠️ Reglas Críticas
+## ⚠️ Critical Rules
 
-- **Formateo ANTES de organizar imports (Inviolable)**: El código debe formatearse siempre ANTES de organizar los imports, NUNCA después. Si un formateador global altera los imports después de organizarlos, re-aplica el ordenamiento de imports como paso definitivo.
-- **No reordenes nada fuera del bloque de imports.** El resto del archivo no se toca.
-- **No conviertas a alias si no puedes inferir el alias correcto.** En ese caso, deja la ruta relativa y avisa al usuario que debe configurar `paths` en su `tsconfig.json`.
-- **No elimines side-effect imports** aunque parezcan unused — son intencionales por naturaleza (`import 'reflect-metadata'`, `import './theme.css'`).
-- **No rompas el código.** Si hay alguna duda sobre si un import está realmente unused (e.g., usado en un tipo JSX implícito o directiva), consérvalo.
-- **No uses `import *` (star imports)** salvo que ya existieran o el usuario los pida explícitamente.
+- Reply in the user's language, even though this skill is written in English.
+- **Format BEFORE organizing imports (non-negotiable)**: Always format the code BEFORE organizing the imports, NEVER after. If a global formatter changes the imports after you organized them, sort the imports again as the final step.
+- **Do not reorder anything outside the import block.** Leave the rest of the file untouched.
+- **Do not convert to an alias if you cannot infer the right one.** Keep the relative path and tell the user to configure `paths` in their `tsconfig.json`.
+- **Do not remove side-effect imports**, even if they look unused: they are intentional (`import 'reflect-metadata'`, `import './theme.css'`).
+- **Do not break the code.** If you are unsure whether an import is really unused (e.g. used by an implicit JSX type or a directive), keep it.
+- **Do not use `import *` (star imports)** unless they were already there or the user asks for them.
 
-## 📚 Referencias
+## 📚 References
 
-- [Ejemplos de transformación](examples/transformations.md)
+- [Transformation examples](examples/transformations.md)
