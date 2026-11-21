@@ -1,8 +1,8 @@
 ---
 name: git-cleanup
-version: 1.0.0
+version: 1.1.0
 description: >-
-  Limpieza segura de ramas locales de Git tras fusionar PRs (Squash/Merge). Protege ramas principales (main/master/develop), detecta ramas eliminadas en origin y elimina ramas obsoletas sin falsos negativos.
+  Safely cleans up local Git branches after PRs are merged (squash or merge). Protects the main branches (main/master/develop), detects branches deleted on origin and removes stale branches without false negatives. Use after merging a PR or to prune old local branches.
 tags: [git, cleanup, branches, trunk-based, devops, hygiene, squash-merge]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
@@ -12,80 +12,82 @@ triggers:
   - clean merged branches
   - post-merge cleanup
   - eliminar ramas viejas
+  - delete old branches
+  - prune local branches
 requirements:
   tools: [run_command, view_file]
   bins: [git, bash]
 ---
 
-# 🧹 Limpieza e Higiene de Ramas Locales de Git (`git-cleanup`)
+# 🧹 Local Git Branch Cleanup and Hygiene (`git-cleanup`)
 
-## 🎯 Propósito
+## 🎯 Purpose
 
-Eliminar de forma segura las ramas locales de Git que ya fueron fusionadas y borradas de `origin` (especialmente tras **Squash & Merge** en GitHub/GitLab, donde `git branch --merged` falla al comparar commits). Protege siempre las ramas principales (`main`, `master`, `develop`) y cualquier rama configurada como protegida.
+Safely deletes local Git branches that were already merged and deleted on `origin`, especially after a **Squash & Merge** on GitHub/GitLab, where `git branch --merged` fails because the commits no longer match. It always protects the main branches (`main`, `master`, `develop`) and any branch configured as protected.
 
-## ⚡ Cuándo Activar esta Skill
+## ⚡ When to Trigger
 
-- Inmediatamente después de fusionar un Pull Request o Merge Request y actualizar `main`.
-- Cuando el usuario solicite limpiar o podar ramas locales obsoletas (*"limpia las ramas locales"*, *"borra ramas fusionadas"*, *"haz git cleanup"*).
-- Al iniciar una nueva tarea para asegurar un árbol de trabajo limpio sin ramas locales acumuladas.
+- Right after a Pull Request or Merge Request is merged and `main` is updated.
+- When the user asks to clean up or prune stale local branches (*"clean up the local branches"*, *"delete merged branches"*, *"run git cleanup"*).
+- When starting a new task, to begin from a clean working tree without piled-up local branches.
 
-## 📋 Flujo de Trabajo Paso a Paso
+## 📋 Workflow
 
 ```mermaid
 flowchart TD
-    A["Verificar estado de trabajo\n(git status --porcelain)"] --> B{"¿Hay cambios sin commitear?"}
-    B -- "Sí" --> C["Abortar o advertir al usuario"]
-    B -- "No" --> D["Cambiar a rama principal y actualizar\n(git switch main && git pull)"]
-    D --> E{"¿Existe comando git-cleanup?"}
-    E -- "Sí" --> F["Ejecutar git-cleanup\n(o git cleanup [protegidas...])"]
-    E -- "No" --> G["Ejecutar podado y detección nativa\n(git fetch --prune + verificación remota)"]
-    F --> H["Informar ramas eliminadas y preservadas"]
+    A["Check working state\n(git status --porcelain)"] --> B{"Uncommitted changes?"}
+    B -- "Yes" --> C["Abort or warn the user"]
+    B -- "No" --> D["Switch to the main branch and update\n(git switch main && git pull)"]
+    D --> E{"Is the git-cleanup command available?"}
+    E -- "Yes" --> F["Run git-cleanup\n(or git cleanup [protected...])"]
+    E -- "No" --> G["Run native prune and detection\n(git fetch --prune + remote check)"]
+    F --> H["Report deleted and kept branches"]
     G --> H
 ```
 
-### Paso 1: Asegurar Rama Principal Actualizada
+### Step 1: Make Sure the Main Branch Is Up to Date
 
-Antes de limpiar cualquier rama, cambia a la rama principal (usualmente `main` o `master`) y actualiza los cambios remotos:
+Before cleaning any branch, switch to the main branch (usually `main` or `master`) and pull the remote changes:
 
 ```bash
 git switch main
 git pull
 ```
 
-Si estás parado sobre una rama que debe eliminarse, Git no permitirá borrarla mientras esté activa.
+If you are on a branch that should be deleted, Git will not delete it while it is checked out.
 
-### Paso 2: Ejecución de la Limpieza
+### Step 2: Run the Cleanup
 
-#### Caso A: Si el comando `git-cleanup` está instalado en el sistema
-Ejecuta la herramienta directamente:
+#### Case A: The `git-cleanup` command is installed
+Run the tool directly:
 
 ```bash
 git-cleanup
 ```
 
-Puedes pasar ramas protegidas adicionales por argumento o consultarlas en la configuración:
+You can pass extra protected branches as arguments or read them from the config:
 ```bash
 git-cleanup develop staging
 ```
 
-#### Caso B: Modo Nativo Autónomo (Fallback cuando `git-cleanup` no está instalado)
-Si `command -v git-cleanup` devuelve falso, ejecuta el siguiente procedimiento nativo que replica la misma lógica de protección y detección de Squash Merge:
+#### Case B: Standalone native mode (fallback when `git-cleanup` is not installed)
+If `command -v git-cleanup` fails, run this native procedure, which reproduces the same protection and squash-merge detection logic:
 
 ```bash
-# 1. Podar referencias remotas eliminadas en origin
+# 1. Prune remote refs deleted on origin
 git fetch --prune
 
-# 2. Definir lista de ramas protegidas
+# 2. Define the protected branches
 PROTECTED=("main" "master" "develop" "staging")
 
-# 3. Leer protecciones adicionales desde git config si existen
+# 3. Read extra protections from git config, if any
 while IFS= read -r configured; do
   [[ -n "$configured" ]] && PROTECTED+=("$configured")
 done < <(git config --get-all cleanup.protected 2>/dev/null || true)
 
-# 4. Inspeccionar ramas locales y eliminar las que no existen en origin
+# 4. Inspect local branches and delete the ones missing on origin
 for branch in $(git for-each-ref --format='%(refname:short)' refs/heads/); do
-  # Verificar si está protegida
+  # Check whether it is protected
   skip=false
   for excl in "${PROTECTED[@]}"; do
     if [[ "$branch" == "$excl" ]]; then
@@ -97,45 +99,46 @@ for branch in $(git for-each-ref --format='%(refname:short)' refs/heads/); do
     continue
   fi
 
-  # Si la rama aún existe en origin, se conserva
+  # If the branch still exists on origin, keep it
   if git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
     continue
   fi
 
-  # Si no existe en origin y no está protegida, eliminarla
-  echo "Eliminando rama local obsoleta: $branch"
+  # Not on origin and not protected: delete it
+  echo "Deleting stale local branch: $branch"
   git branch -D "$branch"
 done
 ```
 
-### Paso 3: Configurar Ramas Protegidas Permanentes (Opcional)
+### Step 3: Configure Permanently Protected Branches (optional)
 
-Si el proyecto maneja ramas de larga duración que no deben borrarse nunca (ej. `release/*`, `develop`):
+If the project has long-lived branches that must never be deleted (e.g. `release/*`, `develop`):
 
 ```bash
-# Para el repositorio actual:
+# For the current repository:
 git config --add cleanup.protected develop
 
-# Para todos los repositorios del usuario:
+# For all of the user's repositories:
 git config --global --add cleanup.protected develop
 ```
 
-## 🛠️ Herramientas Auxiliares
+## 🛠️ Helper Scripts
 
-- `git-cleanup`: CLI standalone disponible en la colección de scripts del usuario.
-- [`references/branch_hygiene.md`](references/branch_hygiene.md): Guía detallada sobre el problema del Squash Merge, diferencias entre `git branch -d` y `git branch -D`, y buenas prácticas de higiene en Git.
+- `git-cleanup`: Standalone CLI available in the user's script collection.
+- [`references/branch_hygiene.md`](references/branch_hygiene.md): Detailed guide to the squash-merge problem, the difference between `git branch -d` and `git branch -D`, and Git hygiene good practices.
 
-## ⚠️ Reglas Críticas
+## ⚠️ Critical Rules
 
-1. **Nunca Borrar Ramas Principales**:
-   - `main`, `master` y `develop` **JAMÁS** deben ser eliminadas.
-2. **Siempre Cambiar a `main` Antes de Podar**:
-   - Nunca ejecutes la limpieza estando parado en una rama de feature temporal.
-3. **Poda Remota Previa Obligatoria (`git fetch --prune`)**:
-   - Siempre sincroniza el estado de `origin` antes de evaluar ramas locales; de lo contrario, ramas ya borradas en GitHub aparecerán falsamente como vivas en el caché local.
-4. **Verificación de Trabajo No Publicado**:
-   - Si una rama nunca tuvo tracking remoto en `origin` y contiene commits locales importantes sin subir, advierte al usuario antes de forzar su borrado con `-D`.
+1. **Reply in the user's language**, even though this skill is written in English.
+2. **Never delete the main branches**:
+   - `main`, `master` and `develop` must **NEVER** be deleted.
+3. **Always switch to `main` before pruning**:
+   - Never run the cleanup while on a temporary feature branch.
+4. **Prune the remote first (`git fetch --prune`)**:
+   - Always sync the state of `origin` before evaluating local branches; otherwise branches already deleted on GitHub look alive in the local cache.
+5. **Check for unpublished work**:
+   - If a branch never tracked a remote on `origin` and holds important local commits that were never pushed, warn the user before force-deleting it with `-D`.
 
-## 📚 Referencias Adicionales
+## 📚 References
 
-* [Guía de Higiene de Ramas y Squash Merge](references/branch_hygiene.md)
+* [Branch Hygiene and Squash Merge Guide](references/branch_hygiene.md)

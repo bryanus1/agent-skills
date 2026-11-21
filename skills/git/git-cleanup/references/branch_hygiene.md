@@ -1,43 +1,43 @@
-# Guía de Higiene de Ramas y Resolución del Squash Merge en Git
+# Branch Hygiene and Solving the Squash Merge Problem in Git
 
-## 1. El Problema del Squash & Merge en Git
+## 1. The Squash & Merge Problem
 
-En flujos de trabajo modernos (GitHub, GitLab, Bitbucket), la mayoría de los Pull Requests se integran usando **Squash and Merge**.
+In modern workflows (GitHub, GitLab, Bitbucket), most Pull Requests are merged with **Squash and Merge**.
 
-### ¿Por qué falla `git branch --merged`?
-El comando estándar `git branch --merged main`:
-1. Compara el historial de commits directos (SHA-1) entre la rama local y `main`.
-2. Al hacer Squash en GitHub, los commits originales de la rama (`c1`, `c2`) se colapsan en un **único commit nuevo** (`S`) en `main`.
-3. Para Git local, los commits `c1` y `c2` **no existen en main**, por lo que Git considera erróneamente que la rama **NO está fusionada**.
-4. Como consecuencia, `git branch -d` rechaza eliminar la rama con el error:
+### Why does `git branch --merged` fail?
+The standard `git branch --merged main` command:
+1. Compares the direct commit history (SHA-1) of the local branch and `main`.
+2. A squash on GitHub collapses the branch's original commits (`c1`, `c2`) into a **single new commit** (`S`) on `main`.
+3. For local Git, commits `c1` and `c2` **do not exist on main**, so Git wrongly considers the branch **NOT merged**.
+4. As a result, `git branch -d` refuses to delete the branch with this error:
    ```text
    error: The branch 'feat/feature' is not fully merged.
    ```
 
 ---
 
-## 2. La Solución: Verificación contra `origin` Podado
+## 2. The Fix: Check Against a Pruned `origin`
 
-Cuando GitHub o GitLab fusionan y cierran un PR, borran la rama remota (`origin/feat/feature`).
+When GitHub or GitLab merges and closes a PR, it deletes the remote branch (`origin/feat/feature`).
 
-El procedimiento correcto consiste en:
-1. `git fetch --prune`: actualiza el catálogo local eliminando los punteros `refs/remotes/origin/*` que ya no existen en el servidor.
-2. Comprobar para cada rama local si existe su contraparte `origin/<rama>`:
-   - Si existe: la rama sigue viva en el remoto (PR aún en revisión o trabajo en curso).
-   - Si **no existe**: la rama ya fue borrada en el remoto, por lo que puede eliminarse localmente con seguridad usando `git branch -D`.
+The right procedure is:
+1. `git fetch --prune`: updates the local catalog and removes the `refs/remotes/origin/*` pointers that no longer exist on the server.
+2. For each local branch, check whether its `origin/<branch>` counterpart exists:
+   - If it exists: the branch is still alive on the remote (PR still in review or work in progress).
+   - If it **does not exist**: the branch was deleted on the remote, so it is safe to delete it locally with `git branch -D`.
 
 ---
 
-## 3. Ramas Protegidas
+## 3. Protected Branches
 
-Las ramas base o de larga duración nunca deben borrarse, incluso si no tienen seguimiento remoto explícito en ese momento:
+Base or long-lived branches must never be deleted, even if they have no explicit remote tracking at the moment:
 - `main`
 - `master`
 - `develop`
 - `staging`
 
-### Configuración de Exclusiones
-`git-cleanup` permite definir exclusiones persistentes en el archivo `.git/config`:
+### Configuring Exclusions
+`git-cleanup` lets you define persistent exclusions in `.git/config`:
 ```bash
 git config --add cleanup.protected develop
 git config --global --add cleanup.protected staging

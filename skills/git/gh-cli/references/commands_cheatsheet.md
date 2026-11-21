@@ -1,17 +1,17 @@
-# 📘 CheatSheet de Comandos `gh`
+# 📘 `gh` Command Cheat Sheet
 
-Todos los comandos se ejecutan dentro del repositorio. Para otro repo añade `-R owner/repo`. Para leer datos, prefiere `--json <campos> --jq <filtro>`.
+Run every command inside the repository. For another repo, add `-R owner/repo`. To read data, prefer `--json <fields> --jq <filter>`.
 
 ---
 
-## Autenticación y Repositorio
+## Authentication and Repository
 
 ```bash
-gh auth status                                   # sesión, cuenta y scopes
-gh auth login                                    # interactivo: lo ejecuta el usuario
+gh auth status                                   # session, account and scopes
+gh auth login                                    # interactive: the user runs it
 gh repo view --json nameWithOwner,defaultBranchRef --jq '.nameWithOwner, .defaultBranchRef.name'
 gh repo clone owner/repo
-gh browse                                        # abre el repo en el navegador
+gh browse                                        # opens the repo in the browser
 ```
 
 ## Pull Requests
@@ -19,21 +19,21 @@ gh browse                                        # abre el repo en el navegador
 ```bash
 gh pr list --state open --author @me
 gh pr list --search "review-requested:@me"
-gh pr status                                     # PRs de la rama actual, creados y pendientes de revisar
+gh pr status                                     # PRs for the current branch, created by you and awaiting your review
 gh pr view 57 --comments
 gh pr view 57 --json title,state,mergeable,reviewDecision,statusCheckRollup
 gh pr diff 57 --name-only
 gh pr checkout 57
 gh pr create --base main --title "feat(#42): ✨ login form" --body-file body.md --label enhancement
-gh pr create --fill --draft                      # título/cuerpo desde los commits
+gh pr create --fill --draft                      # title/body from the commits
 gh pr edit 57 --add-label "domain: auth" --add-reviewer octocat
-gh pr ready 57                                   # draft → listo para revisión
+gh pr ready 57                                   # draft → ready for review
 gh pr review 57 --approve
-gh pr review 57 --request-changes --body "Falta el test de expiración"
-gh pr comment 57 --body "Rebasado sobre main"
+gh pr review 57 --request-changes --body "Missing the expiration test"
+gh pr comment 57 --body "Rebased on main"
 gh pr checks 57 --watch
 gh pr merge 57 --squash --delete-branch
-gh pr close 57 --comment "Sustituido por #60"
+gh pr close 57 --comment "Superseded by #60"
 ```
 
 ## Issues
@@ -41,10 +41,10 @@ gh pr close 57 --comment "Sustituido por #60"
 ```bash
 gh issue list --state open --label bug --assignee @me
 gh issue view 42 --comments
-gh issue create --title "Login falla con SSO" --body-file issue.md --label bug
-gh issue comment 42 --body "Reproducido en v1.3.0"
+gh issue create --title "Login fails with SSO" --body-file issue.md --label bug
+gh issue comment 42 --body "Reproduced on v1.3.0"
 gh issue edit 42 --add-assignee @me --add-label "domain: auth"
-gh issue develop 42 --checkout                   # crea y cambia a una rama vinculada al issue
+gh issue develop 42 --checkout                   # creates and switches to a branch linked to the issue
 gh issue close 42 --reason completed
 ```
 
@@ -55,14 +55,14 @@ gh workflow list
 gh run list --branch "$(git branch --show-current)" --limit 5
 gh run list --status failure --limit 1 --json databaseId --jq '.[0].databaseId'
 gh run view <run-id>
-gh run view <run-id> --log-failed                # solo pasos fallidos
+gh run view <run-id> --log-failed                # failed steps only
 gh run view <run-id> --job <job-id> --log
 gh run watch <run-id>
 gh run rerun <run-id> --failed
 gh workflow run deploy.yml --ref main -f environment=staging
 ```
 
-## Releases y Tags
+## Releases and Tags
 
 ```bash
 gh release list --limit 10
@@ -76,10 +76,10 @@ gh release upload v1.4.0 dist/app.tar.gz
 
 ```bash
 gh label list --limit 200 --json name --jq '.[].name'
-gh label create "domain: auth" --color 0E8A16    # solo con permiso del usuario
+gh label create "domain: auth" --color 0E8A16    # only with the user's permission
 ```
 
-## API (cuando no hay subcomando)
+## API (when there is no subcommand)
 
 ```bash
 gh api repos/{owner}/{repo}/branches/main/protection

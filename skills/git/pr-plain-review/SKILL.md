@@ -1,8 +1,8 @@
 ---
 name: pr-plain-review
-version: 1.0.0
+version: 1.1.0
 description: >-
-  Revisión previa a aprobar un PR o rama en lenguaje llano: explica qué cambió, por qué, qué archivos críticos tocó (migraciones, RLS, términos legales, auth, pagos, infra) y qué riesgo ve. Solo lectura; no modifica código ni aprueba sin confirmación.
+  Plain-language review before approving a PR or branch: explains what changed, why, which critical files it touched (migrations, RLS, legal terms, auth, payments, infra) and what risk it carries. Read-only; it never edits code or approves without confirmation.
 tags: [git, pull-request, code-review, risk-analysis, migrations, rls, pre-approval]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
@@ -13,6 +13,8 @@ triggers:
   - archivos críticos del pr
   - pr plain review
   - review pr before approving
+  - what does this pr change
+  - critical files in this pr
 requirements:
   tools: [run_command, view_file]
   bins: [git]
@@ -20,82 +22,83 @@ requirements:
 
 # PR Plain Review (`revisar-pr`)
 
-## 🎯 Propósito
+## 🎯 Purpose
 
-Dar a quien va a aprobar un Pull Request o Merge Request una lectura rápida y honesta en **lenguaje llano** antes de pulsar *Approve*: qué cambia realmente para el usuario, los datos y la operación; por qué se hizo; qué archivos críticos tocó; y qué riesgo real asume el equipo al aprobar.
+Gives whoever is about to approve a Pull Request or Merge Request a quick, honest read in **plain language** before they press *Approve*: what really changes for users, data and operations; why it was done; which critical files it touched; and what real risk the team takes on by approving it.
 
-Es **estrictamente de solo lectura**: no edita código, no publica comentarios ni aprueba o fusiona PRs sin confirmación explícita.
-
----
-
-## ⚡ Cuándo Activar esta Skill
-
-Activa esta skill cuando el usuario:
-- Pida revisar un PR, MR o rama **antes de aprobar** o hacer merge (*"revisar-pr"*, *"revisa este PR antes de aprobarlo"*, *"¿qué cambia este PR y qué riesgo tiene?"*).
-- Quiera una explicación en **lenguaje llano / de negocio** de un diff técnico o comprobar si tocó zonas sensibles (migraciones, RLS, términos legales, auth, pagos, infraestructura).
-
-**Cuándo derivar a otra skill:**
-- Si pide una auditoría técnica profunda de código (Clean Code, SOLID, patrones, TDD): usa `code-quality-review`.
-- Si pide crear un PR, diagnosticar GitHub Actions o publicar un release: usa `gh-cli`.
+It is **strictly read-only**: it does not edit code, post comments, or approve or merge PRs without explicit confirmation.
 
 ---
 
-## 📋 Flujo de Trabajo Paso a Paso
+## ⚡ When to Trigger
 
-### Paso 1: Obtener Diff y Contexto (Solo Lectura)
-1. Identificar el origen según la petición:
-   - **PR de GitHub:** leer metadatos y diff sin modificar nada:
+Use this skill when the user:
+- Asks to review a PR, MR or branch **before approving** or merging it (*"revisar-pr"*, *"review this PR before I approve it"*, *"what does this PR change and how risky is it?"*).
+- Wants a **plain-language / business** explanation of a technical diff, or wants to check whether it touched sensitive areas (migrations, RLS, legal terms, auth, payments, infrastructure).
+
+**When to hand off to another skill:**
+- For a deep technical code audit (Clean Code, SOLID, patterns, TDD): use `code-quality-review`.
+- To create a PR, diagnose GitHub Actions or publish a release: use `gh-cli`.
+
+---
+
+## 📋 Workflow
+
+### Step 1: Get the Diff and Context (read-only)
+1. Find the source from the request:
+   - **GitHub PR:** read the metadata and diff without changing anything:
      ```bash
      gh pr view <n> --json number,title,body,baseRefName,headRefName,files,commits,statusCheckRollup,labels,isDraft
      gh pr diff <n>
      gh pr view <n> --comments
      ```
-   - **MR de GitLab:** `glab mr view <n>` y `glab mr diff <n>`.
-   - **Rama local o diff pegado:** inspeccionar `git log <base>..HEAD --oneline`, `git diff --stat <base>...HEAD` y `git diff <base>...HEAD` (detectando `main`, `master` o `develop` si no se indica base).
-2. Leer cualquier issue o spec enlazada en el cuerpo del PR (`Closes #...`, ID de tracker) si está accesible para entender la intención original.
-3. **PRs grandes (>40 archivos o >1500 líneas):** agrupar los archivos por área, leer completos todos los archivos críticos y una muestra representativa del resto, y declarar explícitamente al inicio del informe qué se revisó en detalle y qué en resumen.
+   - **GitLab MR:** `glab mr view <n>` and `glab mr diff <n>`.
+   - **Local branch or pasted diff:** inspect `git log <base>..HEAD --oneline`, `git diff --stat <base>...HEAD` and `git diff <base>...HEAD` (detect `main`, `master` or `develop` if no base is given).
+2. Read any issue or spec linked in the PR body (`Closes #...`, tracker ID) if you can access it, to understand the original intent.
+3. **Large PRs (>40 files or >1500 lines):** group the files by area, read every critical file in full and a representative sample of the rest, and state at the top of the report what was reviewed in detail and what only in summary.
 
-### Paso 2: Traducir el "Qué" y Contrastar el "Por Qué"
-1. Explicar el efecto observable del cambio en lenguaje llano (qué cambia para usuarios finales, clientes, datos guardados, costes o equipo de soporte). Si un término técnico es inevitable (p. ej. *RLS*, *migración*, *webhook*), explicar su impacto práctico en una frase.
-2. Contrastar el **título, la descripción y los comentarios** del PR contra el diff real:
-   - Si el PR hace cosas que no figuran en su descripción (p. ej. toca permisos, borra columnas, cambia precios o refactoriza módulos ajenos), destacarlo como **cambio silencioso**.
-   - Si no hay descripción ni issue, declararlo como *"No especificado en el PR"* en lugar de inventar motivos.
+### Step 2: Translate the "What" and Check the "Why"
+1. Explain the observable effect of the change in plain language (what changes for end users, customers, stored data, costs or the support team). If a technical term cannot be avoided (e.g. *RLS*, *migration*, *webhook*), explain its practical impact in one sentence.
+2. Compare the PR's **title, description and comments** against the actual diff:
+   - If the PR does things its description does not mention (e.g. touches permissions, drops columns, changes prices or refactors unrelated modules), flag it as a **silent change**.
+   - If there is no description or issue, say *"Not specified in the PR"* instead of inventing reasons.
 
-### Paso 3: Auditar Archivos Críticos
-1. Cruzar todos los archivos modificados, renombrados o eliminados —y los hunks del diff— contra las 6 familias definidas en [references/critical-files.md](references/critical-files.md):
-   - **Migraciones y esquema de datos**
-   - **RLS, políticas y permisos**
-   - **Términos legales, privacidad y copy sensible**
-   - **Autenticación, sesiones y secretos**
-   - **Pagos y estado financiero**
-   - **Infraestructura, CI/CD y dependencias críticas**
-2. Comprobar también si existe `CODEOWNERS` (`.github/CODEOWNERS`, `CODEOWNERS` o `docs/CODEOWNERS`) para señalar si algún archivo tocado requiere aprobación de un dueño específico.
-3. **Lectura completa obligatoria:** para cada archivo crítico modificado, leer el archivo completo en su estado resultante (no solo el fragmento del diff) para detectar interacciones con políticas, guards, migraciones previas o reglas existentes.
+### Step 3: Audit Critical Files
+1. Check every modified, renamed or deleted file, and the diff hunks, against the 6 families in [references/critical-files.md](references/critical-files.md):
+   - **Migrations and data schema**
+   - **RLS, policies and permissions**
+   - **Legal terms, privacy and sensitive copy**
+   - **Authentication, sessions and secrets**
+   - **Payments and financial state**
+   - **Infrastructure, CI/CD and critical dependencies**
+2. Also check for `CODEOWNERS` (`.github/CODEOWNERS`, `CODEOWNERS` or `docs/CODEOWNERS`) to point out whether a touched file needs approval from a specific owner.
+3. **Full read required:** for each modified critical file, read the whole file in its resulting state (not just the diff hunk) to catch interactions with policies, guards, earlier migrations or existing rules.
 
-### Paso 4: Evaluar Riesgo, Reversibilidad y Señales Objetivas
-1. Clasificar el riesgo global (`Bajo`, `Medio`, `Alto` o `Bloqueante`) usando la matriz de [references/report-template.md](references/report-template.md).
-2. Evaluar la **reversibilidad**: distinguir si basta con un `git revert` tras el merge o si el PR deja efectos difíciles o imposibles de deshacer (borrado de datos, cambios de tipo en BD, aceptación legal, rotación de claves, cobros).
-3. Recoger el estado real de `statusCheckRollup` / checks de CI y comprobar si las zonas críticas añaden o actualizan tests. Nunca asumir que los tests pasan si no hay evidencia en el PR o en una ejecución real.
+### Step 4: Assess Risk, Reversibility and Objective Signals
+1. Classify the overall risk (`Low`, `Medium`, `High` or `Blocking`) with the matrix in [references/report-template.md](references/report-template.md).
+2. Assess **reversibility**: tell apart a PR that a `git revert` after merging undoes from one that leaves hard or impossible-to-undo effects (deleted data, column type changes, legal acceptance, key rotation, charges).
+3. Collect the real state of `statusCheckRollup` / CI checks and check whether the critical areas add or update tests. Never assume the tests pass without evidence in the PR or a real run.
 
-### Paso 5: Entregar el Informe Pre-Aprobación
-1. Presentar el informe en el chat siguiendo exactamente la estructura de [references/report-template.md](references/report-template.md).
-2. Si no se detectó ningún archivo crítico, declararlo de forma explícita listando las categorías verificadas.
-3. Si el usuario pide dejar la revisión en GitHub/GitLab, mostrar primero el texto exacto y esperar confirmación antes de ejecutar `gh pr comment` o `gh pr review`. Nunca ejecutar `--approve` ni `merge` sin orden explícita.
-
----
-
-## ⚠️ Reglas Críticas
-
-1. **Solo lectura por defecto:** prohibido editar código del proyecto, aprobar PRs, fusionar ramas o publicar comentarios en el tracker/PR sin petición y confirmación explícita.
-2. **Lenguaje llano respaldado por evidencia:** traducir a impacto claro para el lector, citando siempre `archivo:línea` o el recurso exacto detrás de cada riesgo.
-3. **Cero suposiciones:** si falta contexto (sin descripción, sin CI visible, archivo binario o generado), decirlo explícitamente en *"Qué no se pudo verificar"*.
-4. **Los archivos críticos nunca se minimizan:** cualquier toque a migraciones, RLS, términos legales, auth, pagos o secretos se reporta en la tabla dedicada aunque parezca "pequeño".
-5. **Honestidad de alcance:** en PRs grandes nunca simular haber leído cada línea; declarar qué archivos críticos se leyeron íntegros y qué zonas quedaron resumidas.
-6. **Sin derivar fuera de foco sin motivo:** si el usuario pide opinión de arquitectura o refactor profundo además de este brief, sugerir `code-quality-review`.
+### Step 5: Deliver the Pre-Approval Report
+1. Present the report in the chat following exactly the structure in [references/report-template.md](references/report-template.md).
+2. If no critical file was found, say so explicitly and list the categories you checked.
+3. If the user asks to leave the review on GitHub/GitLab, show the exact text first and wait for confirmation before running `gh pr comment` or `gh pr review`. Never run `--approve` or `merge` without an explicit order.
 
 ---
 
-## 📚 Referencias
+## ⚠️ Critical Rules
 
-- [Catálogo de archivos críticos](references/critical-files.md): patrones de rutas, señales en el diff y preguntas clave por categoría.
-- [Plantilla del informe y matriz de riesgo](references/report-template.md): formato canónico, criterios de riesgo y ejemplo completo.
+1. **Reply in the user's language**, even though this skill is written in English. The report template is in English; render it in the user's language.
+2. **Read-only by default:** never edit project code, approve PRs, merge branches or post comments on the tracker/PR without an explicit request and confirmation.
+3. **Plain language backed by evidence:** translate into clear impact for the reader, always citing the `file:line` or exact resource behind each risk.
+4. **No assumptions:** if context is missing (no description, no visible CI, binary or generated file), say so explicitly under *"What could not be verified"*.
+5. **Never downplay critical files:** any touch to migrations, RLS, legal terms, auth, payments or secrets goes in the dedicated table, even if it looks "small".
+6. **Be honest about scope:** in large PRs never pretend to have read every line; state which critical files were read in full and which areas were summarized.
+7. **Stay on focus:** if the user also wants an architecture opinion or a deep refactor beyond this brief, suggest `code-quality-review`.
+
+---
+
+## 📚 References
+
+- [Critical files catalog](references/critical-files.md): path patterns, diff signals and key questions per category.
+- [Report template and risk matrix](references/report-template.md): canonical format, risk criteria and a full example.

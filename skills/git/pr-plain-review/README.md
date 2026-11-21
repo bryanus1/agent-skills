@@ -1,60 +1,62 @@
 # 🔍 PR Plain Review (`pr-plain-review`)
 
-> **Revisión previa a aprobar un Pull Request o rama en lenguaje llano: resume qué cambió, por qué, qué archivos críticos tocó (migraciones, RLS, términos legales, auth, pagos, infra) y qué riesgo real asumes antes de hacer clic en *Approve*.**
+> **Plain-language review before approving a Pull Request or branch: sums up what changed, why, which critical files it touched (migrations, RLS, legal terms, auth, payments, infra) and what real risk you take on before clicking *Approve*.**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `pr-plain-review` |
-| **Categoría** | `git` |
-| **Versión** | `1.0.0` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
-| **Requisitos** | Herramientas de lectura/shell (`git`; opcionalmente `gh` o `glab` para PRs/MRs) |
+| **Name** | `pr-plain-review` |
+| **Category** | `git` |
+| **Version** | `1.1.0` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Requirements** | Read/shell tools (`git`; optionally `gh` or `glab` for PRs/MRs) |
 
 ---
 
-## 🎯 Diferencia frente a otras skills del catálogo
+## 🎯 How It Differs from Other Skills in the Catalog
 
-| Skill | Cuándo usarla |
+| Skill | When to use it |
 | :--- | :--- |
-| **`pr-plain-review`** | Cuando vas a **revisar o aprobar un PR** y quieres entender rápido en lenguaje llano el impacto real, los archivos críticos tocados y el riesgo |
-| [`code-quality-review`](../../practices/code-quality-review/README.md) | Cuando quieres una **auditoría técnica de código** (Clean Code, SOLID, patrones, TDD, frontend/backend) para mejorar la implementación |
-| [`gh-cli`](../gh-cli/README.md) | Cuando quieres **crear PRs, depurar GitHub Actions, gestionar issues o publicar releases** |
+| **`pr-plain-review`** | When you are about to **review or approve a PR** and want a quick plain-language view of the real impact, the critical files touched and the risk |
+| [`code-quality-review`](../../practices/code-quality-review/README.md) | When you want a **technical code audit** (Clean Code, SOLID, patterns, TDD, frontend/backend) to improve the implementation |
+| [`gh-cli`](../gh-cli/README.md) | When you want to **create PRs, debug GitHub Actions, manage issues or publish releases** |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
 ```bash
-# Instalar en el proyecto actual con skills.sh:
+# Install into the current project with skills.sh:
 npx skills add bryanus1/agent-skills --skill pr-plain-review
 
-# Instalar globalmente en tu máquina:
+# Install globally on your machine:
 npx skills add bryanus1/agent-skills --skill pr-plain-review -g
 ```
 
 ---
 
-## 💡 Ejemplos de Uso
+## 💡 Usage Examples
 
-### 1. Antes de aprobar un PR en GitHub
-> *"revisar-pr #88 antes de aprobar"*
+The skill replies in the user's language, so you can ask in English or Spanish.
 
-Lee título, descripción, checks, comentarios y diff con `gh`, detecta que el PR toca una migración destructiva, una política RLS y la página de términos sin mencionar todo en la descripción, y entrega el informe de riesgo y reversibilidad sin aprobar nada por su cuenta.
+### 1. Before approving a GitHub PR
+> *"revisar-pr #88 before I approve it"*
 
-### 2. Revisar una rama local antes de fusionar
-> *"Resume en lenguaje llano qué cambia esta rama respecto a main y qué riesgo ves"*
+Reads the title, description, checks, comments and diff with `gh`, finds that the PR touches a destructive migration, an RLS policy and the terms page without mentioning all of it in the description, and delivers the risk and reversibility report without approving anything on its own.
 
-Compara la rama contra `main` con `git diff`, traduce el efecto para usuarios/datos/operación y confirma explícitamente si tocó o no archivos críticos.
+### 2. Review a local branch before merging
+> *"Sum up in plain language what this branch changes compared to main and what risk you see"*
 
-### 3. Comprobar un diff pegado o PR sensible
-> *"¿Qué archivos críticos toca este PR?"*
+Compares the branch against `main` with `git diff`, translates the effect for users/data/operations and states explicitly whether it touched critical files.
 
-Cruza el cambio contra las 6 categorías críticas (migraciones, RLS/permisos, legal/términos, auth/secretos, pagos e infra/CI), lee completos los archivos críticos modificados y señala cualquier escenario de fallo con `archivo:línea`.
+### 3. Check a pasted diff or a sensitive PR
+> *"Which critical files does this PR touch?"*
+
+Checks the change against the 6 critical categories (migrations, RLS/permissions, legal/terms, auth/secrets, payments and infra/CI), reads the modified critical files in full and points out any failure scenario with `file:line`.
 
 ---
 
-## 📚 Documentación
+## 📚 Documentation
 
-- **[`SKILL.md`](SKILL.md)**: instrucciones operativas, flujo paso a paso y reglas críticas de solo lectura.
-- **[Catálogo de archivos críticos](references/critical-files.md)**: las 6 categorías sensibles, patrones de rutas, señales de alarma y `CODEOWNERS`.
-- **[Plantilla del informe y matriz de riesgo](references/report-template.md)**: formato canónico del brief pre-aprobación y ejemplo completo.
+- **[`SKILL.md`](SKILL.md)**: operating instructions, step-by-step workflow and read-only critical rules.
+- **[Critical files catalog](references/critical-files.md)**: the 6 sensitive categories, path patterns, red flags and `CODEOWNERS`.
+- **[Report template and risk matrix](references/report-template.md)**: canonical pre-approval brief format and a full example.

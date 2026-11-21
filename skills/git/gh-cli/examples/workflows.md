@@ -1,17 +1,17 @@
-# 📚 Casos de Uso y Flujos de Ejemplo — `gh-cli`
+# 📚 Use Cases and Example Workflows — `gh-cli`
 
-## Caso 1: Crear un PR vinculado a un issue
+## Case 1: Create a PR linked to an issue
 
-Estás en la rama `feat/42-login-form` y el repo tiene `.gh-domains` con `auth` y `billing`:
+You are on the `feat/42-login-form` branch and the repo has `.gh-domains` with `auth` and `billing`:
 
 ```bash
 bash <skill-dir>/scripts/create_pr.sh --domain auth --reviewer octocat --dry-run
 ```
 
-**Previsualización**:
-- **Título**: `feat(#42): ✨ login form`
+**Preview**:
+- **Title**: `feat(#42): ✨ login form`
 - **Labels**: `enhancement, domain: auth`
-- **Cuerpo**:
+- **Body**:
   ```markdown
   This Pull Request introduces changes for **login form**.
 
@@ -22,62 +22,62 @@ bash <skill-dir>/scripts/create_pr.sh --domain auth --reviewer octocat --dry-run
   - test: cover invalid credentials
   ```
 
-Tras la confirmación del usuario (y si la rama aún no está publicada):
+After the user confirms (and if the branch is not published yet):
 
 ```bash
 bash <skill-dir>/scripts/create_pr.sh --domain auth --reviewer octocat --push
 ```
 
-Si `domain: auth` no existe en GitHub, el script aborta antes de crear nada e indica qué label falta.
+If `domain: auth` does not exist on GitHub, the script aborts before creating anything and says which label is missing.
 
 ---
 
-## Caso 2: PR sin issue
+## Case 2: PR without an issue
 
-Rama `chore/upgrade-zod`:
+Branch `chore/upgrade-zod`:
 
 ```bash
 bash <skill-dir>/scripts/create_pr.sh --dry-run
 ```
 
-**Título**: `chore: 🔧 upgrade zod` (sin scope). Sin label de tipo, porque `chore` no tiene equivalente en los labels por defecto de GitHub.
+**Title**: `chore: 🔧 upgrade zod` (no scope). No type label, because `chore` has no equivalent among GitHub's default labels.
 
 ---
 
-## Caso 3: Diagnosticar un check fallido de un PR
+## Case 3: Diagnose a PR's failed check
 
 ```bash
 bash <skill-dir>/scripts/diagnose_run.sh --pr 57 --job lint --lines 40
 ```
 
-1. Muestra `gh pr checks 57`.
-2. Busca el último run fallido de la rama del PR.
-3. Imprime solo las líneas fallidas del job `lint`:
+1. Shows `gh pr checks 57`.
+2. Finds the latest failed run on the PR's branch.
+3. Prints only the failed lines of the `lint` job:
    ```text
    lint  Run pnpm lint  src/auth/login.ts:12:7  error  'user' is assigned a value but never used
    ```
-4. El agente corrige `src/auth/login.ts`, ejecuta `pnpm lint` en local y hace commit. No relanza el workflow a ciegas.
+4. The agent fixes `src/auth/login.ts`, runs `pnpm lint` locally and commits. It does not re-run the workflow blindly.
 
 ---
 
-## Caso 4: Revisar y fusionar un PR
+## Case 4: Review and merge a PR
 
 ```bash
 gh pr view 57 --json title,reviewDecision,mergeable --jq '.'
 gh pr diff 57
 gh pr checks 57
 gh pr review 57 --approve --body "LGTM"
-gh pr merge 57 --squash --delete-branch    # solo tras confirmación explícita
+gh pr merge 57 --squash --delete-branch    # only after explicit confirmation
 ```
 
 ---
 
-## Caso 5: Publicar una release
+## Case 5: Publish a release
 
 ```bash
-bash <skill-dir>/scripts/release_helper.sh draft-notes            # vista previa local
+bash <skill-dir>/scripts/release_helper.sh draft-notes            # local preview
 bash <skill-dir>/scripts/release_helper.sh create v1.4.0 --dry-run
-bash <skill-dir>/scripts/release_helper.sh create v1.4.0          # tras confirmación
+bash <skill-dir>/scripts/release_helper.sh create v1.4.0          # after confirmation
 ```
 
-GitHub genera las notas a partir de los PRs fusionados desde la release anterior.
+GitHub generates the notes from the PRs merged since the previous release.
