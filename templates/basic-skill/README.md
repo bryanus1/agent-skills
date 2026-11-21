@@ -1,34 +1,34 @@
 # 🧩 Basic Skill Template
 
-> **Plantilla base para skills basadas en Markdown puro (directrices de arquitectura, convenciones de código y flujos procedimentales).**
+> **Base template for pure-Markdown skills (architecture guidelines, code conventions and procedural workflows).**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `basic-skill-template` |
-| **Versión** | `1.0.0` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Name** | `basic-skill-template` |
+| **Version** | `1.1.0` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
 ```bash
-# Instalar en el proyecto actual con skills.sh:
-npx skills add bryanus1/agent-skills --skill <nombre-de-tu-skill>
+# Install into the current project with skills.sh:
+npx skills add bryanus1/agent-skills --skill <your-skill-name>
 
-# Instalar globalmente en tu máquina:
-npx skills add bryanus1/agent-skills --skill <nombre-de-tu-skill> -g
+# Install globally on your machine:
+npx skills add bryanus1/agent-skills --skill <your-skill-name> -g
 ```
 
 ---
 
-## 💡 Ejemplos de Uso con Agentes de IA
+## 💡 Usage Examples with AI Agents
 
-* **Activar la skill mediante lenguaje natural**:
-  > *"Aplica el flujo o estándar de `<nombre-de-tu-skill>` sobre este archivo"*
+* **Trigger the skill in natural language**:
+  > *"Apply the `<your-skill-name>` workflow or standard to this file"*
 
 ---
 
-## 📚 Documentación y Especificación
+## 📚 Documentation and Specification
 
-- **[`SKILL.md`](SKILL.md)**: Instrucciones paso a paso, disparadores (`triggers`) y reglas críticas para el agente de IA.
+- **[`SKILL.md`](SKILL.md)**: Step-by-step instructions, `triggers` and critical rules for the AI agent.

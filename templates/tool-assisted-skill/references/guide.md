@@ -1,7 +1,7 @@
-# Guía de Referencia Técnica
+# Technical Reference Guide
 
-Este documento proporciona detalles técnicos y directrices profundas que solo son consultadas por el agente cuando se requiere profundizar en el flujo de trabajo.
+This document holds detailed technical guidance that the agent reads only when it needs to go deeper into the workflow.
 
-## Reglas de Arquitectura
-- Modularidad alta y acoplamiento bajo.
-- Pruebas unitarias para cada nuevo módulo.
+## Architecture Rules
+- High modularity and low coupling.
+- Unit tests for every new module.

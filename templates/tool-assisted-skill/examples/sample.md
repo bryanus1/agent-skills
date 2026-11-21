@@ -1,13 +1,13 @@
-# Ejemplos de Referencia
+# Reference Examples
 
-## Entrada Esperada
+## Expected Input
 ```text
-Por favor revisa y optimiza el módulo X.
+Please review and optimize module X.
 ```
 
-## Salida Esperada
+## Expected Output
 ```text
-1. Diagnóstico ejecutado.
-2. Problemas detectados y corregidos.
-3. Validación exitosa.
+1. Diagnostic run.
+2. Issues found and fixed.
+3. Validation passed.
 ```

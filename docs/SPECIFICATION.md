@@ -1,127 +1,134 @@
 # 📐 Agent Skills Specification (v1.0.0)
 
-Esta especificación define el estándar unificado y agnóstico para crear, empaquetar y distribuir **Skills** para asistentes y agentes de desarrollo de software impulsados por IA (*Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf, Roo Code, etc.*).
+This specification defines a single, agent-agnostic standard for creating, packaging and distributing **Skills** for AI-powered coding assistants and agents (*Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf, Roo Code, etc.*).
 
 ---
 
-## 1. Conceptos Fundamentales
+## 1. Core Concepts
 
-Una **Skill** es un paquete autocontenido de conocimiento procedural, directrices contextuales, herramientas auxiliares y flujos de trabajo que enseña a un agente cómo ejecutar tareas complejas con alta precisión y consistencia.
+A **Skill** is a self-contained package of procedural knowledge, contextual guidelines, helper tools and workflows that teaches an agent how to carry out complex tasks accurately and consistently.
 
-### Principio de Progressive Disclosure
-Los agentes de IA operan bajo presupuestos finitos de ventana de contexto. Para maximizar la eficiencia:
-1. **Fase de Descubrimiento (Level 1)**: Solo el nombre (`name`) y la descripción (`description`) de la skill se inyectan en el prompt inicial del agente.
-2. **Fase de Activación (Level 2)**: El agente lee el archivo `SKILL.md` únicamente cuando el contexto de la tarea coincide con los disparadores (`triggers`).
-3. **Fase de Profundización (Level 3)**: Los archivos dentro de `references/`, `scripts/` o `examples/` solo se consultan o ejecutan cuando las instrucciones principales lo indiquen expresamente.
+### Progressive Disclosure
+AI agents work with a limited context window. To use it well:
+1. **Discovery (Level 1)**: Only the skill's `name` and `description` are injected into the agent's initial prompt.
+2. **Activation (Level 2)**: The agent reads `SKILL.md` only when the task matches the skill's `triggers`.
+3. **Deep dive (Level 3)**: Files in `references/`, `scripts/` or `examples/` are read or run only when the main instructions say so.
 
 ---
 
-## 2. Estructura de Directorios
+## 2. Directory Structure
 
-Cada skill debe ubicarse en su propio directorio con la siguiente anatomía:
+Each skill lives in its own directory with this layout:
 
 ```
 skill-name/
-├── SKILL.md              # [REQUERIDO] Metadatos YAML + Instrucciones para el agente
-├── README.md             # [REQUERIDO] Documentación humana: instalación, ejemplos y CLI
-├── metadata.json         # [OPCIONAL] Esquema extendido y compatibilidad
-├── scripts/              # [OPCIONAL] Scripts ejecutables por el agente (Bash, Python, Node)
+├── SKILL.md              # [REQUIRED] YAML metadata + instructions for the agent
+├── README.md             # [REQUIRED] Human docs: installation, examples and CLI
+├── metadata.json         # [OPTIONAL] Extended schema and compatibility
+├── scripts/              # [OPTIONAL] Scripts the agent runs (Bash, Python, Node)
 │   ├── run_check.sh
 │   └── helper.py
-├── references/           # [OPCIONAL] Documentación y guías técnicas complementarias
+├── references/           # [OPTIONAL] Supporting docs and technical guides
 │   └── architecture.md
-├── examples/             # [OPCIONAL] Casos de uso de referencia (Before / After)
+├── examples/             # [OPTIONAL] Reference use cases (Before / After)
 │   └── sample_output.md
-└── evals/                # [REQUERIDO en skills/] Prompts de evaluación (formato skill-creator)
+└── evals/                # [REQUIRED under skills/] Evaluation prompts (skill-creator format)
     ├── evals.json        # { "skill_name", "evals": [{ "id", "prompt", "expected_output", "files" }] }
-    └── inputs/           # Archivos de entrada referenciados en "files" (rutas relativas a la skill)
+    └── inputs/           # Input files listed in "files" (paths relative to the skill)
 ```
 
-Los resultados de ejecutar los evals van en `evals-workspace/` (ignorado por git), nunca dentro de `skills/`.
+Eval run results go in `evals-workspace/` (git-ignored), never inside `skills/`.
 
 ---
 
-## 3. Esquema de Frontmatter (`SKILL.md`)
+## 3. Frontmatter Schema (`SKILL.md`)
 
-Todo archivo `SKILL.md` DEBE comenzar con un bloque YAML frontmatter delimitado por `---`:
+Every `SKILL.md` MUST start with a YAML frontmatter block delimited by `---`:
 
 ```yaml
 ---
-name: string                   # [Requerido] Identificador único kebab-case (máx 40 chars)
-version: string                # [Requerido] Versión semántica (ej. 1.0.0)
-description: string            # [Requerido] Descripción precisa y accionable (máx 350 chars)
-author: string                 # [Opcional] Autor o Maintainer
-license: string                # [Opcional] Licencia SPDX (ej. MIT, Apache-2.0)
-tags: string[]                 # [Opcional] Lista de etiquetas para búsqueda y clasificación
-agents: string[]               # [Opcional] Agentes compatibles ('antigravity', 'claude-code', 'codex', 'cursor', 'windsurf', 'all')
-triggers: string[]             # [Requerido] Palabras clave, comandos o condiciones de activación
-requirements:                  # [Opcional] Requisitos de ejecución
-  tools: string[]              # Herramientas necesarias (ej. 'run_command', 'view_file', 'replace_file_content')
-  bins: string[]               # Binarios del sistema requeridos (ej. 'git', 'docker', 'pnpm')
-  skills: string[]             # Otras skills del catálogo de las que depende (ej. 'nestjs-architecture')
+name: string                   # [Required] Unique kebab-case identifier (max 40 chars)
+version: string                # [Required] Semantic version (e.g. 1.0.0)
+description: string            # [Required] Precise, actionable description (max 350 chars)
+author: string                 # [Optional] Author or maintainer
+license: string                # [Optional] SPDX license (e.g. MIT, Apache-2.0)
+tags: string[]                 # [Optional] Tags for search and classification
+agents: string[]               # [Optional] Compatible agents ('antigravity', 'claude-code', 'codex', 'cursor', 'windsurf', 'all')
+triggers: string[]             # [Required] Keywords, commands or activation conditions
+requirements:                  # [Optional] Runtime requirements
+  tools: string[]              # Tools needed (e.g. 'run_command', 'view_file', 'replace_file_content')
+  bins: string[]               # System binaries needed (e.g. 'git', 'docker', 'pnpm')
+  skills: string[]             # Other catalog skills this one depends on (e.g. 'nestjs-architecture')
 ---
 ```
 
-`requirements.skills` declara dependencias entre skills: cada nombre debe existir en el catálogo (el linter lo valida) y se publica como `requires` en `catalog/catalog.json`. Instala las dependencias junto a la skill (`npx skills add <repo> --skill <nombre>`); los scripts pueden resolverlas como directorios hermanos (`<skill-dir>/../<nombre>/`).
+`requirements.skills` declares dependencies between skills: each name must exist in the catalog (the linter checks it) and is published as `requires` in `catalog/catalog.json`. Install the dependencies next to the skill (`npx skills add <repo> --skill <name>`); scripts can resolve them as sibling directories (`<skill-dir>/../<name>/`).
 
-### Reglas de Validación de Metadatos:
-- **`name`**: Solo letras minúsculas, números y guiones (`^[a-z0-9-]+$`).
-- **`description`**: Debe responder claramente a:
-  1. *¿Qué hace la skill?*
-  2. *¿Cuándo debe activarla el agente?*
-  3. *Palabras clave o intenciones desencadenantes.*
-  *Límite recomendado: 350 caracteres para preservar contexto global.*
-- **`triggers`**: Al menos 2 términos clave o intenciones descriptivas.
+### Metadata Validation Rules:
+- **`name`**: Lowercase letters, digits and hyphens only (`^[a-z0-9-]+$`).
+- **`description`**: Must clearly answer:
+  1. *What does the skill do?*
+  2. *When should the agent activate it?*
+  3. *Which keywords or intents trigger it?*
+  *Recommended limit: 350 characters, to save global context.*
+- **`triggers`**: At least 2 keywords or descriptive intents.
+
+### Language
+- Write the `description` and the body in **English**: agents follow English instructions most reliably.
+- `triggers` are bilingual: include the phrases users actually type, in English and in Spanish.
+- Every skill tells the agent to **reply in the user's language** (a line in Critical Rules), so an English skill does not switch the conversation to English.
+- Shared terminology is in [GLOSSARY.md](GLOSSARY.md).
 
 ---
 
-## 4. Cuerpo de `SKILL.md`
+## 4. `SKILL.md` Body
 
-El contenido Markdown debe seguir una estructura estandarizada en secciones:
+The Markdown body follows a standard set of sections:
 
 ```markdown
-# Nombre Legible de la Skill
+# Human-Readable Skill Name
 
-## 🎯 Propósito
-Descripción concisa del objetivo de la skill y el problema que resuelve.
+## 🎯 Purpose
+Short statement of the skill's goal and the problem it solves.
 
-## ⚡ Cuándo Activar esta Skill
-Condiciones exactas, intenciones del usuario o patrones en el código que deben disparar este flujo.
+## ⚡ When to Trigger
+Exact conditions, user intents or code patterns that should start this workflow.
 
-## 📋 Flujo de Trabajo Paso a Paso
-Instrucciones procedimentales numeradas y deterministas que el agente debe seguir en orden.
+## 📋 Workflow
+Numbered, deterministic steps the agent follows in order.
 
-## 🛠️ Scripts y Herramientas Auxiliares
-(Si aplica) Explicación de los scripts ubicados en `scripts/` y cómo ejecutarlos.
+## 🛠️ Helper Scripts
+(If any) What the scripts in `scripts/` do and how to run them.
 
-## ⚠️ Reglas y Consideraciones Críticas
-Restricciones de seguridad, errores comunes que se deben evitar y buenas prácticas obligatorias.
+## ⚠️ Critical Rules
+Safety constraints, common mistakes to avoid and mandatory practices.
 
-## 📚 Referencias Adicionales
-Enlaces a documentos complementarios en `references/`.
+## 📚 References
+Links to supporting documents in `references/`.
 ```
 
 ---
 
-## 5. Directrices para Scripts (`scripts/`)
+## 5. Script Guidelines (`scripts/`)
 
-- **Determinismo**: Los scripts deben ser reproducibles, no interactivos (o aceptar flags no-interactivas como `-y` o `--non-interactive`).
-- **Códigos de Salida Semánticos**:
-  - `0`: Éxito / Validación pasada.
-  - `> 0`: Error con mensaje explícito en `stderr` / `stdout`.
-- **Portabilidad**: Preferir scripts de Shell POSIX (`#!/usr/bin/env sh` o `bash`), Python 3 estándar o Node.js sin dependencias pesadas innecesarias.
-- **Seguridad**: No ejecutar comandos destructivos (`rm -rf /`, `git push --force`) sin confirmación explícita.
-- **No Sobrescritura**: Los scripts que generan archivos deben abortar (código `1`, sin escribir nada) si algún archivo destino ya existe, ofrecer `--dry-run` para previsualizar y exigir `--force` para sobrescribir.
-- **Rutas Portables**: Las skills se instalan en otros proyectos (`.claude/skills/<name>/`, `.agents/skills/<name>/`…). En `SKILL.md` enlaza los archivos propios con rutas relativas a la skill (`references/guia.md`) y muestra los scripts como `node <skill-dir>/scripts/x.mjs`. Nunca uses rutas absolutas ni `file:///`.
+- **Determinism**: Scripts must be reproducible and non-interactive (or accept non-interactive flags such as `-y` or `--non-interactive`).
+- **Meaningful exit codes**:
+  - `0`: Success / validation passed.
+  - `> 0`: Error, with an explicit message on `stderr` / `stdout`.
+- **Portability**: Prefer POSIX shell scripts (`#!/usr/bin/env sh` or `bash`), standard Python 3 or Node.js without unnecessary heavy dependencies.
+- **Safety**: Never run destructive commands (`rm -rf /`, `git push --force`) without explicit confirmation.
+- **No overwrites**: Scripts that generate files must abort (exit code `1`, writing nothing) if any target file already exists, offer `--dry-run` to preview, and require `--force` to overwrite.
+- **Portable paths**: Skills are installed into other projects (`.claude/skills/<name>/`, `.agents/skills/<name>/`…). In `SKILL.md`, link the skill's own files with skill-relative paths (`references/guide.md`) and show scripts as `node <skill-dir>/scripts/x.mjs`. Never use absolute paths or `file:///`.
+- **Output language**: Help text, errors and comments in generated code are in English.
 
 ---
 
-## 6. Mapeo y Compatibilidad Multi-Agente
+## 6. Multi-Agent Mapping and Compatibility
 
-| Agente / Entorno | Ubicación Nativa de Destino | Modo de Adaptación |
+| Agent / Environment | Native Target Location | Adaptation Mode |
 | :--- | :--- | :--- |
-| **Google Antigravity** | `.agents/skills/<name>/` o `~/.gemini/config/skills/<name>/` | Nativo directo (`SKILL.md`) |
-| **Claude Code** | `.claude/skills/<name>/` o `.claude/config/` | Nativo directo / Markdown import |
-| **OpenAI Codex / CLI** | `.codex/skills/<name>/` | Nativo directo |
-| **Cursor IDE** | `.cursorrules` / `.cursor/rules/` | Conversión/Inyección por adaptador |
-| **Windsurf** | `.windsurfrules` | Conversión/Inyección por adaptador |
+| **Google Antigravity** | `.agents/skills/<name>/` or `~/.gemini/config/skills/<name>/` | Native (`SKILL.md`) |
+| **Claude Code** | `.claude/skills/<name>/` or `.claude/config/` | Native / Markdown import |
+| **OpenAI Codex / CLI** | `.codex/skills/<name>/` | Native |
+| **Cursor IDE** | `.cursorrules` / `.cursor/rules/` | Converted/injected by an adapter |
+| **Windsurf** | `.windsurfrules` | Converted/injected by an adapter |
