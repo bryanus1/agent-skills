@@ -4,15 +4,15 @@
     {
       "id": 1,
       "prompt": "Acabo de fusionar el Pull Request de mi rama feat/user-auth en GitHub. Limpia las ramas locales del repo.",
-      "expected_output": "El agente cambia a la rama principal (git switch main), actualiza los cambios (git pull), y ejecuta git-cleanup (o realiza git fetch --prune verificando la ausencia de refs/remotes/origin/feat/user-auth). Elimina la rama obsoleta con seguridad protegiendo main y reporta el resultado al usuario.",
+      "expected_output": "The agent switches to the main branch (git switch main), pulls the changes (git pull) and runs git-cleanup (or runs git fetch --prune and checks that refs/remotes/origin/feat/user-auth is gone). It safely deletes the stale branch while protecting main and reports the result to the user. The reply is in Spanish.",
       "files": [
         "references/branch_hygiene.md"
       ]
     },
     {
       "id": 2,
-      "prompt": "Tengo muchas ramas locales viejas acumuladas después de varios squash merges. Bórralas pero no toques develop ni main.",
-      "expected_output": "El agente protege explícitamente main y develop (vía argumentos de git-cleanup o lista de exclusión en el flujo nativo), ejecuta la poda remota git fetch --prune, identifica las ramas locales que ya no existen en origin y las elimina sin intentar borrar main ni develop.",
+      "prompt": "I have a lot of old local branches piled up after several squash merges. Delete them, but don't touch develop or main.",
+      "expected_output": "The agent explicitly protects main and develop (through git-cleanup arguments or the exclusion list in the native flow), runs the remote prune git fetch --prune, finds the local branches that no longer exist on origin and deletes them without trying to delete main or develop.",
       "files": []
     }
   ]

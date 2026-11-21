@@ -1,92 +1,92 @@
-# Plantilla del Informe y Matriz de Riesgo (`pr-plain-review`)
+# Report Template and Risk Matrix (`pr-plain-review`)
 
-Usa esta estructura para entregar la revisión previa a aprobar. Mantén un tono directo, sin jerga innecesaria y respaldado por rutas reales.
+Use this structure to deliver the pre-approval review. Keep the tone direct, without needless jargon, and backed by real paths. Render the headings and labels in the user's language.
 
 ---
 
-## 📊 Matriz de Niveles de Riesgo
+## 📊 Risk Level Matrix
 
-| Nivel | Criterio | Veredicto habitual |
+| Level | Criteria | Usual verdict |
 | :--- | :--- | :--- |
-| **Bajo** | Cambio acotado, reversible con `git revert`, sin archivos críticos o con cambios triviales/documentales y checks claros. | `Aprobar` |
-| **Medio** | Toca lógica de negocio relevante o configuración con impacto controlado; requiere confirmar algún caso borde o verificar checks. | `Aprobar con notas` |
-| **Alto** | Toca archivos críticos (migraciones, RLS, auth, pagos, términos, CI) con riesgo de regresión, impacto irreversible parcial o cambios no explicados en la descripción. | `Pedir cambios antes de aprobar` |
-| **Bloqueante** | Exposición de datos/bypass de RLS o auth, pérdida de datos sin respaldo, secreto filtrado en el diff, fallo grave en pagos o CI roto en zona crítica. | `No aprobar aún` |
+| **Low** | Contained change, reversible with `git revert`, no critical files (or only trivial/documentation changes) and clear checks. | `Approve` |
+| **Medium** | Touches relevant business logic or configuration with controlled impact; needs an edge case confirmed or checks verified. | `Approve with notes` |
+| **High** | Touches critical files (migrations, RLS, auth, payments, terms, CI) with regression risk, partly irreversible impact, or changes the description does not explain. | `Request changes before approving` |
+| **Blocking** | Data exposure or RLS/auth bypass, data loss without a backup, a secret leaked in the diff, a serious payments bug, or broken CI in a critical area. | `Do not approve yet` |
 
 ---
 
-## 📄 Plantilla Canónica
+## 📄 Canonical Template
 
 ```markdown
-### Veredicto: <Aprobar | Aprobar con notas | Pedir cambios antes de aprobar | No aprobar aún>
-**Riesgo global:** <Bajo | Medio | Alto | Bloqueante> — <resumen de 1 frase con el motivo principal>
-**Reversibilidad:** <Fácil (basta `git revert`) | Parcial (<qué queda atrás>) | Irreversible (<motivo>)>
+### Verdict: <Approve | Approve with notes | Request changes before approving | Do not approve yet>
+**Overall risk:** <Low | Medium | High | Blocking> — <one-sentence summary of the main reason>
+**Reversibility:** <Easy (a `git revert` is enough) | Partial (<what is left behind>) | Irreversible (<reason>)>
 
-### Qué cambió (en lenguaje llano)
-- <Efecto concreto 1 para usuarios, datos u operación>
-- <Efecto concreto 2>
+### What changed (in plain language)
+- <Concrete effect 1 for users, data or operations>
+- <Concrete effect 2>
 
-### Por qué cambió
-<Motivo según título, descripción e issue enlazada — o "No especificado en el PR">
-> **Desalineación detectada (si aplica):** <cambios en el diff que no estaban explicados en la descripción del PR>
+### Why it changed
+<Reason according to the title, description and linked issue — or "Not specified in the PR">
+> **Mismatch found (if any):** <changes in the diff that the PR description does not explain>
 
-### Archivos críticos tocados
-| Categoría | Archivo | Qué toca (en llano) | Reversibilidad |
+### Critical files touched
+| Category | File | What it touches (plain language) | Reversibility |
 |---|---|---|---|
-| <Categoría> | `ruta/archivo` | <impacto concreto> | <Reversible / Irreversible / Requiere rollback manual> |
+| <Category> | `path/file` | <concrete impact> | <Reversible / Irreversible / Needs manual rollback> |
 
-*(Si no hay ninguno: "Ninguno detectado (revisadas las 6 categorías críticas: migraciones, RLS/permisos, legal/términos, auth/secretos, pagos e infra/CI).")*
+*(If none: "None found (checked the 6 critical categories: migrations, RLS/permissions, legal/terms, auth/secrets, payments and infra/CI).")*
 
-### Riesgos y puntos a revisar antes de aprobar
-1. **[<Severidad>] <Resumen del riesgo>** (`archivo:línea`)
-   - **Qué podría pasar:** <escenario concreto>
-   - **Qué confirmar o pedir:** <acción concreta antes de pulsar Approve>
+### Risks and points to review before approving
+1. **[<Severity>] <Risk summary>** (`file:line`)
+   - **What could happen:** <concrete scenario>
+   - **What to confirm or ask for:** <concrete action before pressing Approve>
 
-### Checks, tests y lo que no se pudo verificar
-- **CI / Checks:** <resultado real o "No visible / sin configurar">
-- **Tests en zonas críticas:** <sí añade / no cubre X>
-- **No verificado / alcance:** <archivos omitidos en PR gigante, comportamiento en runtime, aprobación legal pendiente>
+### Checks, tests and what could not be verified
+- **CI / Checks:** <real result or "Not visible / not configured">
+- **Tests in critical areas:** <adds tests / does not cover X>
+- **Not verified / scope:** <files skipped in a huge PR, runtime behavior, pending legal approval>
 ```
 
 ---
 
-## 📌 Ejemplo Completo
+## 📌 Full Example
 
 ```markdown
-### Veredicto: Pedir cambios antes de aprobar
-**Riesgo global:** Alto — Elimina una columna en producción y relaja una regla de acceso en la tabla de suscripciones sin mencionarlo en la descripción del PR.
-**Reversibilidad:** Irreversible en datos (si se aplica la migración, los datos de `legacy_plan` se pierden).
+### Verdict: Request changes before approving
+**Overall risk:** High — Drops a column in production and loosens an access rule on the subscriptions table without mentioning either in the PR description.
+**Reversibility:** Irreversible for data (once the migration runs, the `legacy_plan` data is gone).
 
-### Qué cambió (en lenguaje llano)
-- Añade la opción de suscripción anual en la pantalla de precios y en el flujo de pago con Stripe.
-- Guarda el periodo de facturación en la base de datos y actualiza el texto legal de renovación automática.
-- Permite a cualquier usuario autenticado consultar la tabla de planes desde la app.
+### What changed (in plain language)
+- Adds the annual subscription option to the pricing screen and the Stripe checkout flow.
+- Stores the billing period in the database and updates the legal text on automatic renewal.
+- Lets any authenticated user read the plans table from the app.
 
-### Por qué cambió
-Según la descripción del PR #88 ("Plan anual de suscripción"), busca habilitar pagos anuales con 20 % de descuento para Q4.
-> **Desalineación detectada:** El PR no menciona la eliminación de `legacy_plan` en la migración ni el cambio en la política de acceso (RLS) de `subscriptions`.
+### Why it changed
+According to the description of PR #88 ("Annual subscription plan"), it enables annual payments with a 20% discount for Q4.
+> **Mismatch found:** The PR does not mention dropping `legacy_plan` in the migration or the change to the access policy (RLS) on `subscriptions`.
 
-### Archivos críticos tocados
-| Categoría | Archivo | Qué toca (en llano) | Reversibilidad |
+### Critical files touched
+| Category | File | What it touches (plain language) | Reversibility |
 |---|---|---|---|
-| Migraciones | `supabase/migrations/20261115_annual_plan.sql` | Añade `billing_interval` y borra la columna `legacy_plan` | Irreversible (pierde datos) |
-| RLS / Permisos | `supabase/migrations/20261115_annual_plan.sql` | Amplía la política `SELECT` de `subscriptions` | Reversible con nueva migración |
-| Términos legales | `content/legal/terms.mdx` | Actualiza la cláusula de renovación anual y cancelación | Fácil (`git revert`) |
-| Pagos | `src/billing/checkout.ts` | Calcula el precio anual antes de crear la sesión de Stripe | Fácil (`git revert`) |
+| Migrations | `supabase/migrations/20261115_annual_plan.sql` | Adds `billing_interval` and drops the `legacy_plan` column | Irreversible (data loss) |
+| RLS / Permissions | `supabase/migrations/20261115_annual_plan.sql` | Widens the `SELECT` policy on `subscriptions` | Reversible with a new migration |
+| Legal terms | `content/legal/terms.mdx` | Updates the annual renewal and cancellation clause | Easy (`git revert`) |
+| Payments | `src/billing/checkout.ts` | Computes the annual price before creating the Stripe session | Easy (`git revert`) |
 
-### Riesgos y puntos a revisar antes de aprobar
-1. **[Crítico] Posible exposición de suscripciones de otros clientes** (`supabase/migrations/20261115_annual_plan.sql:19`)
-   - **Qué podría pasar:** La nueva política RLS (regla que decide quién puede leer qué filas en la base de datos) usa `USING (true)` sobre `subscriptions` en lugar de filtrar por `auth.uid() = user_id`. Cualquier usuario con sesión podría leer estados de pago ajenos.
-   - **Qué confirmar o pedir:** Restringir la política a `auth.uid() = user_id` antes de aprobar.
-2. **[Alto] Borrado destructivo de columna en el mismo deploy** (`supabase/migrations/20261115_annual_plan.sql:7`)
-   - **Qué podría pasar:** `DROP COLUMN legacy_plan` elimina datos históricos de inmediato y puede provocar errores en el código antiguo durante el despliegue.
-   - **Qué confirmar o pedir:** Verificar si ya no existen registros activos y, si aplica, mover el `DROP` a un PR posterior tras verificar en producción.
-3. **[Medio] Cambio en cláusula de renovación** (`content/legal/terms.mdx:42`)
-   - **Qué podría pasar:** Modifica el plazo de aviso previo de cancelación de 7 a 15 días.
-   - **Qué confirmar o pedir:** Confirmar que legal/producto aprobó esa redacción.
+### Risks and points to review before approving
+1. **[Critical] Other customers' subscriptions may be exposed** (`supabase/migrations/20261115_annual_plan.sql:19`)
+   - **What could happen:** The new RLS policy (the rule that decides who can read which rows in the database) uses `USING (true)` on `subscriptions` instead of filtering by `auth.uid() = user_id`. Any signed-in user could read other people's payment status.
+   - **What to confirm or ask for:** Restrict the policy to `auth.uid() = user_id` before approving.
+2. **[High] Destructive column drop in the same deploy** (`supabase/migrations/20261115_annual_plan.sql:7`)
+   - **What could happen:** `DROP COLUMN legacy_plan` deletes historical data immediately and can make the old code fail during the rollout.
+   - **What to confirm or ask for:** Check that no active records remain and, if so, move the `DROP` to a later PR after verifying in production.
+3. **[Medium] Renewal clause change** (`content/legal/terms.mdx:42`)
+   - **What could happen:** Changes the cancellation notice period from 7 to 15 days.
+   - **What to confirm or ask for:** Confirm that legal/product approved that wording.
 
-### Checks, tests y lo que no se pudo verificar
-- **CI / Checks:** `lint` ✅ · `unit-tests` ✅ (no hay tests de integración contra RLS).
-- **Tests en zonas críticas:** `src/billing/checkout.ts` tiene test unitario nuevo; la migración SQL y la política RLS no están cubiertas por tests automáticos.
-- **No verificado:** Comportamiento real del webhook de Stripe en sandbox y aprobación externa de `content/legal/terms.mdx`.
+### Checks, tests and what could not be verified
+- **CI / Checks:** `lint` ✅ · `unit-tests` ✅ (no integration tests against RLS).
+- **Tests in critical areas:** `src/billing/checkout.ts` has a new unit test; the SQL migration and the RLS policy are not covered by automated tests.
+- **Not verified:** Real behavior of the Stripe webhook in sandbox and external approval of `content/legal/terms.mdx`.
 ```

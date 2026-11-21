@@ -258,8 +258,8 @@
     },
     {
       "name": "gh-cli",
-      "version": "1.0.1",
-      "description": "Automatización de flujos de GitHub con gh CLI y scripts: Pull Requests con Conventional Commits, emojis y labels verificados, diagnóstico de GitHub Actions, issues y releases con notas generadas. Úsala al crear o revisar PRs, depurar workflows fallidos o publicar releases.",
+      "version": "1.1.0",
+      "description": "Automates GitHub workflows with the gh CLI and scripts: Pull Requests with Conventional Commits, emojis and verified labels, GitHub Actions diagnostics, issues, and releases with generated notes. Use when creating or reviewing PRs, debugging failed workflows or publishing releases.",
       "category": "git",
       "path": "skills/git/gh-cli/SKILL.md",
       "readme": "skills/git/gh-cli/README.md",
@@ -286,8 +286,11 @@
         "pull request",
         "crear pr",
         "abrir pr github",
+        "create pr",
+        "open github pr",
         "github actions",
         "workflow fallido",
+        "failed workflow",
         "github issue",
         "github release"
       ],
@@ -295,8 +298,8 @@
     },
     {
       "name": "git-cleanup",
-      "version": "1.0.0",
-      "description": "Limpieza segura de ramas locales de Git tras fusionar PRs (Squash/Merge). Protege ramas principales (main/master/develop), detecta ramas eliminadas en origin y elimina ramas obsoletas sin falsos negativos.",
+      "version": "1.1.0",
+      "description": "Safely cleans up local Git branches after PRs are merged (squash or merge). Protects the main branches (main/master/develop), detects branches deleted on origin and removes stale branches without false negatives. Use after merging a PR or to prune old local branches.",
       "category": "git",
       "path": "skills/git/git-cleanup/SKILL.md",
       "readme": "skills/git/git-cleanup/README.md",
@@ -322,14 +325,16 @@
         "borrar ramas fusionadas",
         "clean merged branches",
         "post-merge cleanup",
-        "eliminar ramas viejas"
+        "eliminar ramas viejas",
+        "delete old branches",
+        "prune local branches"
       ],
       "requires": []
     },
     {
       "name": "pr-plain-review",
-      "version": "1.0.0",
-      "description": "Revisión previa a aprobar un PR o rama en lenguaje llano: explica qué cambió, por qué, qué archivos críticos tocó (migraciones, RLS, términos legales, auth, pagos, infra) y qué riesgo ve. Solo lectura; no modifica código ni aprueba sin confirmación.",
+      "version": "1.1.0",
+      "description": "Plain-language review before approving a PR or branch: explains what changed, why, which critical files it touched (migrations, RLS, legal terms, auth, payments, infra) and what risk it carries. Read-only; it never edits code or approves without confirmation.",
       "category": "git",
       "path": "skills/git/pr-plain-review/SKILL.md",
       "readme": "skills/git/pr-plain-review/README.md",
@@ -356,7 +361,9 @@
         "qué cambia este pr",
         "archivos críticos del pr",
         "pr plain review",
-        "review pr before approving"
+        "review pr before approving",
+        "what does this pr change",
+        "critical files in this pr"
       ],
       "requires": []
     },
