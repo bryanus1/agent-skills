@@ -1,8 +1,8 @@
 ---
 name: idd-explore
-version: 2.0.0
+version: 2.1.0
 description: >-
-  Fase Explore del flujo IDD (Issue-Driven Development). Refina issues de Notion, Linear, GitHub Issues/Projects o notas locales con solo título o ideas sueltas: explora el repo, extrae restricciones y reglas, preserva estimaciones y deja una ficha lista para idd-plan.
+  Explore phase of the IDD (Issue-Driven Development) flow. Refines Notion, Linear, GitHub Issues/Projects items or local notes that only have a title or loose ideas: explores the repo, extracts constraints and rules, keeps estimates and leaves a spec ready for idd-plan.
 tags: [workflow, idd, sdd, issue-tracking, triage, specification, linear, notion, github-issues]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
@@ -10,8 +10,11 @@ triggers:
   - refinar issue
   - refine issue
   - analizar ticket
+  - analyze ticket
   - preparar ticket
+  - prepare ticket
   - explorar requerimiento
+  - explore requirement
   - linear triage
   - github issue triage
   - idd explore
@@ -21,84 +24,88 @@ requirements:
 
 # IDD Explore (Issue Triage)
 
-## 🎯 Propósito
+## 🎯 Purpose
 
-Primera fase del flujo **IDD (Issue-Driven Development)**: `idd-explore` → `idd-plan` → `idd-apply`.
+First phase of the **IDD (Issue-Driven Development)** flow: `idd-explore` → `idd-plan` → `idd-apply`.
 
-Transforma issues vagos, mínimos (solo título) o con notas informales ("brain dumps") en una ficha técnica estructurada, cruzando el requerimiento con la realidad del repositorio local y preservando intactos los metadatos de estimación y calendario.
+Turns vague, minimal (title only) or informal ("brain dump") issues into a structured technical spec, checking the requirement against the reality of the local repository and keeping the estimate and schedule metadata intact.
 
-**La herramienta de seguimiento es la fuente de verdad** (Notion, Linear, GitHub Issues/Projects). Solo si no hay ninguna disponible se usa un archivo Markdown local en `docs/specs/`.
-
----
-
-## ⚡ Cuándo Activar esta Skill
-
-Activa esta skill cuando el usuario:
-- Proporcione un ítem de un tracker (`ENG-104`, `#42`, URL de Notion, Linear o GitHub Projects) pidiendo refinarlo, analizarlo o prepararlo.
-- Diga *"refina este issue"*, *"haz triage de ENG-104"*, *"explora este requerimiento"* o *"prepara el ticket"*.
-- Pegue notas sueltas o una ruta `.md` y quiera convertirlas en un requerimiento claro antes de planificar.
-
-No la uses para generar el plan de implementación (eso es `idd-plan`) ni para escribir código (eso es `idd-apply`).
+**The tracker is the source of truth** (Notion, Linear, GitHub Issues/Projects). A local Markdown file in `docs/specs/` is used only when none is available.
 
 ---
 
-## 📋 Flujo de Trabajo Paso a Paso
+## ⚡ When to Trigger
 
-### Paso 1: Detectar la Fuente e Ingerir el Requerimiento
-Detectar el origen según la entrada (detalle en [references/adapters.md](references/adapters.md)):
+Use this skill when the user:
+- Gives a tracker item (`ENG-104`, `#42`, a Notion, Linear or GitHub Projects URL) and asks to refine, analyze or prepare it.
+- Says *"refine this issue"*, *"triage ENG-104"*, *"explore this requirement"* or *"prepare the ticket"*.
+- Pastes loose notes or a `.md` path and wants to turn them into a clear requirement before planning.
 
-| Entrada | Fuente | Lectura |
+Do not use it to produce the implementation plan (that is `idd-plan`) or to write code (that is `idd-apply`).
+
+---
+
+## 📋 Workflow
+
+### Step 1: Detect the Source and Ingest the Requirement
+Detect the source from the input (details in [references/adapters.md](references/adapters.md)):
+
+| Input | Source | Read with |
 |---|---|---|
-| URL `notion.so/...` o ID de página | **Notion** | Notion MCP `notion-fetch` |
-| `ENG-104`, URL de Linear | **Linear** | Linear MCP `get_issue` |
-| `#42`, `owner/repo#42`, URL de issue | **GitHub Issues** | `gh issue view` |
-| URL `github.com/.../projects/N` o ítem de proyecto | **GitHub Projects** | `gh project item-list` → issue enlazada |
-| Ruta `.md` o texto pegado | **Local** | leer el archivo o el texto |
+| `notion.so/...` URL or page ID | **Notion** | Notion MCP `notion-fetch` |
+| `ENG-104`, Linear URL | **Linear** | Linear MCP `get_issue` |
+| `#42`, `owner/repo#42`, issue URL | **GitHub Issues** | `gh issue view` |
+| `github.com/.../projects/N` URL or project item | **GitHub Projects** | `gh project item-list` → linked issue |
+| `.md` path or pasted text | **Local** | read the file or the text |
 
-Extraer título, cuerpo y estado actual.
+Extract the title, body and current state.
 
-### Paso 2: Análisis de Notas y Extracción de Restricciones
-1. Clasificar el contenido:
-   - **Caso A (vacío / solo título):** inferir alcance desde el codebase y el título.
-   - **Caso B (notas desestructuradas):** extraer restricciones arquitectónicas, reglas de negocio y casos de borde, y metadatos de gestión (estimación, fechas, fase, comandos sugeridos).
-2. **Preservación estricta:** ningún dato de estimación, fase o fecha se descarta.
+### Step 2: Analyze the Notes and Extract Constraints
+1. Classify the content:
+   - **Case A (empty / title only):** infer the scope from the codebase and the title.
+   - **Case B (unstructured notes):** extract architectural constraints, business rules and edge cases, plus management metadata (estimate, dates, phase, suggested commands).
+2. **Strict preservation:** no estimate, phase or date is ever dropped.
 
-### Paso 3: Exploración de Solo Lectura del Codebase
-1. Búsqueda dirigida por título y palabras clave.
-2. Identificar archivos y módulos impactados, patrones existentes, tipos y esquemas vinculados.
-3. **No editar código** en esta fase.
+### Step 3: Read-Only Codebase Exploration
+1. Targeted search by title and keywords.
+2. Find the impacted files and modules, existing patterns, and related types and schemas.
+3. **Do not edit code** in this phase.
 
-### Paso 4: Formular la Ficha (7 Secciones)
-Seguir exactamente [references/issue-template.md](references/issue-template.md):
-`🎯 Objetivo` · `🛡️ Restricciones Arquitectónicas` · `📋 Reglas de Negocio Clave` · `🧭 Contexto Técnico en el Repo` · `📦 Alcance Propuesto` · `🗓️ Metadatos & Planificación` · `❓ Preguntas / Decisiones Abiertas`.
+### Step 4: Write the Spec (7 Sections)
+Follow [references/issue-template.md](references/issue-template.md) exactly:
+`🎯 Goal` · `🛡️ Architectural Constraints` · `📋 Key Business Rules` · `🧭 Technical Context in the Repo` · `📦 Proposed Scope` · `🗓️ Metadata & Planning` · `❓ Open Questions / Decisions`.
 
-### Paso 5: Puerta de Revisión
-1. Mostrar la ficha completa en el chat e indicar dónde se va a guardar.
-2. **Esperar la confirmación explícita del usuario antes de cualquier escritura.**
+Keep the section headings exactly as in the template (the later phases look for them); write the content in the user's language.
 
-### Paso 6: Persistir (el tracker primero)
-1. **La entrada era un ítem de tracker:** escribir la ficha en la descripción del ítem o en el cuerpo de la página de Notion.
-2. **La entrada era texto o `.md`, pero hay un tracker conectado** (MCP de Notion o Linear, o `gh` autenticado): ofrecer crear el ítem ahí y crearlo solo si el usuario acepta.
-3. **No hay tracker:** guardar en `docs/specs/<YYYY-MM-DD>-<slug>.md` (un único archivo por cambio, que `idd-plan` y `idd-apply` ampliarán después).
+### Step 5: Review Gate
+1. Show the full spec in the chat and say where it will be saved.
+2. **Wait for the user's explicit confirmation before any write.**
 
-### Paso 7: Siguiente Paso
-Cerrar con:
-> *"La ficha está lista. Cuando quieras, usa **idd-plan** sobre este mismo ítem para generar el plan de implementación."*
+### Step 6: Persist (tracker first)
+1. **The input was a tracker item:** write the spec into the item's description or the body of the Notion page.
+2. **The input was text or a `.md`, but a tracker is connected** (Notion or Linear MCP, or an authenticated `gh`): offer to create the item there, and create it only if the user accepts.
+3. **No tracker:** save to `docs/specs/<YYYY-MM-DD>-<slug>.md` (one file per change, which `idd-plan` and `idd-apply` extend later).
 
----
-
-## ⚠️ Reglas Críticas
-
-1. **Nunca editar código fuente del proyecto**: esta fase es de especificación, no de implementación.
-2. **Puerta de revisión obligatoria**: no escribir en el tracker ni en disco sin mostrar el borrador y obtener confirmación.
-3. **Preservar metadatos de gestión**: estimaciones, ventanas de tiempo y fases van siempre a `🗓️ Metadatos & Planificación`.
-4. **Verificar rutas**: en `🧭 Contexto Técnico en el Repo` solo aparecen rutas cuya existencia se comprobó. No inventar rutas.
-5. **No duplicar**: si el ítem ya existe en un tracker, se actualiza ese ítem; no se crea además un `.md` local.
-6. **Enlaces relativos**: los enlaces internos de la skill son siempre relativos (ej. `[adapters](references/adapters.md)`).
+### Step 7: Next Step
+Close with (in the user's language):
+> *"The spec is ready. Whenever you want, run **idd-plan** on this same item to produce the implementation plan."*
 
 ---
 
-## 📚 Referencias
+## ⚠️ Critical Rules
 
-- [Plantilla de la ficha](references/issue-template.md): las 7 secciones y un ejemplo completo.
-- [Adaptadores de proveedores](references/adapters.md): lectura y escritura en Notion, Linear, GitHub Issues/Projects y local.
+1. **Reply in the user's language**, even though this skill is written in English.
+2. **Never edit the project's source code**: this phase is specification, not implementation.
+3. **Mandatory review gate**: do not write to the tracker or to disk without showing the draft and getting confirmation.
+4. **Keep management metadata**: estimates, time windows and phases always go to `🗓️ Metadata & Planning`.
+5. **Verify paths**: `🧭 Technical Context in the Repo` lists only paths you confirmed exist. Never invent paths.
+6. **No duplicates**: if the item already exists in a tracker, update that item; do not also create a local `.md`.
+7. **Legacy Spanish specs**: items written by earlier versions use Spanish headings (`🎯 Objetivo`, `🗓️ Metadatos & Planificación`…). Recognize them with the table in [references/adapters.md](references/adapters.md#-idd-markers); when updating such an item, keep its existing headings instead of mixing languages.
+8. **Relative links**: the skill's internal links are always relative (e.g. `[adapters](references/adapters.md)`).
+
+---
+
+## 📚 References
+
+- [Spec template](references/issue-template.md): the 7 sections and a full example.
+- [Provider adapters](references/adapters.md): reading and writing in Notion, Linear, GitHub Issues/Projects and local files, plus the IDD markers.

@@ -1,51 +1,53 @@
 # 🔎 Explain Change (`explain-change`)
 
-> **Auditoría posterior a `/opsx:apply`, `idd-apply` o cualquier implementación asistida por IA: contrasta el código realmente escrito contra la propuesta original y resume qué decisiones tomó la IA por su cuenta (supuestos, límites, contratos, dependencias, alcance extra y atajos).**
+> **Audit after `/opsx:apply`, `idd-apply` or any AI-assisted implementation: compares the code actually written against the original proposal and sums up the decisions the AI made on its own (assumptions, limits, contracts, dependencies, extra scope and shortcuts).**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `explain-change` |
-| **Categoría** | `workflow` |
-| **Versión** | `1.0.0` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
-| **Fuentes Soportadas** | OpenSpec (`openspec/changes/`), IDD (Notion, Linear, GitHub Issues/Projects, `docs/specs/`), planes `.md` o PRs |
-| **Modo** | Solo lectura por defecto |
+| **Name** | `explain-change` |
+| **Category** | `workflow` |
+| **Version** | `1.1.0` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Supported Sources** | OpenSpec (`openspec/changes/`), IDD (Notion, Linear, GitHub Issues/Projects, `docs/specs/`), `.md` plans or PRs |
+| **Mode** | Read-only by default |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
 ```bash
-# Instalar en el proyecto actual con skills.sh:
+# Install into the current project with skills.sh:
 npx skills add bryanus1/agent-skills --skill explain-change
 
-# Instalar globalmente en tu máquina:
+# Install globally on your machine:
 npx skills add bryanus1/agent-skills --skill explain-change -g
 ```
 
 ---
 
-## 💡 Ejemplos de Uso
+## 💡 Usage Examples
 
-### 1. Justo después de `/opsx:apply`
-> *"explicar-cambio después del último /opsx:apply"*
+The skill replies in the user's language, so you can ask in English or Spanish.
 
-Localiza el cambio activo en `openspec/changes/<nombre>/` (`proposal.md`, `design.md`, `specs/`, `tasks.md`), inspecciona el `git diff` y los archivos nuevos, y te muestra únicamente las decisiones implícitas que tomó la IA (p. ej. una librería instalada fuera de diseño, un límite arbitrario o un refactor colateral).
+### 1. Right after `/opsx:apply`
+> *"explicar-cambio after the last /opsx:apply"*
 
-### 2. Después de implementar un ticket con `idd-apply`
-> *"¿Qué decisiones tomó la IA que no estaban en el plan de ENG-104?"*
+Finds the active change in `openspec/changes/<name>/` (`proposal.md`, `design.md`, `specs/`, `tasks.md`), inspects the `git diff` and the new files, and shows you only the implicit decisions the AI made (e.g. a library installed outside the design, an arbitrary limit or a collateral refactor).
 
-Lee el plan y los comentarios de progreso/desviaciones del issue en Linear, separa lo que ya habías aprobado en `### Desviaciones` de las decisiones silenciosas o puntos omitidos, y prioriza lo que requiere tu validación.
+### 2. After implementing a ticket with `idd-apply`
+> *"Which decisions did the AI make that weren't in the ENG-104 plan?"*
 
-### 3. Plan local en Markdown o PR
-> *"Audita los cambios de esta rama contra docs/specs/2026-11-12-exportar-csv.md"*
+Reads the plan and the progress/deviation comments on the Linear issue, separates what you had already approved in the plan's deviations from the silent decisions or omitted items, and prioritizes what needs your validation. It reads both the English IDD markers and the Spanish ones from earlier versions.
 
-Compara la rama actual contra `main` frente a la especificación indicada y pregunta qué decisiones aceptar (con opción a documentarlas tras tu OK) o revertir.
+### 3. Local Markdown plan or PR
+> *"Audit the changes on this branch against docs/specs/2026-11-12-export-csv.md"*
+
+Compares the current branch against `main` and the given spec, and asks which decisions to accept (with the option to document them after your OK) or revert.
 
 ---
 
-## 📚 Documentación
+## 📚 Documentation
 
-- **[`SKILL.md`](SKILL.md)**: flujo paso a paso, regla anti-autojustificación y restricciones de solo lectura.
-- **[Fuentes de la propuesta](references/proposal-sources.md)**: localización y lectura en OpenSpec, IDD y planes genéricos.
-- **[Taxonomía de decisiones e informe](references/decision-taxonomy.md)**: las 6 categorías, criterios 🔴/🟡/🟢, plantilla canónica y ejemplo completo.
+- **[`SKILL.md`](SKILL.md)**: step-by-step workflow, the no-self-justification rule and read-only constraints.
+- **[Proposal sources](references/proposal-sources.md)**: finding and reading OpenSpec, IDD and generic plans.
+- **[Decision taxonomy and report](references/decision-taxonomy.md)**: the 6 categories, 🔴/🟡/🟢 criteria, canonical template and a full example.

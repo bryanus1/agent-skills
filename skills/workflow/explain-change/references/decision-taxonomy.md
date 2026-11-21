@@ -1,91 +1,91 @@
-# Taxonomía de Decisiones e Informe (`explain-change`)
+# Decision Taxonomy and Report (`explain-change`)
 
-Usa esta guía para clasificar qué decidió la IA fuera de la propuesta y presentar el informe priorizado por necesidad de validación humana.
+Use this guide to classify what the AI decided outside the proposal and to present the report prioritized by the need for human validation. Render the headings and labels in the user's language.
 
 ---
 
-## 🔍 6 Categorías de Decisiones Implícitas
+## 🔍 6 Categories of Implicit Decisions
 
-| Categoría | Qué buscar en el diff | Ejemplo típico |
+| Category | What to look for in the diff | Typical example |
 | :--- | :--- | :--- |
-| **1. Alcance extra** | Archivos tocados que no corresponden a ninguna tarea ni requisito; refactors de estilo en módulos ajenos; endpoints/botones no pedidos. | Reescribió `src/utils/date.ts` y renombró funciones existentes "para limpiar". |
-| **2. Contratos y datos** | Nuevos campos en API/BD, migraciones añadidas, cambio en códigos HTTP, payloads, tipos exportados o formatos de respuesta. | Devolvió `200` con `{ error }` en lugar de `422`, o añadió columna `metadata jsonb`. |
-| **3. Comportamiento y defaults** | Límites numéricos, timeouts, reintentos, paginación, políticas de cache, manejo silencioso de errores (`catch` vacío / fallback) o mensajes al usuario no definidos. | Fijó un límite de 500 filas, timeout de 5 s o devolvió `[]` si falla la query. |
-| **4. Arquitectura y dependencias** | Librerías instaladas en `package.json`/lockfiles, patrones o abstracciones nuevas, cambio del enfoque acordado en `design.md`. | Instaló `json2csv` en lugar de usar el serializador existente, o creó un adapter extra. |
-| **5. Seguridad, permisos y config** | Reglas RLS, middlewares/guards, validaciones relajadas (`optional()`, `z.any()`), CORS, nuevas variables de entorno o flags. | Añadió `PROCESS_TIMEOUT_MS` en config y marcó el campo `email` como opcional. |
-| **6. Atajos, compromisos y deuda** | `TODO`/`FIXME`, casts (`as any`, `@ts-ignore`), tests saltados (`it.skip`), mocks excesivos, tareas marcadas `[x]` en `tasks.md` sin estar completas. | Marcó la tarea de test como hecha pero solo testeó el caso feliz con mock total. |
+| **1. Extra scope** | Touched files that match no task or requirement; style refactors in unrelated modules; endpoints/buttons nobody asked for. | Rewrote `src/utils/date.ts` and renamed existing functions "to clean up". |
+| **2. Contracts and data** | New API/DB fields, added migrations, changed HTTP codes, payloads, exported types or response formats. | Returned `200` with `{ error }` instead of `422`, or added a `metadata jsonb` column. |
+| **3. Behavior and defaults** | Numeric limits, timeouts, retries, pagination, cache policies, silent error handling (empty `catch` / fallback) or user-facing messages that were not defined. | Set a 500-row limit, a 5 s timeout, or returned `[]` when the query fails. |
+| **4. Architecture and dependencies** | Libraries installed in `package.json`/lockfiles, new patterns or abstractions, a different approach than the one agreed in `design.md`. | Installed `json2csv` instead of using the existing serializer, or created an extra adapter. |
+| **5. Security, permissions and config** | RLS rules, middlewares/guards, relaxed validations (`optional()`, `z.any()`), CORS, new environment variables or flags. | Added `PROCESS_TIMEOUT_MS` to the config and made the `email` field optional. |
+| **6. Shortcuts, trade-offs and debt** | `TODO`/`FIXME`, casts (`as any`, `@ts-ignore`), skipped tests (`it.skip`), excessive mocks, tasks ticked `[x]` in `tasks.md` that are not complete. | Ticked the test task as done but only tested the happy path with a full mock. |
 
 ---
 
-## 🚦 Criterios de Prioridad
+## 🚦 Priority Criteria
 
-- 🔴 **Requiere tu validación:** cambios en contratos públicos, BD/migraciones, seguridad/permisos, dependencias nuevas, alcance extra grande o decisiones que contradicen `proposal.md` / `design.md`.
-- 🟡 **Conviene revisar:** supuestos funcionales (límites, mensajes, ordenamiento, fallbacks), variables de entorno nuevas, refactors colaterales o atajos/deuda técnica (`TODO`, tests incompletos).
-- 🟢 **Detalle menor de implementación:** decisiones internas coherentes con la propuesta (nombres de variables locales, división interna de helpers privados, orden de imports). Agrúpalas en 1–3 viñetas breves al final para no enterrar lo importante.
+- 🔴 **Needs your validation:** changes to public contracts, DB/migrations, security/permissions, new dependencies, large extra scope, or decisions that contradict `proposal.md` / `design.md`.
+- 🟡 **Worth reviewing:** functional assumptions (limits, messages, ordering, fallbacks), new environment variables, collateral refactors, or shortcuts/technical debt (`TODO`, incomplete tests).
+- 🟢 **Minor implementation detail:** internal decisions consistent with the proposal (local variable names, internal split of private helpers, import order). Group them in 1–3 short bullets at the end so they do not bury what matters.
 
 ---
 
-## 📄 Plantilla Canónica del Informe
+## 📄 Canonical Report Template
 
 ```markdown
-### Veredicto: <Fiel a la propuesta | Con decisiones menores | Con decisiones que requieren validación | Desalineado con la propuesta>
-**Propuesta contrastada:** <ruta OpenSpec / ítem IDD / plan>
-**Cambio inspeccionado:** <archivos modificados/nuevos en working tree o rama contra base>
+### Verdict: <Faithful to the proposal | Minor decisions | Decisions that need validation | Misaligned with the proposal>
+**Proposal compared:** <OpenSpec path / IDD item / plan>
+**Change inspected:** <modified/new files in the working tree, or branch against base>
 
-### 🔴 Decisiones que requieren tu validación
-1. **[<Categoría>] <Título corto de la decisión>** (`archivo:línea`)
-   - **Qué decidió la IA:** <descripción concreta de lo implementado>
-   - **Frente a la propuesta:** <"No estaba en proposal.md" | "Contradice design.md § X">
-   - **Por qué probablemente lo hizo e impacto:** <motivo técnico y efecto en producto/sistema>
-   - **Alternativa si no te convence:** <opción directa>
+### 🔴 Decisions that need your validation
+1. **[<Category>] <Short title of the decision>** (`file:line`)
+   - **What the AI decided:** <concrete description of what was implemented>
+   - **Against the proposal:** <"Not in proposal.md" | "Contradicts design.md § X">
+   - **Likely reason and impact:** <technical reason and effect on the product/system>
+   - **Alternative if you don't like it:** <direct option>
 
-### 🟡 Decisiones que conviene revisar
-- **[<Categoría>] <Resumen>** (`archivo:línea`) — <frente a la propuesta + impacto breve>
+### 🟡 Decisions worth reviewing
+- **[<Category>] <Summary>** (`file:line`) — <against the proposal + short impact>
 
-### 🟢 Detalles menores de implementación
-- <Resumen agrupado de decisiones internas razonables que no cambian comportamiento ni contrato>
+### 🟢 Minor implementation details
+- <Grouped summary of reasonable internal decisions that change neither behavior nor contract>
 
-### 📋 Puntos de la propuesta omitidos, parciales o desviados
-- **Omitidos / parciales:** <requisitos o tareas marcadas `[x]` con huecos reales, o "Ninguno">
-- **Desviaciones ya registradas:** <las documentadas en `### Desviaciones` / comentarios IDD, o "Ninguna">
+### 📋 Proposal items omitted, partial or deviated
+- **Omitted / partial:** <requirements or tasks ticked `[x]` with real gaps, or "None">
+- **Deviations already recorded:** <those documented in the plan's deviations section / IDD comments, or "None">
 
-### Siguiente paso
-¿Qué decisiones **aceptas** tal cual (puedo documentarlas en `<design.md / plan>` si confirmas) y cuáles quieres que **ajustemos o revirtamos**?
+### Next step
+Which decisions do you **accept** as they are (I can document them in `<design.md / plan>` if you confirm) and which do you want us to **adjust or revert**?
 ```
 
 ---
 
-## 📌 Ejemplo Completo
+## 📌 Full Example
 
 ```markdown
-### Veredicto: Con decisiones que requieren validación
-**Propuesta contrastada:** `openspec/changes/export-invoices-csv/` (`proposal.md`, `design.md`, `specs/export/spec.md`, `tasks.md`)
-**Cambio inspeccionado:** 5 archivos modificados, 1 nuevo (sin commitear tras `/opsx:apply`)
+### Verdict: Decisions that need validation
+**Proposal compared:** `openspec/changes/export-invoices-csv/` (`proposal.md`, `design.md`, `specs/export/spec.md`, `tasks.md`)
+**Change inspected:** 5 modified files, 1 new (uncommitted after `/opsx:apply`)
 
-### 🔴 Decisiones que requieren tu validación
-1. **[Arquitectura y dependencias] Instaló la librería `papaparse` no contemplada en `design.md`** (`package.json:18`, `src/invoices/export.ts:3`)
-   - **Qué decidió la IA:** Añadió `papaparse` y `@types/papaparse` al proyecto en vez de usar `toCsv` de `src/shared/csv.ts` indicado en `design.md`.
-   - **Frente a la propuesta:** Contradice `design.md` ("Reutilizar el helper interno `toCsv` sin añadir dependencias").
-   - **Por qué probablemente lo hizo e impacto:** Evitó ajustar el escape de comillas en `toCsv`, pero introduce una dependencia externa nueva y cambia el lockfile.
-   - **Alternativa si no te convence:** Desinstalar `papaparse`, corregir el escape en `src/shared/csv.ts` y reutilizarlo.
+### 🔴 Decisions that need your validation
+1. **[Architecture and dependencies] Installed the `papaparse` library, which `design.md` did not plan for** (`package.json:18`, `src/invoices/export.ts:3`)
+   - **What the AI decided:** Added `papaparse` and `@types/papaparse` to the project instead of using `toCsv` from `src/shared/csv.ts`, as `design.md` says.
+   - **Against the proposal:** Contradicts `design.md` ("Reuse the internal `toCsv` helper without adding dependencies").
+   - **Likely reason and impact:** It avoided fixing quote escaping in `toCsv`, but it introduces a new external dependency and changes the lockfile.
+   - **Alternative if you don't like it:** Uninstall `papaparse`, fix the escaping in `src/shared/csv.ts` and reuse it.
 
-2. **[Comportamiento y defaults] Limitó la exportación a 500 filas y devuelve `200` vacío si hay error de lectura** (`src/invoices/export.ts:29-41`)
-   - **Qué decidió la IA:** Fijó `MAX_EXPORT_ROWS = 500` y envolvió la consulta en un `try/catch` que devuelve CSV vacío con cabecera.
-   - **Frente a la propuesta:** `specs/export/spec.md` no definía límite de filas ni ese fallback silencioso.
-   - **Por qué probablemente lo hizo e impacto:** Evitó timeouts en consultas grandes, pero un usuario con >500 facturas recibirá un archivo incompleto sin aviso de truncado o error.
-   - **Alternativa si no te convence:** Subir o hacer configurable el límite y devolver `422` o cabecera de aviso cuando se supere.
+2. **[Behavior and defaults] Capped the export at 500 rows and returns an empty `200` on read errors** (`src/invoices/export.ts:29-41`)
+   - **What the AI decided:** Set `MAX_EXPORT_ROWS = 500` and wrapped the query in a `try/catch` that returns an empty CSV with only the header.
+   - **Against the proposal:** `specs/export/spec.md` defined neither a row limit nor that silent fallback.
+   - **Likely reason and impact:** It avoided timeouts on large queries, but a user with >500 invoices gets an incomplete file with no truncation warning or error.
+   - **Alternative if you don't like it:** Raise the limit or make it configurable, and return `422` or a warning header when it is exceeded.
 
-### 🟡 Decisiones que conviene revisar
-- **[Alcance extra] Refactorizó funciones de formato de fecha en `src/shared/dates.ts:12-34`** — No estaba pedido en `tasks.md`; aunque mantiene la firma pública, toca un módulo usado por otros reportes.
-- **[Atajos y deuda] Añadió `// TODO: validar permiso de rol admin` en `src/invoices/export.ts:15`** — Marcó la tarea 2.1 como `[x]` en `tasks.md`, pero dejó pendiente restringir el acceso por rol.
+### 🟡 Decisions worth reviewing
+- **[Extra scope] Refactored the date formatting functions in `src/shared/dates.ts:12-34`** — Not asked for in `tasks.md`; it keeps the public signature, but it touches a module other reports use.
+- **[Shortcuts and debt] Added `// TODO: validate admin role permission` in `src/invoices/export.ts:15`** — Ticked task 2.1 as `[x]` in `tasks.md`, but left restricting access by role pending.
 
-### 🟢 Detalles menores de implementación
-- Creó el helper privado `sanitizeCsvCell` dentro de `src/invoices/export.ts:52` para prevenir inyección de fórmulas en Excel (`=`, `+`, `-`, `@`).
+### 🟢 Minor implementation details
+- Created the private helper `sanitizeCsvCell` in `src/invoices/export.ts:52` to prevent formula injection in Excel (`=`, `+`, `-`, `@`).
 
-### 📋 Puntos de la propuesta omitidos, parciales o desviados
-- **Omitidos / parciales:** El escenario "Exportación sin resultados devuelve `204` o aviso" de `specs/export/spec.md` quedó devolviendo CSV solo con cabeceras `200 OK`.
-- **Desviaciones ya registradas:** Ninguna.
+### 📋 Proposal items omitted, partial or deviated
+- **Omitted / partial:** The "Export with no results returns `204` or a notice" scenario in `specs/export/spec.md` ended up returning a header-only CSV with `200 OK`.
+- **Deviations already recorded:** None.
 
-### Siguiente paso
-¿Qué decisiones **aceptas** tal cual (puedo documentarlas en `openspec/changes/export-invoices-csv/design.md` si confirmas) y cuáles quieres que **ajustemos o revirtamos**?
+### Next step
+Which decisions do you **accept** as they are (I can document them in `openspec/changes/export-invoices-csv/design.md` if you confirm) and which do you want us to **adjust or revert**?
 ```

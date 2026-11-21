@@ -1,49 +1,59 @@
-# Fuentes de la Propuesta (`explain-change`)
+# Proposal Sources (`explain-change`)
 
-Guía para localizar y leer la propuesta o plan original antes de contrastarlo contra el código implementado.
+Guide to finding and reading the original proposal or plan before comparing it against the implemented code.
 
 ---
 
 ## 1. OpenSpec (`/opsx:apply` / `openspec/changes/`)
 
-- **Dónde buscar:** carpeta `openspec/changes/<nombre-del-cambio>/` en la raíz del repo.
-- **Qué excluir:** ignora `openspec/changes/archive/` por defecto (salvo que el usuario pida auditar un cambio ya archivado).
-- **Archivos que forman la propuesta completa:**
-  1. `proposal.md` — intención, alcance y qué queda fuera.
-  2. `design.md` — decisiones técnicas y alternativas acordadas.
-  3. `specs/**/*.md` — requisitos y escenarios esperados.
-  4. `tasks.md` — lista de tareas e ítems marcados como completados (`- [x]`).
-- **Si hay varios cambios activos:** lista los directorios dentro de `openspec/changes/` (excluyendo `archive/`) y pregunta al usuario cuál auditar. Si la rama actual o los archivos tocados apuntan claramente a uno, proponlo para confirmar.
+- **Where to look:** the `openspec/changes/<change-name>/` folder at the repo root.
+- **What to skip:** ignore `openspec/changes/archive/` by default (unless the user asks to audit an archived change).
+- **Files that make up the full proposal:**
+  1. `proposal.md` — intent, scope and what is left out.
+  2. `design.md` — technical decisions and agreed alternatives.
+  3. `specs/**/*.md` — expected requirements and scenarios.
+  4. `tasks.md` — task list and items ticked as done (`- [x]`).
+- **If there are several active changes:** list the directories inside `openspec/changes/` (skipping `archive/`) and ask the user which to audit. If the current branch or the touched files clearly point to one, suggest it for confirmation.
 
 ---
 
-## 2. Flujo IDD (`idd-plan` / `idd-apply`)
+## 2. IDD Flow (`idd-plan` / `idd-apply`)
 
-Lee la sección `## 🛠️ Plan de Implementación` (y la ficha previa si existe) desde el proveedor correspondiente:
+Read the `## 🛠️ Implementation Plan` section (and the earlier spec if there is one) from the matching provider:
 
-| Entrada o rastro | Proveedor | Cómo leer |
+| Input or trace | Provider | How to read |
 |---|---|---|
-| URL `notion.so/...` o ID de página | **Notion** | `notion-fetch` sobre la página |
-| `ENG-104` o URL de Linear | **Linear** | `get_issue` (cuerpo) + `list_comments` (para ver `🔄 Progreso IDD` y desviaciones registradas) |
-| `#42`, `owner/repo#42` o URL de issue | **GitHub Issues** | `gh issue view <n> --json title,body,comments` |
-| URL de GitHub Projects o ítem | **GitHub Projects** | `gh project item-list` → leer issue enlazada o cuerpo del draft item |
-| Archivo local | **Local** | `docs/specs/<YYYY-MM-DD>-<slug>.md` |
+| `notion.so/...` URL or page ID | **Notion** | `notion-fetch` on the page |
+| `ENG-104` or Linear URL | **Linear** | `get_issue` (body) + `list_comments` (to see the progress comments and recorded deviations) |
+| `#42`, `owner/repo#42` or issue URL | **GitHub Issues** | `gh issue view <n> --json title,body,comments` |
+| GitHub Projects URL or item | **GitHub Projects** | `gh project item-list` → read the linked issue or the draft item body |
+| Local file | **Local** | `docs/specs/<YYYY-MM-DD>-<slug>.md` |
 
-**Importante en IDD:**
-- Revisa siempre la subsección `### Desviaciones` del plan y los comentarios `🔄 Progreso IDD` publicados durante `idd-apply`.
-- Si una decisión diferente al plan ya figura ahí como acordada con el usuario, repórtala en una línea bajo *"Desviaciones ya registradas"* para no mezclarla con decisiones silenciosas nuevas.
+**IDD markers:** items written by earlier versions of the IDD skills use Spanish markers. Read both:
+
+| English | Legacy Spanish |
+|---|---|
+| `## 🛠️ Implementation Plan` | `## 🛠️ Plan de Implementación` |
+| `### Deviations` | `### Desviaciones` |
+| `🔄 IDD Progress` | `🔄 Progreso IDD` |
+| `✅ IDD — implemented` | `✅ IDD — implementado` |
+| `Status: planned / in progress / implemented` | `Estado: planificado / en progreso / implementado` |
+
+**Important in IDD:**
+- Always check the plan's deviations subsection and the progress comments posted during `idd-apply`.
+- If a decision that differs from the plan already appears there as agreed with the user, report it in one line under *"Deviations already recorded"* so it is not mixed with new silent decisions.
 
 ---
 
-## 3. Plan Genérico o Referencia Directa
+## 3. Generic Plan or Direct Reference
 
-- **Plan en el chat:** si el cambio vino de un plan aprobado en la misma conversación, úsalo como referencia declarando explícitamente que se compara contra el plan de la sesión.
-- **Archivo `.md` o descripción de PR/issue:** si el usuario pasa una ruta (`docs/rfc-auth.md`, `PLAN.md`) o un PR (`gh pr view <n> --json title,body`), léelo íntegro antes de revisar el diff.
+- **Plan in the chat:** if the change came from a plan approved in the same conversation, use it as the reference and state explicitly that you are comparing against the session's plan.
+- **`.md` file or PR/issue description:** if the user gives a path (`docs/rfc-auth.md`, `PLAN.md`) or a PR (`gh pr view <n> --json title,body`), read it in full before reviewing the diff.
 
 ---
 
-## 4. Desempate y Ausencia de Propuesta
+## 4. Tie-Breaking and No Proposal
 
-- Si el usuario indica explícitamente un origen (p. ej. *"después de /opsx:apply en export-csv"* o *"contra ENG-104"*), usa ese origen directamente.
-- Si existen a la vez cambios activos en `openspec/changes/` y archivos en `docs/specs/`, pregunta cuál corresponde al trabajo en curso.
-- Si **no existe ninguna propuesta ni plan verificable**, detente y responde qué buscaste, pidiendo al usuario que indique el archivo, ticket o resumen contra el que contrastar el diff.
+- If the user names a source explicitly (e.g. *"after /opsx:apply on export-csv"* or *"against ENG-104"*), use that source directly.
+- If there are both active changes in `openspec/changes/` and files in `docs/specs/`, ask which one matches the work in progress.
+- If **there is no verifiable proposal or plan at all**, stop, say what you looked for, and ask the user for the file, ticket or summary to compare the diff against.

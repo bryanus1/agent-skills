@@ -1,8 +1,8 @@
 ---
 name: idd-apply
-version: 1.0.0
+version: 1.1.0
 description: >-
-  Fase Apply del flujo IDD (Issue-Driven Development). Implementa el plan guardado en Notion, Linear, GitHub Issues/Projects o un .md local: ejecuta las tareas en orden, marca cada casilla al verificarla, se detiene ante desviaciones y cierra con la verificación del plan.
+  Apply phase of the IDD (Issue-Driven Development) flow. Implements the plan saved in Notion, Linear, GitHub Issues/Projects or a local .md: runs the tasks in order, ticks each checkbox once verified, stops on deviations and closes with the plan's verification.
 tags: [workflow, idd, sdd, implementation, linear, notion, github-issues]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
@@ -11,6 +11,7 @@ triggers:
   - apply plan
   - implement the plan
   - continúa el plan
+  - continue the plan
   - idd apply
 requirements:
   tools: [view_file, replace_file_content, write_to_file, run_command]
@@ -19,85 +20,88 @@ requirements:
 
 # IDD Apply
 
-## 🎯 Propósito
+## 🎯 Purpose
 
-Tercera fase del flujo **IDD (Issue-Driven Development)**: `idd-explore` → `idd-plan` → **`idd-apply`**.
+Third phase of the **IDD (Issue-Driven Development)** flow: `idd-explore` → `idd-plan` → **`idd-apply`**.
 
-Implementa exactamente lo que dice el plan de `idd-plan`. **El plan es la fuente de verdad**: las tareas se ejecutan en orden y cualquier desviación se acuerda con el usuario antes de seguir.
+Implements exactly what the `idd-plan` plan says. **The plan is the source of truth**: tasks run in order and any deviation is agreed with the user before going on.
 
-**Cómo se registra el progreso:**
-- **Plan en un tracker:** durante la implementación el progreso va en **comentarios** del ítem; el cuerpo solo se edita una vez, al cerrar. Así no se reescribe la descripción en cada tarea ni se pisan ediciones ajenas.
-- **Plan en `.md` local:** las casillas se marcan directamente en el archivo.
-
----
-
-## ⚡ Cuándo Activar esta Skill
-
-Activa esta skill cuando el usuario:
-- Pida implementar, aplicar o continuar un plan (`ENG-104`, `#42`, URL de Notion o de GitHub Projects, ruta `.md`).
-- Diga *"aplica el plan"*, *"implementa ENG-104"*, *"continúa con las tareas del plan"* o *"idd apply"*.
-- Acabe de aprobar un plan generado con `idd-plan`.
+**How progress is recorded:**
+- **Plan in a tracker:** during implementation, progress goes in **comments** on the item; the body is edited only once, at the end. That way the description is not rewritten on every task and other people's edits are not overwritten.
+- **Plan in a local `.md`:** the checkboxes are ticked directly in the file.
 
 ---
 
-## 📋 Flujo de Trabajo Paso a Paso
+## ⚡ When to Trigger
 
-### Paso 1: Localizar el Plan
-1. Detectar el proveedor como en las fases anteriores; los comandos están en `<skill-dir>/../idd-explore/references/adapters.md` (`<skill-dir>` es el directorio que contiene este `SKILL.md`).
-2. Si el usuario no indica el ítem y no hay tracker, buscar en `docs/specs/*.md` los archivos con `Estado: planificado` o `Estado: en progreso`. Si hay más de uno, preguntar cuál.
-3. Leer la sección `## 🛠️ Plan de Implementación` completa y, si está en un tracker, los comentarios `🔄 Progreso IDD` posteriores: las tareas que figuran ahí como hechas cuentan como `- [x]` aunque el cuerpo aún no lo refleje.
-
-### Paso 2: Validar el Plan
-Comprobar que tiene **Requisitos con escenarios**, **Tareas** y **Verificación**. Si falta alguna, o hay **Preguntas abiertas** que bloquean, detenerse y sugerir completar el plan con `idd-plan`.
-
-### Paso 3: Preparar
-1. Mostrar el resumen: tareas pendientes (`- [ ]`), ya hechas (`- [x]`) y la primera que se va a ejecutar.
-2. Revisar el estado de git (`git status`). Si hay cambios sin relación con el plan, avisar antes de empezar.
-3. Si el plan vive en un tracker, pedir **una sola vez** el OK para publicar comentarios de progreso durante la implementación.
-4. Marcar el inicio: en el tracker, un primer comentario `🔄 Progreso IDD — en progreso`; en local, cambiar la línea a `Estado: en progreso`.
-
-### Paso 4: Ejecutar Tarea por Tarea
-Para cada tarea pendiente, en orden:
-1. Leer los archivos implicados y el requisito enlazado (`→ R1`).
-2. Hacer el **cambio mínimo** que cumple la tarea, siguiendo los patrones del repo y reutilizando lo indicado en *Diseño y decisiones*.
-3. Verificar la tarea (test, build o comprobación concreta).
-4. Registrar el avance:
-   - **Tracker:** al terminar cada grupo de tareas (y siempre antes de terminar el turno), publicar un comentario `🔄 Progreso IDD` con las tareas completadas y cómo se verificaron. No editar el cuerpo.
-   - **Local:** marcar `- [x]` en el archivo al terminar cada tarea.
-
-### Paso 5: Gestionar Desviaciones
-Detenerse y preguntar si:
-- Una tarea es ambigua, o un archivo o API del plan no existe o funciona distinto.
-- Hace falta algo fuera del plan o fuera de alcance.
-- Un test falla y la corrección cambia el diseño.
-
-Proponer el ajuste y, tras la confirmación, registrarlo: en el tracker, en el siguiente comentario de progreso (sección *Desviación*); en local, directamente en el plan (tarea nueva, requisito modificado o nota en *Desviaciones*). Luego continuar. No improvisar en silencio.
-
-### Paso 6: Verificación Final
-1. Ejecutar cada punto de la sección **Verificación** y marcarlo.
-2. Comprobar que cada escenario de los requisitos queda cubierto. Si algo falla, volver al Paso 4 o al 5.
-
-### Paso 7: Cerrar
-1. Mostrar el resumen: tareas completadas, archivos cambiados, resultado de la verificación y desviaciones.
-2. Con confirmación del usuario, consolidar el plan en su ubicación con **una sola edición**: todas las casillas completadas en `- [x]`, tareas añadidas, `Estado: implementado · <fecha>` y `### Desviaciones` si las hubo. En el tracker, volver a leer el cuerpo justo antes, cambiar solo la sección del plan y dejar un último comentario `✅ IDD — implementado` con el resumen.
-3. No hacer commit, push, merge ni cerrar el issue salvo que el usuario lo pida.
+Use this skill when the user:
+- Asks to implement, apply or continue a plan (`ENG-104`, `#42`, a Notion or GitHub Projects URL, a `.md` path).
+- Says *"apply the plan"*, *"implement ENG-104"*, *"continue with the plan's tasks"* or *"idd apply"*.
+- Has just approved a plan produced with `idd-plan`.
 
 ---
 
-## ⚠️ Reglas Críticas
+## 📋 Workflow
 
-1. **El plan manda**: no implementar nada que no esté en el plan ni en su alcance sin acordarlo y reflejarlo primero en el plan.
-2. **Nunca marcar una tarea sin verificarla**: si no se pudo verificar, dejarla en `- [ ]` y explicar por qué.
-3. **Un solo lugar**: el progreso queda en el ítem donde vive el plan (o en su `.md`); no se crea una copia local si el plan está en el tracker.
-4. **En el tracker, el cuerpo se edita una sola vez**: durante la implementación solo se publican comentarios; la consolidación del plan se hace al cerrar.
-5. **Confirmación antes de escribir en el tracker**: el usuario aprueba al inicio los comentarios de progreso y, al final, el cierre.
-6. **Sin acciones irreversibles no pedidas**: nada de commit, push, merge, cerrar issues ni comandos destructivos (`rm -rf`, `git reset --hard`, `git push --force`).
-7. **Reportar con honestidad**: si un test falla o un paso se omitió, decirlo con la salida real.
+### Step 1: Locate the Plan
+1. Detect the provider as in the earlier phases; the commands are in `<skill-dir>/../idd-explore/references/adapters.md` (`<skill-dir>` is the directory that holds this `SKILL.md`).
+2. If the user does not name the item and there is no tracker, search `docs/specs/*.md` for files with `Status: planned` or `Status: in progress` (or the legacy `Estado: planificado` / `Estado: en progreso`). If there is more than one, ask which.
+3. Read the whole `## 🛠️ Implementation Plan` section (or the legacy `## 🛠️ Plan de Implementación`) and, if it lives in a tracker, the later `🔄 IDD Progress` comments (or legacy `🔄 Progreso IDD`): tasks listed there as done count as `- [x]` even if the body does not show it yet.
+
+### Step 2: Validate the Plan
+Check that it has **Requirements with scenarios**, **Tasks** and **Verification**. If any is missing, or there are blocking **Open questions**, stop and suggest completing the plan with `idd-plan`.
+
+### Step 3: Prepare
+1. Show the summary: pending tasks (`- [ ]`), done tasks (`- [x]`) and the first one to run.
+2. Check the git state (`git status`). If there are changes unrelated to the plan, warn before starting.
+3. If the plan lives in a tracker, ask **once** for the OK to post progress comments during the implementation.
+4. Mark the start: in the tracker, a first `🔄 IDD Progress — in progress` comment; locally, change the line to `Status: in progress`.
+
+### Step 4: Run Task by Task
+For each pending task, in order:
+1. Read the files involved and the linked requirement (`→ R1`).
+2. Make the **smallest change** that fulfills the task, following the repo's patterns and reusing what *Design and decisions* names.
+3. Verify the task (test, build or a concrete check).
+4. Record the progress:
+   - **Tracker:** after each group of tasks (and always before ending the turn), post a `🔄 IDD Progress` comment with the completed tasks and how they were verified. Do not edit the body.
+   - **Local:** tick `- [x]` in the file after each task.
+
+### Step 5: Handle Deviations
+Stop and ask if:
+- A task is ambiguous, or a file or API in the plan does not exist or works differently.
+- Something outside the plan or out of scope is needed.
+- A test fails and the fix changes the design.
+
+Propose the adjustment and, after confirmation, record it: in the tracker, in the next progress comment (*Deviation* section); locally, directly in the plan (new task, modified requirement or a note under *Deviations*). Then continue. Never improvise silently.
+
+### Step 6: Final Verification
+1. Run each item in the **Verification** section and tick it.
+2. Check that every requirement scenario is covered. If something fails, go back to Step 4 or 5.
+
+### Step 7: Close
+1. Show the summary: completed tasks, changed files, verification result and deviations.
+2. With the user's confirmation, consolidate the plan in its location with **a single edit**: every completed checkbox as `- [x]`, added tasks, `Status: implemented · <date>` and `### Deviations` if there were any. In the tracker, read the body again right before, change only the plan section and leave a final `✅ IDD — implemented` comment with the summary.
+3. Do not commit, push, merge or close the issue unless the user asks.
+
+Keep the markers exactly as in [references/apply-checklist.md](references/apply-checklist.md); write the content in the user's language. If the plan uses the legacy Spanish markers, keep writing the Spanish ones (`Estado: …`, `🔄 Progreso IDD`, `### Desviaciones`) so the item does not mix languages.
 
 ---
 
-## 📚 Referencias
+## ⚠️ Critical Rules
 
-- [Checklist de ejecución](references/apply-checklist.md): marcas de estado, formato de desviaciones y resumen de cierre.
-- Plantilla del plan: `<skill-dir>/../idd-plan/references/plan-template.md`.
-- Adaptadores de proveedores: `<skill-dir>/../idd-explore/references/adapters.md`.
+1. **Reply in the user's language**, even though this skill is written in English.
+2. **The plan rules**: implement nothing outside the plan or its scope without agreeing on it and reflecting it in the plan first.
+3. **Never tick a task without verifying it**: if it could not be verified, leave it as `- [ ]` and explain why.
+4. **One place**: progress stays in the item where the plan lives (or in its `.md`); no local copy is created if the plan is in the tracker.
+5. **In the tracker, the body is edited only once**: during implementation only comments are posted; the plan is consolidated at the end.
+6. **Confirmation before writing to the tracker**: the user approves the progress comments at the start and the close at the end.
+7. **No unrequested irreversible actions**: no commit, push, merge, closing issues or destructive commands (`rm -rf`, `git reset --hard`, `git push --force`).
+8. **Report honestly**: if a test fails or a step was skipped, say so with the real output.
+
+---
+
+## 📚 References
+
+- [Execution checklist](references/apply-checklist.md): status markers, deviation format and closing summary.
+- Plan template: `<skill-dir>/../idd-plan/references/plan-template.md`.
+- Provider adapters and IDD markers (English and legacy Spanish): `<skill-dir>/../idd-explore/references/adapters.md`.

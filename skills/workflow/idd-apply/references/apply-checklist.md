@@ -1,70 +1,72 @@
-# Checklist de Ejecución (IDD Apply)
+# Execution Checklist (IDD Apply)
 
-Formato de las marcas que `idd-apply` escribe.
+Format of the markers `idd-apply` writes.
 
-- **Plan en un tracker:** el progreso va en comentarios del ítem y el cuerpo se consolida una sola vez al cerrar.
-- **Plan en `.md` local:** todo se marca directamente en el archivo.
+- **Plan in a tracker:** progress goes in comments on the item and the body is consolidated once, at the end.
+- **Plan in a local `.md`:** everything is ticked directly in the file.
+
+Plans created by earlier versions use the Spanish markers (`Estado: planificado`, `🔄 Progreso IDD`, `### Desviaciones`…). Read both; when the plan already uses the Spanish ones, keep writing them in Spanish. Full table: `<skill-dir>/../idd-explore/references/adapters.md` under "IDD Markers".
 
 ---
 
-## Estados del plan
+## Plan statuses
 
-La línea de estado está al inicio de `## 🛠️ Plan de Implementación`. En el tracker, los estados intermedios se comunican en los comentarios y en el cuerpo solo cambia de `planificado` a `implementado` al cerrar.
+The status line sits at the top of `## 🛠️ Implementation Plan`. In the tracker, the intermediate statuses are reported in the comments, and the body only changes from `planned` to `implemented` at the end.
 
-| Estado | Cuándo |
+| Status | When |
 |---|---|
-| `Estado: planificado` | Lo deja `idd-plan` |
-| `Estado: en progreso` | Al empezar la primera tarea |
-| `Estado: bloqueado — <motivo>` | Si hay que parar a la espera de una decisión |
-| `Estado: implementado · <YYYY-MM-DD>` | Tras la verificación final y el OK del usuario |
+| `Status: planned` | Left by `idd-plan` |
+| `Status: in progress` | When the first task starts |
+| `Status: blocked — <reason>` | When work must stop waiting for a decision |
+| `Status: implemented · <YYYY-MM-DD>` | After the final verification and the user's OK |
 
-## Casillas
+## Checkboxes
 
-- `- [ ]` pendiente · `- [x]` hecha y verificada.
-- Una tarea que no se pudo verificar queda `- [ ]` con una nota: `- [ ] 2.1 … → R1 _(pendiente: falla el test X)_`.
-- Las tareas añadidas durante la implementación se numeran a continuación (`1.3`, `1.4`…) y llevan `_(añadida)_`.
+- `- [ ]` pending · `- [x]` done and verified.
+- A task that could not be verified stays `- [ ]` with a note: `- [ ] 2.1 … → R1 _(pending: test X fails)_`.
+- Tasks added during implementation are numbered next (`1.3`, `1.4`…) and carry `_(added)_`.
 
-## Comentario de progreso (tracker)
+## Progress comment (tracker)
 
-Un comentario por grupo de tareas, y siempre uno antes de terminar el turno:
+One comment per group of tasks, and always one before ending the turn:
 
 ```markdown
-🔄 Progreso IDD — en progreso
+🔄 IDD Progress — in progress
 
-**Completadas:** 1.1, 1.2
-**Verificación:** `pnpm test invoices` ✅
-**Siguiente:** 2.1
-**Desviación:** (ninguna) | Tarea 1.2 usa `paginateAll` en vez de `find` (acordado con el usuario)
+**Completed:** 1.1, 1.2
+**Verification:** `pnpm test invoices` ✅
+**Next:** 2.1
+**Deviation:** (none) | Task 1.2 uses `paginateAll` instead of `find` (agreed with the user)
 ```
 
-Al retomar, las tareas listadas en estos comentarios cuentan como hechas aunque el cuerpo siga en `- [ ]`.
+When resuming, the tasks listed in these comments count as done even if the body still shows `- [ ]`.
 
-Al cerrar, último comentario: `✅ IDD — implementado` con el resumen de cierre.
+At the end, a final comment: `✅ IDD — implemented` with the closing summary.
 
-## Desviaciones
+## Deviations
 
-Si el resultado difiere del plan, añadir al final del plan (en el tracker, al consolidar el cuerpo en el cierre):
+If the result differs from the plan, add this at the end of the plan (in the tracker, when consolidating the body at the end):
 
 ```markdown
-### Desviaciones
-- **Tarea 1.2:** se usó `paginateAll` en lugar de `find` porque `find` limita a 100 filas. Acordado con el usuario el 2026-11-12.
-- **R2:** el límite pasó de 10 000 a 5 000 filas (decisión de producto).
+### Deviations
+- **Task 1.2:** used `paginateAll` instead of `find` because `find` caps at 100 rows. Agreed with the user on 2026-11-12.
+- **R2:** the limit changed from 10,000 to 5,000 rows (product decision).
 ```
 
-## Antes de pasar a la siguiente tarea
+## Before moving to the next task
 
-- [ ] El cambio se limita a lo que pide la tarea.
-- [ ] Sigue los patrones existentes del repo.
-- [ ] La verificación de la tarea pasó.
-- [ ] El avance está registrado (casilla en local, o incluido en el próximo comentario de progreso en el tracker).
+- [ ] The change is limited to what the task asks for.
+- [ ] It follows the repo's existing patterns.
+- [ ] The task's verification passed.
+- [ ] The progress is recorded (checkbox locally, or included in the next progress comment in the tracker).
 
-## Resumen de cierre (en el chat)
+## Closing summary (in the chat)
 
 ```markdown
-**Plan:** <enlace o ruta> — Estado: implementado
-**Tareas:** 6/6 completadas
-**Archivos:** `src/a.ts`, `src/a.spec.ts`
-**Verificación:** `pnpm test invoices` ✅ · `pnpm lint` ✅
-**Desviaciones:** 1 (ver plan)
-**Pendiente:** commit/PR cuando lo indiques
+**Plan:** <link or path> — Status: implemented
+**Tasks:** 6/6 completed
+**Files:** `src/a.ts`, `src/a.spec.ts`
+**Verification:** `pnpm test invoices` ✅ · `pnpm lint` ✅
+**Deviations:** 1 (see plan)
+**Pending:** commit/PR when you say so
 ```

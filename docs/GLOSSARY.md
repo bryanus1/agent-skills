@@ -21,7 +21,7 @@ Skills in this catalog are written in English, because agents follow English ins
 | :--- | :--- |
 | Skill `name`, folder names, script names and flags | Other skills and users call them (`monorepo-architecture` runs its siblings' scripts) |
 | Spanish `triggers` | Users type in Spanish; add English triggers next to them |
-| Strings a script reads or writes in the user's project (labels, tracker property names, file paths such as `docs/specs/`) | Changing them breaks existing projects; if one has to change, make it a **major** bump |
+| Strings a script reads or writes in the user's project (labels, tracker property names, file paths such as `docs/specs/`) | Changing them breaks existing projects; if one has to change, make it a **major** bump, or write the English string and keep reading the Spanish one (see the IDD markers in `skills/workflow/idd-explore/references/adapters.md`), which is a **minor** bump |
 | Conventional Commit types, emoji conventions, Git/GitHub terms | They are already English identifiers |
 | Brand and product names (Notion, Linear, GitHub Projects, NestJS…) | Proper nouns |
 

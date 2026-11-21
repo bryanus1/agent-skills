@@ -1,8 +1,8 @@
 ---
 name: explain-change
-version: 1.0.0
+version: 1.1.0
 description: >-
-  Tras implementar un cambio con IA (/opsx:apply, idd-apply o cualquier plan), contrasta el diff real contra la propuesta original y resume qué decisiones tomó la IA que no estaban especificadas: supuestos, alcance extra, contratos, dependencias y atajos. Solo lectura.
+  After an AI implements a change (/opsx:apply, idd-apply or any plan), compares the real diff against the original proposal and sums up the decisions the AI made that were not specified: assumptions, extra scope, contracts, dependencies and shortcuts. Read-only.
 tags: [workflow, openspec, idd, sdd, ai-audit, diff-analysis, traceability]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
@@ -14,6 +14,8 @@ triggers:
   - auditar cambios contra la propuesta
   - explain change
   - undeclared decisions
+  - what did the ai decide
+  - audit change against the plan
 requirements:
   tools: [run_command, view_file]
   bins: [git]
@@ -21,84 +23,85 @@ requirements:
 
 # Explain Change (`explicar-cambio`)
 
-## 🎯 Propósito
+## 🎯 Purpose
 
-Auditar lo que realmente quedó implementado después de que una IA ejecutara `/opsx:apply`, `idd-apply` o cualquier plan de trabajo. Contrasta el diff real contra la propuesta original y resume **solo las decisiones que la IA tomó por su cuenta** sin estar especificadas: supuestos, valores por defecto, contratos alterados, dependencias nuevas, alcance extra y atajos.
+Audits what was actually implemented after an AI ran `/opsx:apply`, `idd-apply` or any work plan. It compares the real diff against the original proposal and sums up **only the decisions the AI made on its own** without them being specified: assumptions, defaults, altered contracts, new dependencies, extra scope and shortcuts.
 
-Es **estrictamente de solo lectura**: te da visibilidad antes de dar por bueno el cambio o abrir un PR, sin modificar código ni reescribir documentos sin tu confirmación.
-
----
-
-## ⚡ Cuándo Activar esta Skill
-
-Activa esta skill cuando el usuario:
-- Termine de ejecutar `/opsx:apply`, `idd-apply` o una implementación asistida y pregunte qué hizo o decidió la IA (*"explicar-cambio"*, *"¿qué decisiones tomó la IA que no estaban en la propuesta?"*, *"audita el cambio contra el plan"*).
-- Quiera verificar fidelidad entre una spec/plan (OpenSpec, IDD o documento `.md`) y el código en disco o en la rama actual.
-
-**No la uses** si el usuario pide implementar el plan (`idd-apply`) o evaluar calidad/bugs generales sin compararlo contra una propuesta (`code-quality-review` o `pr-plain-review`).
+It is **strictly read-only**: it gives you visibility before you accept the change or open a PR, without editing code or rewriting documents without your confirmation.
 
 ---
 
-## 📋 Flujo de Trabajo Paso a Paso
+## ⚡ When to Trigger
 
-### Paso 1: Localizar la Propuesta Original
-Seguir [references/proposal-sources.md](references/proposal-sources.md) según el flujo que use el proyecto:
-1. **OpenSpec:** buscar el cambio activo en `openspec/changes/<nombre>/` (`proposal.md`, `design.md`, `specs/**/*.md` y `tasks.md`), excluyendo `openspec/changes/archive/` salvo petición explícita. Si hay varios cambios activos, preguntar cuál auditar (puedes proponer el que coincide con la rama o archivos modificados, pidiendo confirmación).
-2. **IDD:** leer la ficha y la sección `## 🛠️ Plan de Implementación` (junto con `### Desviaciones` y los comentarios `🔄 Progreso IDD` posteriores) en Notion, Linear, GitHub Issues/Projects o `docs/specs/*.md`.
-3. **Genérico:** usar el plan acordado en la conversación, un archivo `.md` indicado o la descripción del issue/PR.
-4. **Sin propuesta contrastable:** si no existe ninguna spec, plan o descripción previa verificable, detenerse y pedir al usuario contra qué documento o requisitos comparar; nunca inventar una propuesta.
+Use this skill when the user:
+- Has just run `/opsx:apply`, `idd-apply` or an assisted implementation and asks what the AI did or decided (*"explicar-cambio"*, *"which decisions did the AI make that weren't in the proposal?"*, *"audit the change against the plan"*).
+- Wants to check how faithful the code on disk or on the current branch is to a spec/plan (OpenSpec, IDD or a `.md` document).
 
-### Paso 2: Recoger el Cambio Real Implementado (Solo Lectura)
-Inspeccionar lo que realmente existe en el repositorio:
+**Do not use it** if the user asks to implement the plan (`idd-apply`) or to assess general quality/bugs without comparing against a proposal (`code-quality-review` or `pr-plain-review`).
+
+---
+
+## 📋 Workflow
+
+### Step 1: Find the Original Proposal
+Follow [references/proposal-sources.md](references/proposal-sources.md) for the flow the project uses:
+1. **OpenSpec:** find the active change in `openspec/changes/<name>/` (`proposal.md`, `design.md`, `specs/**/*.md` and `tasks.md`), skipping `openspec/changes/archive/` unless explicitly asked. If there are several active changes, ask which one to audit (you can suggest the one that matches the branch or the modified files, and ask for confirmation).
+2. **IDD:** read the spec and the `## 🛠️ Implementation Plan` section (together with `### Deviations` and the later `🔄 IDD Progress` comments) in Notion, Linear, GitHub Issues/Projects or `docs/specs/*.md`. Items from earlier versions use the Spanish markers (`## 🛠️ Plan de Implementación`, `### Desviaciones`, `🔄 Progreso IDD`); read both.
+3. **Generic:** use the plan agreed in the conversation, a `.md` file the user names, or the issue/PR description.
+4. **No proposal to compare against:** if there is no verifiable spec, plan or earlier description, stop and ask the user which document or requirements to compare against; never invent a proposal.
+
+### Step 2: Collect the Change Actually Implemented (read-only)
+Inspect what really exists in the repository:
 ```bash
 git status --short
 git diff --stat
 git diff
 git ls-files --others --exclude-standard
 ```
-Si la implementación ya fue commiteada en la rama actual, comparar también contra la rama base (`main`, `master` o `develop`):
+If the implementation was already committed on the current branch, also compare against the base branch (`main`, `master` or `develop`):
 ```bash
 git log <base>..HEAD --oneline
 git diff <base>...HEAD
 ```
-Para archivos nuevos o con cambios estructurales, leer el archivo completo cuando haga falta entender dependencias, tipos o efectos secundarios.
+For new files or structural changes, read the whole file when you need to understand dependencies, types or side effects.
 
-### Paso 3: Contrastar Propuesta vs. Código Real (en Dos Direcciones)
-1. **En el código, pero NO en la propuesta (decisiones implícitas):** revisar cada archivo modificado/añadido y clasificar cualquier decisión no declarada en las 6 categorías de [references/decision-taxonomy.md](references/decision-taxonomy.md):
-   - *Alcance extra* (archivos, refactors o funcionalidades fuera de la propuesta).
-   - *Contratos y datos* (migraciones, esquemas, endpoints, códigos HTTP o tipos públicos no especificados).
-   - *Comportamiento y valores por defecto* (límites, timeouts, fallbacks, mensajes de error o casos borde elegidos por la IA).
-   - *Arquitectura y dependencias* (paquetes añadidos, patrones o capas ausentes en el diseño).
-   - *Seguridad, permisos y configuración* (auth, RLS, validaciones relajadas/endurecidas, variables de entorno).
-   - *Atajos, compromisos y deuda* (`TODO`s, `as any`, tests omitidos/debilitados, tareas marcadas como hechas parcialmente).
-2. **En la propuesta, pero NO hecho o distinto:** distinguir con claridad entre **desviaciones ya documentadas/acordadas** (p. ej. en `### Desviaciones` o comentarios `🔄 Progreso IDD`) y **omisiones o cambios silenciosos**.
+### Step 3: Compare Proposal vs. Real Code (both directions)
+1. **In the code but NOT in the proposal (implicit decisions):** review each modified/added file and classify any undeclared decision into the 6 categories of [references/decision-taxonomy.md](references/decision-taxonomy.md):
+   - *Extra scope* (files, refactors or features outside the proposal).
+   - *Contracts and data* (migrations, schemas, endpoints, HTTP codes or public types that were not specified).
+   - *Behavior and defaults* (limits, timeouts, fallbacks, error messages or edge cases the AI chose).
+   - *Architecture and dependencies* (added packages, patterns or layers missing from the design).
+   - *Security, permissions and configuration* (auth, RLS, relaxed/tightened validations, environment variables).
+   - *Shortcuts, trade-offs and debt* (`TODO`s, `as any`, skipped/weakened tests, tasks ticked as done when only partly done).
+2. **In the proposal but NOT done, or done differently:** clearly separate **deviations that were already documented/agreed** (e.g. in `### Deviations` or `🔄 IDD Progress` comments) from **silent omissions or changes**.
 
-### Paso 4: Priorizar por Necesidad de Validación Humana
-1. Filtrar todo lo que **sí** estaba especificado en la propuesta para centrarse únicamente en el **delta no declarado**.
-2. Clasificar cada decisión según [references/decision-taxonomy.md](references/decision-taxonomy.md):
-   - 🔴 **Requiere tu validación:** afecta seguridad, datos, contratos públicos, dependencias, alcance grande o dinero.
-   - 🟡 **Conviene revisar:** supuestos de negocio/UX, límites arbitrarios, refactors colaterales o deuda técnica.
-   - 🟢 **Detalle menor de implementación:** decisiones locales razonables (nombres internos, helpers privados), agrupadas en resumen sin ruido.
+### Step 4: Prioritize by Need for Human Validation
+1. Filter out everything the proposal **did** specify, to focus only on the **undeclared delta**.
+2. Classify each decision with [references/decision-taxonomy.md](references/decision-taxonomy.md):
+   - 🔴 **Needs your validation:** affects security, data, public contracts, dependencies, large scope or money.
+   - 🟡 **Worth reviewing:** business/UX assumptions, arbitrary limits, collateral refactors or technical debt.
+   - 🟢 **Minor implementation detail:** reasonable local decisions (internal names, private helpers), grouped in a short summary without noise.
 
-### Paso 5: Entregar Informe y Opciones de Cierre
-1. Presentar el informe con el formato canónico de [references/decision-taxonomy.md](references/decision-taxonomy.md).
-2. Si el código implementó exactamente la propuesta sin decisiones ocultas relevantes, declararlo limpiamente como **Fiel a la propuesta** sin fabricar hallazgos.
-3. Cerrar preguntando qué decisiones **acepta** (ofreciendo registrarlas en `design.md` o en `### Desviaciones` del plan solo tras confirmación) y cuáles desea **revertir o ajustar**.
-
----
-
-## ⚠️ Reglas Críticas
-
-1. **Solo lectura por defecto:** no modificar código fuente, tests, `design.md` ni issues/PRs durante la auditoría.
-2. **Regla anti-autojustificación:** aunque tú mismo hayas ejecutado `/opsx:apply` o `idd-apply` en turnos previos, audita el diff en disco como un **tercero escéptico**. No confíes en tu recuerdo ni justifiques un cambio si no está escrito explícitamente en la propuesta.
-3. **Foco estricto en el delta:** no resumas lo que ya estaba pedido en la propuesta; el valor de esta skill es sacar a la luz únicamente lo que **no** estaba especificado o lo que se desvió.
-4. **Evidencia trazable:** cada hallazgo debe citar `archivo:línea` y la sección o requisito de la propuesta frente al que diverge o añade algo.
-5. **No inventar propuesta:** si no hay propuesta/plan contrastable, pedirlo antes de evaluar.
-6. **Honestidad ante fidelidad total:** si la IA siguió la propuesta sin apartarse ni improvisar decisiones relevantes, decirlo sin rellenar con trivialidades.
+### Step 5: Deliver the Report and Closing Options
+1. Present the report in the canonical format of [references/decision-taxonomy.md](references/decision-taxonomy.md).
+2. If the code implemented the proposal exactly with no relevant hidden decisions, say so plainly as **Faithful to the proposal** without making up findings.
+3. Close by asking which decisions they **accept** (offering to record them in `design.md` or in the plan's deviations section only after confirmation) and which they want to **revert or adjust**.
 
 ---
 
-## 📚 Referencias
+## ⚠️ Critical Rules
 
-- [Fuentes de la propuesta](references/proposal-sources.md): cómo localizar y leer propuestas de OpenSpec, IDD (Notion, Linear, GitHub, local) y planes genéricos.
-- [Taxonomía de decisiones e informe](references/decision-taxonomy.md): las 6 categorías, criterios 🔴/🟡/🟢, plantilla del informe y ejemplo completo.
+1. **Reply in the user's language**, even though this skill is written in English. The report template is in English; render it in the user's language.
+2. **Read-only by default:** do not modify source code, tests, `design.md` or issues/PRs during the audit.
+3. **No self-justification:** even if you ran `/opsx:apply` or `idd-apply` yourself in earlier turns, audit the diff on disk as a **skeptical third party**. Do not trust your memory or justify a change unless it is explicitly written in the proposal.
+4. **Strict focus on the delta:** do not summarize what the proposal already asked for; the value of this skill is surfacing only what was **not** specified or what deviated.
+5. **Traceable evidence:** every finding cites `file:line` and the proposal section or requirement it diverges from or adds to.
+6. **Never invent a proposal:** if there is no proposal/plan to compare against, ask for it before evaluating.
+7. **Honest when fully faithful:** if the AI followed the proposal without deviating or improvising relevant decisions, say so without padding it with trivia.
+
+---
+
+## 📚 References
+
+- [Proposal sources](references/proposal-sources.md): how to find and read OpenSpec proposals, IDD plans (Notion, Linear, GitHub, local) and generic plans.
+- [Decision taxonomy and report](references/decision-taxonomy.md): the 6 categories, 🔴/🟡/🟢 criteria, report template and a full example.

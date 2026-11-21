@@ -4,25 +4,25 @@
     {
       "id": 1,
       "prompt": "Haz triage del issue ENG-104 en Linear. El ticket solo dice 'Soporte de exportación a CSV'.",
-      "expected_output": "El agente consulta el issue vía Linear MCP (get_issue), identifica que no tiene descripción, explora el codebase local de forma read-only para encontrar los módulos de facturación o reportes existentes, formula el borrador estructurado en 7 secciones (Objetivo, Restricciones, Reglas, Contexto, Alcance, Metadatos, Preguntas) y pide confirmación explícita al usuario antes de llamar a save_issue.",
+      "expected_output": "The agent reads the issue through the Linear MCP (get_issue), notices it has no description, explores the local codebase read-only to find the existing billing or reporting modules, drafts the 7-section spec (Goal, Constraints, Rules, Context, Scope, Metadata, Questions) with the English headings, and asks the user for explicit confirmation before calling save_issue. The reply is in Spanish.",
       "files": []
     },
     {
       "id": 2,
       "prompt": "Revisa el issue #89 de GitHub. Tiene estas notas: 'Vive en backend (Edge Function Deno o Postgres), nunca cliente. Días hábiles vs calendario (1 mes no son 30 días). Estimación: 16 h · Fase F4 · Ventana: 16-19 nov 2026'.",
-      "expected_output": "El agente lee el issue con gh issue view, extrae las restricciones arquitectónicas (backend obligatorio, cliente solo consumidor), las reglas de negocio (días hábiles vs calendario) y preserva íntegramente las estimaciones (16 h), ventana de entrega (16-19 nov) y fase (F4) en la sección de Metadatos. Inspecciona el repo local y solicita confirmación antes de actualizar el issue en GitHub.",
+      "expected_output": "The agent reads the issue with gh issue view, extracts the architectural constraints (backend required, client only consumes), the business rules (business vs calendar days) and keeps the estimate (16 h), delivery window (Nov 16-19) and phase (F4) intact in the Metadata section. It inspects the local repo and asks for confirmation before updating the issue on GitHub. The reply is in Spanish.",
       "files": []
     },
     {
       "id": 3,
-      "prompt": "Tengo un requerimiento para Jira pero no tengo integración directa configurada. Ayúdame a refinar el cálculo de métricas de retención.",
-      "expected_output": "El agente detecta que no hay integración con Jira, explora el código local, genera la ficha de 7 secciones, pide confirmación y la guarda en docs/specs/<YYYY-MM-DD>-<slug>.md, mostrando además el bloque Markdown listo para copiar en Jira.",
+      "prompt": "I have a requirement for Jira but no direct integration set up. Help me refine the retention metrics calculation.",
+      "expected_output": "The agent detects there is no Jira integration, explores the local code, produces the 7-section spec, asks for confirmation and saves it to docs/specs/<YYYY-MM-DD>-<slug>.md, also showing the Markdown block ready to paste into Jira.",
       "files": []
     },
     {
       "id": 4,
-      "prompt": "Explora este requerimiento de Notion y déjalo listo para planificar: https://www.notion.so/acme/Exportar-reportes-a-PDF-1a2b3c4d5e6f",
-      "expected_output": "El agente lee la página con notion-fetch, explora el repo en solo lectura, arma la ficha de 7 secciones, la muestra y pide confirmación antes de escribirla en la misma página con notion-update-page. No crea un .md local y termina sugiriendo idd-plan.",
+      "prompt": "Explore this Notion requirement and get it ready for planning: https://www.notion.so/acme/Exportar-reportes-a-PDF-1a2b3c4d5e6f",
+      "expected_output": "The agent reads the page with notion-fetch, explores the repo read-only, builds the 7-section spec, shows it and asks for confirmation before writing it into the same page with notion-update-page. It does not create a local .md and ends by suggesting idd-plan.",
       "files": []
     }
   ]

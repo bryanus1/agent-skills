@@ -1,28 +1,28 @@
 # 🛠️ IDD Plan (`idd-plan`)
 
-> **Fase 2 del flujo IDD (Issue-Driven Development): `idd-explore` → `idd-plan` → `idd-apply`. Genera un plan de implementación detallado (requisitos con escenarios, diseño, archivos verificados, tareas y verificación) y lo guarda en el mismo ítem de tu tracker o, si no tienes, en un `.md` local. No toca código.**
+> **Phase 2 of the IDD (Issue-Driven Development) flow: `idd-explore` → `idd-plan` → `idd-apply`. Produces a detailed implementation plan (requirements with scenarios, design, verified files, tasks and verification) and saves it in the same tracker item or, if you have none, in a local `.md`. Does not touch code.**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `idd-plan` |
-| **Categoría** | `workflow` |
-| **Versión** | `1.0.0` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
-| **Depende de** | [`idd-explore`](../idd-explore/README.md) (adaptadores de proveedores) |
+| **Name** | `idd-plan` |
+| **Category** | `workflow` |
+| **Version** | `1.1.0` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Depends on** | [`idd-explore`](../idd-explore/README.md) (provider adapters) |
 
 ---
 
-## 🧭 El flujo IDD
+## 🧭 The IDD Flow
 
-| Fase | Skill | Qué produce | ¿Toca código? |
+| Phase | Skill | Output | Touches code? |
 |---|---|---|---|
-| 1. Explore | [`idd-explore`](../idd-explore/README.md) | Ficha de 7 secciones | No |
-| 2. Plan | **`idd-plan`** | Plan detallado | No |
-| 3. Apply | [`idd-apply`](../idd-apply/README.md) | Código + tareas marcadas | Sí |
+| 1. Explore | [`idd-explore`](../idd-explore/README.md) | 7-section spec | No |
+| 2. Plan | **`idd-plan`** | Detailed plan | No |
+| 3. Apply | [`idd-apply`](../idd-apply/README.md) | Code + ticked tasks | Yes |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
 ```bash
 npx skills add bryanus1/agent-skills --skill idd-explore --skill idd-plan --skill idd-apply
@@ -30,42 +30,46 @@ npx skills add bryanus1/agent-skills --skill idd-explore --skill idd-plan --skil
 
 ---
 
-## 📄 Qué contiene el plan
+## 📄 What the Plan Contains
 
-1. **Contexto**: por qué y para qué.
-2. **Requisitos** en formato delta (`ADDED` / `MODIFIED` / `REMOVED`), con "DEBE…" y escenarios *Dado / Cuando / Entonces*.
-3. **Diseño y decisiones**: enfoque, código que se reutiliza y alternativa descartada.
-4. **Archivos afectados**: rutas verificadas en el repo.
-5. **Tareas** `- [ ] 1.1 … → R1`, pequeñas y enlazadas a requisitos.
-6. **Verificación**: comandos reales por escenario.
-7. **Fuera de alcance, supuestos, preguntas abiertas y metadatos**.
+1. **Context**: why and what for.
+2. **Requirements** in delta format (`ADDED` / `MODIFIED` / `REMOVED`), with "MUST…" and *Given / When / Then* scenarios.
+3. **Design and decisions**: approach, code that is reused and the discarded alternative.
+4. **Affected files**: paths verified in the repo.
+5. **Tasks** `- [ ] 1.1 … → R1`, small and linked to requirements.
+6. **Verification**: real commands per scenario.
+7. **Out of scope, assumptions, open questions and metadata**.
 
-Para cambios pequeños genera un **plan corto** (contexto, requisitos, tareas y verificación) y, si el plan pasa de unas 12 tareas, propone **dividirlo** en varios ítems.
+For small changes it produces a **short plan** (context, requirements, tasks and verification) and, if the plan goes beyond about 12 tasks, it proposes **splitting** it into several items.
 
-Plantilla completa, plan corto y ejemplo: [references/plan-template.md](references/plan-template.md).
+Full template, short plan and example: [references/plan-template.md](references/plan-template.md).
 
----
-
-## 💡 Ejemplos
-
-### 1. Desde un issue de GitHub
-> *"Planifica el issue #42"*
-
-Lee el issue (y la ficha de `idd-explore` si existe), explora el repo, te pregunta solo lo que cambia el alcance, te muestra el plan y, tras tu OK, lo añade al cuerpo del issue con `gh issue edit --body-file`.
-
-### 2. Desde una página de Notion
-> *"Haz el plan de implementación de https://www.notion.so/…"*
-
-Igual que arriba, pero escribe la sección `🛠️ Plan de Implementación` en la misma página.
-
-### 3. Sin tracker
-> *"Planifica docs/specs/2026-11-12-exportar-csv.md"*
-
-Añade el plan debajo de la ficha en ese mismo archivo.
+> **Spanish headings from earlier versions:** since 1.1.0 the plan is written with English markers (`## 🛠️ Implementation Plan`, `Status: planned`). Plans created before that keep `## 🛠️ Plan de Implementación` and `Estado: planificado`, and `idd-plan` and `idd-apply` still recognize them.
 
 ---
 
-## 📚 Documentación
+## 💡 Examples
 
-- **[`SKILL.md`](SKILL.md)**: instrucciones operativas y reglas críticas.
-- **[Plantilla del plan](references/plan-template.md)**: estructura, reglas de redacción y ejemplo.
+The skill replies in the user's language, so you can ask in English or Spanish.
+
+### 1. From a GitHub issue
+> *"Plan issue #42"*
+
+Reads the issue (and the `idd-explore` spec if there is one), explores the repo, asks you only what changes the scope, shows you the plan and, after your OK, adds it to the issue body with `gh issue edit --body-file`.
+
+### 2. From a Notion page
+> *"Write the implementation plan for https://www.notion.so/…"*
+
+Same as above, but writes the `🛠️ Implementation Plan` section into the same page.
+
+### 3. No tracker
+> *"Plan docs/specs/2026-11-12-export-csv.md"*
+
+Appends the plan below the spec in that same file.
+
+---
+
+## 📚 Documentation
+
+- **[`SKILL.md`](SKILL.md)**: operating instructions and critical rules.
+- **[Plan template](references/plan-template.md)**: structure, writing rules and an example.
