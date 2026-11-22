@@ -1,47 +1,47 @@
-# Checklist de Descubrimiento del Repo (`architecture-map`)
+# Repo Discovery Checklist (`architecture-map`)
 
-Explora el repositorio de arriba hacia abajo en **solo lectura**, priorizando manifiestos, entrypoints y esquemas antes que archivos individuales de detalle.
-
----
-
-## 🚫 Exclusiones Obligatorias
-
-No leas ni copies contenido de:
-- Secretos y entorno real: `.env`, `.env.local`, `.env.*.local`, `.env.production`, `*.pem`, `*.key`, `credentials*`, `secrets*`.
-- Dependencias y artefactos generados: `node_modules/`, `.venv/`, `vendor/`, `target/`, `dist/`, `build/`, `.next/`, `.astro/`, `.expo/`, `.turbo/`.
-- Lockfiles completos (`pnpm-lock.yaml`, `package-lock.json`, `Cargo.lock`) o binarios.
+Explore the repository top-down in **read-only** mode, prioritizing manifests, entry points and schemas over individual detail files.
 
 ---
 
-## 🔎 Exploración en 7 Capas
+## 🚫 Mandatory Exclusions
 
-### 1. Topología y Manifiestos
-- Árbol superficial (`ls` / `find` con profundidad máxima 2–3 excluyendo directorios ignorados).
-- Detección de monorepo: `pnpm-workspace.yaml`, `turbo.json`, `nx.json`, `lerna.json`, workspaces en `package.json` o `Cargo.toml`.
-- Manifiestos raíz y por app: `package.json`, `tsconfig.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, `Gemfile`, `composer.json`.
-- Extrae: runtime, lenguaje, framework principal, gestor de paquetes y scripts disponibles.
+Do not read or copy content from:
+- Secrets and real environment: `.env`, `.env.local`, `.env.*.local`, `.env.production`, `*.pem`, `*.key`, `credentials*`, `secrets*`.
+- Dependencies and generated artifacts: `node_modules/`, `.venv/`, `vendor/`, `target/`, `dist/`, `build/`, `.next/`, `.astro/`, `.expo/`, `.turbo/`.
+- Full lockfiles (`pnpm-lock.yaml`, `package-lock.json`, `Cargo.lock`) or binaries.
 
-### 2. Apps, Módulos y Fronteras
-- Monorepo: inspeccionar `apps/*` y `packages/*` (o `services/*`, `libs/*`) para ver quién consume a quién.
-- App única: revisar `src/` (`app/`, `pages/`, `modules/`, `features/`, `domain/`, `api/`, `cmd/`, `internal/`).
-- Identificar entrypoints reales (`main.ts`, `index.ts`, `app/layout.tsx`, `server.ts`, `cli.ts`) y la capa de enrutado o API pública (REST, GraphQL, tRPC, Server Actions, CLI commands).
+---
 
-### 3. Datos y Persistencia (si aplica)
-- ORM / clientes de datos: `prisma/schema.prisma`, `drizzle.config.*` + esquemas, `typeorm`, `sqlalchemy`, `alembic/`, `supabase/migrations/`, `*.sql`.
-- Caché, mensajería o tareas en segundo plano: Redis, BullMQ, queues, cron jobs, workers, almacenamiento de objetos (S3, Supabase Storage, R2).
-- Identifica entidades centrales y dónde vive el estado persistente (no hace falta listar cada columna secundaria).
+## 🔎 Exploration in 7 Layers
 
-### 4. Autenticación, Seguridad y Permisos (si aplica)
-- Proveedores e integraciones de identidad (Auth.js/NextAuth, Clerk, Supabase Auth, Cognito, OAuth/JWT propio).
-- Guards, middlewares de sesión/roles (RBAC), verificación de ownership o políticas RLS en SQL.
+### 1. Topology and Manifests
+- A shallow tree (`ls` / `find` with a maximum depth of 2–3, excluding ignored directories).
+- Monorepo detection: `pnpm-workspace.yaml`, `turbo.json`, `nx.json`, `lerna.json`, workspaces in `package.json` or `Cargo.toml`.
+- Root and per-app manifests: `package.json`, `tsconfig.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, `Gemfile`, `composer.json`.
+- Extract: runtime, language, main framework, package manager and available scripts.
 
-### 5. Integraciones Externas y Variables de Entorno
-- Clientes HTTP o SDKs de terceros (pagos como Stripe, email como Resend/SES, LLM/IA, analytics, observabilidad como Sentry/OTel, webhooks entrantes/salientes).
-- Nombres de variables de entorno: leer únicamente `.env.example` / `.env.template` o esquemas de validación (`env.ts`, `config.py`, `process.env.*`). Agrupar por servicio sin inventar valores.
+### 2. Apps, Modules and Boundaries
+- Monorepo: inspect `apps/*` and `packages/*` (or `services/*`, `libs/*`) to see who consumes whom.
+- Single app: review `src/` (`app/`, `pages/`, `modules/`, `features/`, `domain/`, `api/`, `cmd/`, `internal/`).
+- Identify the real entry points (`main.ts`, `index.ts`, `app/layout.tsx`, `server.ts`, `cli.ts`) and the routing layer or public API (REST, GraphQL, tRPC, Server Actions, CLI commands).
 
-### 6. Flujos Clave (1 a 3 recorridos)
-- Trazar de extremo a extremo los flujos principales del sistema (p. ej. *request HTTP -> validación -> servicio -> repositorio -> BD*, o *webhook externo -> verificación -> cola -> notificación*), verificando nombres reales de archivos y funciones.
+### 3. Data and Persistence (if applicable)
+- ORM / data clients: `prisma/schema.prisma`, `drizzle.config.*` + schemas, `typeorm`, `sqlalchemy`, `alembic/`, `supabase/migrations/`, `*.sql`.
+- Cache, messaging or background tasks: Redis, BullMQ, queues, cron jobs, workers, object storage (S3, Supabase Storage, R2).
+- Identify the core entities and where persistent state lives (no need to list every secondary column).
 
-### 7. Testing, CI/CD y Despliegue
-- Frameworks de test y comandos reales (`package.json`, `vitest.config.*`, `jest.config.*`, `playwright.config.*`, `pytest.ini`).
-- Pipelines y despliegue: `.github/workflows/*.yml`, `Dockerfile*`, `docker-compose*`, `vercel.json`, `fly.toml`, `netlify.toml`, `terraform/`.
+### 4. Authentication, Security and Permissions (if applicable)
+- Identity providers and integrations (Auth.js/NextAuth, Clerk, Supabase Auth, Cognito, custom OAuth/JWT).
+- Guards, session/role middleware (RBAC), ownership checks or RLS policies in SQL.
+
+### 5. External Integrations and Environment Variables
+- HTTP clients or third-party SDKs (payments such as Stripe, email such as Resend/SES, LLM/AI, analytics, observability such as Sentry/OTel, incoming/outgoing webhooks).
+- Environment variable names: read only `.env.example` / `.env.template` or validation schemas (`env.ts`, `config.py`, `process.env.*`). Group them by service without inventing values.
+
+### 6. Key Flows (1 to 3 paths)
+- Trace the system's main flows end to end (e.g. *HTTP request -> validation -> service -> repository -> DB*, or *external webhook -> verification -> queue -> notification*), checking the real names of files and functions.
+
+### 7. Testing, CI/CD and Deployment
+- Test frameworks and real commands (`package.json`, `vitest.config.*`, `jest.config.*`, `playwright.config.*`, `pytest.ini`).
+- Pipelines and deployment: `.github/workflows/*.yml`, `Dockerfile*`, `docker-compose*`, `vercel.json`, `fly.toml`, `netlify.toml`, `terraform/`.

@@ -1,25 +1,25 @@
-# Estrategia de RBAC y Validación de Ownership
+# RBAC and Ownership Validation Strategy
 
-Este documento establece la estrategia de seguridad de **doble barrera** en NestJS 12: guards globales (`JwtAuthGuard` → `RolesGuard`) en el perímetro HTTP y validación granular de propiedad (*ownership*) en los servicios.
+This document sets the **double barrier** security strategy in NestJS 12: global guards (`JwtAuthGuard` → `RolesGuard`) at the HTTP perimeter and fine-grained ownership validation in the services.
 
 ---
 
-## 1. La Doble Barrera de Seguridad
+## 1. The Double Security Barrier
 
 ```mermaid
 flowchart TD
-    A["Petición HTTP Entrante"] --> B["Barrera 1A: JwtAuthGuard (APP_GUARD)\n(omitido solo con @Public())"]
-    B -- "Sin token o inválido" --> C["401 Unauthorized"]
-    B -- "Token válido (req.user)" --> D["Barrera 1B: RolesGuard (APP_GUARD)\n(@Roles(Role.ADMIN, Role.USER))"]
-    D -- "Rol no autorizado" --> E["403 Forbidden"]
-    D -- "Rol permitido" --> F["Controlador extrae @CurrentUser() / req.user"]
+    A["Incoming HTTP Request"] --> B["Barrera 1A: JwtAuthGuard (APP_GUARD)\n(skipped only with @Public())"]
+    B -- "Missing or invalid token" --> C["401 Unauthorized"]
+    B -- "Valid token (req.user)" --> D["Barrera 1B: RolesGuard (APP_GUARD)\n(@Roles(Role.ADMIN, Role.USER))"]
+    D -- "Role not allowed" --> E["403 Forbidden"]
+    D -- "Role allowed" --> F["Controller reads @CurrentUser() / req.user"]
     F --> G["Barrera 2: Service Ownership Check\n(create: ownerId | findAll: scope | findOne: check)"]
-    G -- "No es dueño ni ADMIN" --> H["throw new ForbiddenException(...)"]
-    G -- "Dueño legítimo o ADMIN" --> I["Ejecuta Operación de Negocio"]
+    G -- "Neither owner nor ADMIN" --> H["throw new ForbiddenException(...)"]
+    G -- "Legitimate owner or ADMIN" --> I["Runs the Business Operation"]
 ```
 
-### Orden obligatorio de `APP_GUARD` en `AppModule`
-`JwtAuthGuard` **DEBE** registrarse antes que `RolesGuard` para que `req.user` exista cuando `RolesGuard` evalúe el rol:
+### Mandatory `APP_GUARD` order in `AppModule`
+`JwtAuthGuard` **MUST** be registered before `RolesGuard` so `req.user` exists when `RolesGuard` evaluates the role:
 
 ```typescript
 // src/app.module.ts
@@ -34,9 +34,9 @@ export class AppModule {}
 
 ---
 
-## 2. Piezas Compartidas en `src/common/`
+## 2. Shared Pieces in `src/common/`
 
-No dupliques `enum Role` ni decoradores dentro de cada módulo:
+Do not duplicate `enum Role` or decorators inside each module:
 
 - **`src/common/enums/role.enum.ts`**:
   ```typescript
@@ -46,15 +46,15 @@ No dupliques `enum Role` ni decoradores dentro de cada módulo:
     USER = 'user',
   }
   ```
-- **`src/common/decorators/public.decorator.ts`**: `SetMetadata(IS_PUBLIC_KEY, true)` para rutas abiertas (login, healthcheck).
+- **`src/common/decorators/public.decorator.ts`**: `SetMetadata(IS_PUBLIC_KEY, true)` for open routes (login, healthcheck).
 - **`src/common/decorators/roles.decorator.ts`**: `SetMetadata(ROLES_KEY, roles)`.
-- **`src/common/decorators/current-user.decorator.ts`**: `createParamDecorator` compatible con `NodeAdapter` y `ExpressAdapter` que extrae `req.user` tipado como `AuthUser`.
+- **`src/common/decorators/current-user.decorator.ts`**: a `createParamDecorator`, compatible with `NodeAdapter` and `ExpressAdapter`, that extracts `req.user` typed as `AuthUser`.
 
-> **Prohibido:** usar fallbacks silenciosos como `req.user?.id || 'anonymous'`. Si un endpoint no tiene `@Public()`, `JwtAuthGuard` debe rechazar con `401` antes de llegar al controlador.
+> **Forbidden:** silent fallbacks such as `req.user?.id || 'anonymous'`. If an endpoint has no `@Public()`, `JwtAuthGuard` must reject with `401` before the request reaches the controller.
 
 ---
 
-## 3. Ownership Completo en Servicios (`create`, `findAll`, `findOne`, `update`, `remove`)
+## 3. Full Ownership in Services (`create`, `findAll`, `findOne`, `update`, `remove`)
 
 ```typescript
 import { Inject, Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
@@ -73,14 +73,14 @@ export class InvoiceService {
   ) {}
 
   async create(dto: CreateInvoiceDto, requesterId: string, _requesterRole: string): Promise<Invoice> {
-    // El ownerId siempre proviene del usuario autenticado, nunca del body
+    // ownerId always comes from the authenticated user, never from the body
     return this.invoiceRepository.create({ ...dto, ownerId: requesterId });
   }
 
   async findAll(query: FindInvoicesQueryDto, requesterId: string, requesterRole: string) {
     const { page = 1, limit = 20, search } = query;
     const skip = (page - 1) * limit;
-    // Usuarios comunes solo listan sus propios registros
+    // Regular users only list their own records
     const ownerId = requesterRole === Role.ADMIN ? undefined : requesterId;
 
     const [items, total] = await this.invoiceRepository.findMany({ skip, take: limit, search, ownerId });
@@ -90,10 +90,10 @@ export class InvoiceService {
   async findOne(id: string, requesterId: string, requesterRole: string): Promise<Invoice> {
     const invoice = await this.invoiceRepository.findById(id);
     if (!invoice) {
-      throw new NotFoundException('Factura no encontrada');
+      throw new NotFoundException('Invoice not found');
     }
     if (requesterRole !== Role.ADMIN && invoice.ownerId !== requesterId) {
-      throw new ForbiddenException('No tienes permisos para acceder a esta factura');
+      throw new ForbiddenException('You do not have permission to access this invoice');
     }
     return invoice;
   }
@@ -102,12 +102,12 @@ export class InvoiceService {
 
 ---
 
-## 4. Respuestas y Excepciones HTTP Estándar
+## 4. Standard HTTP Responses and Exceptions
 
-| Excepción | Código | Cuándo Lanzar |
+| Exception | Code | When to Throw |
 | :--- | :---: | :--- |
-| `BadRequestException` | `400` | Validación de DTO (`ValidationPipe`), UUID inválido (`ParseUUIDPipe`) o regla de negocio inválida. |
-| `UnauthorizedException` | `401` | Token JWT ausente, expirado o inválido (`JwtAuthGuard`). |
-| `ForbiddenException` | `403` | Rol insuficiente (`RolesGuard`) o fallo de *ownership* en servicio. |
-| `NotFoundException` | `404` | El ID solicitado no existe en persistencia. |
-| `ConflictException` | `409` | Violación de unicidad (email duplicado, código único ya registrado). |
+| `BadRequestException` | `400` | DTO validation (`ValidationPipe`), an invalid UUID (`ParseUUIDPipe`) or a broken business rule. |
+| `UnauthorizedException` | `401` | Missing, expired or invalid JWT (`JwtAuthGuard`). |
+| `ForbiddenException` | `403` | Insufficient role (`RolesGuard`) or a failed *ownership* check in the service. |
+| `NotFoundException` | `404` | The requested ID does not exist in persistence. |
+| `ConflictException` | `409` | A uniqueness violation (duplicate email, unique code already registered). |

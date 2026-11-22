@@ -1,24 +1,24 @@
-# Testing y Toolchain Moderno: Vitest, Playwright, OXC y SWC
+# Testing and Modern Toolchain: Vitest, Playwright, OXC and SWC
 
-Esta guía define el estándar de compilación, análisis estático, pruebas unitarias ($\ge 90\%$) y pruebas End-to-End (E2E) para proyectos Next.js con Screaming Architecture.
+This guide defines the standard for compilation, static analysis, unit tests ($\ge 90\%$) and End-to-End (E2E) tests for Next.js projects with Screaming Architecture.
 
 ---
 
-## 1. Visión General del Toolchain
+## 1. Toolchain Overview
 
-| Herramienta | Rol en la Arquitectura | Propósito |
+| Tool | Role in the Architecture | Purpose |
 | :--- | :--- | :--- |
-| **SWC** | Compilador TypeScript / JSX | Compilación nativa en Next.js y transformación instantánea en Vitest (`@vitejs/plugin-react-swc`). |
-| **OXC (`oxlint` / `oxfmt`)** | Linter y Formateador en Rust | Análisis estático ultrarrápido (`correctness`, `suspicious`, `perf`) con plugins para React, Next.js y accesibilidad. |
-| **Vitest** | Unit & Integration Test Runner | Pruebas colocalizadas (`.test.ts`, `.test.tsx`) con `@testing-library/react` y cobertura V8 $\ge 90\%$. |
-| **Playwright** | End-to-End (E2E) Testing | Verificación de rutas delgadas en `src/app/**`, flujos de usuario completos y diálogos modales en `e2e/`. |
+| **SWC** | TypeScript / JSX compiler | Native compilation in Next.js and instant transformation in Vitest (`@vitejs/plugin-react-swc`). |
+| **OXC (`oxlint` / `oxfmt`)** | Rust linter and formatter | Ultra-fast static analysis (`correctness`, `suspicious`, `perf`) with plugins for React, Next.js and accessibility. |
+| **Vitest** | Unit & Integration Test Runner | Colocated tests (`.test.ts`, `.test.tsx`) with `@testing-library/react` and V8 coverage $\ge 90\%$. |
+| **Playwright** | End-to-End (E2E) Testing | Verifies thin routes in `src/app/**`, full user flows and modal dialogs in `e2e/`. |
 
 ---
 
-## 2. Pruebas Unitarias con Vitest + SWC ($\ge 90\%$ Coverage)
+## 2. Unit Tests with Vitest + SWC ($\ge 90\%$ Coverage)
 
-### 2.1 Configuración de Referencia (`vitest.config.ts`)
-Usa `@vitejs/plugin-react-swc` para compilar TSX con SWC y `@vitest/coverage-v8` aplicando las exclusiones arquitectónicas exactas:
+### 2.1 Reference Configuration (`vitest.config.ts`)
+Use `@vitejs/plugin-react-swc` to compile TSX with SWC and `@vitest/coverage-v8` with the exact architectural exclusions:
 
 ```typescript
 import path from 'node:path';
@@ -71,10 +71,10 @@ export default defineConfig({
 import '@testing-library/jest-dom/vitest';
 ```
 
-### 2.2 Convenciones de Pruebas Unitarias en Vitest
-- **Imports explícitos**: Importar siempre `describe`, `it`, `expect`, `vi`, `beforeEach` desde `'vitest'` (`globals: false`).
-- **Mocks y Spies**: Usar `vi.fn()`, `vi.spyOn()` y `vi.mock()`. Nunca usar APIs globales de Jest (`jest.fn()`).
-- **Testing de Hooks con TanStack Query**: Envolver `renderHook` con un `QueryClientProvider` con `retry: false`:
+### 2.2 Vitest Unit Test Conventions
+- **Explicit imports**: always import `describe`, `it`, `expect`, `vi`, `beforeEach` from `'vitest'` (`globals: false`).
+- **Mocks and spies**: use `vi.fn()`, `vi.spyOn()` and `vi.mock()`. Never use Jest global APIs (`jest.fn()`).
+- **Testing hooks with TanStack Query**: wrap `renderHook` in a `QueryClientProvider` with `retry: false`:
   ```tsx
   import React from 'react';
   import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -108,19 +108,19 @@ import '@testing-library/jest-dom/vitest';
 
 ---
 
-## 3. Pruebas End-to-End (E2E) con Playwright (`e2e/`)
+## 3. End-to-End (E2E) Tests with Playwright (`e2e/`)
 
-Dado que `src/app/**` es una capa de enrutamiento delgada excluida de pruebas unitarias, la integración real de rutas, layouts, redirecciones, metadatos y flujos completos se valida con **Playwright**.
+Since `src/app/**` is a thin routing layer excluded from unit tests, the real integration of routes, layouts, redirects, metadata and full flows is validated with **Playwright**.
 
-### 3.1 Estructura del Directorio `e2e/`
+### 3.1 `e2e/` Directory Structure
 ```text
 e2e/
-├── fixtures/             # Fixtures de autenticación y datos semilla
-├── billing.spec.ts       # Flujos E2E de la feature billing
-└── auth.spec.ts          # Flujos E2E de autenticación y guardas de ruta
+├── fixtures/             # Authentication fixtures and seed data
+├── billing.spec.ts       # E2E flows for the billing feature
+└── auth.spec.ts          # E2E flows for authentication and route guards
 ```
 
-### 3.2 Ejemplo de Especificación E2E (`e2e/billing.spec.ts`)
+### 3.2 E2E Spec Example (`e2e/billing.spec.ts`)
 ```typescript
 import { expect, test } from '@playwright/test';
 
@@ -130,11 +130,11 @@ test.describe('Billing Feature (/billing)', () => {
 
     await expect(page.getByRole('heading', { name: /billing overview/i })).toBeVisible();
 
-    await page.getByRole('button', { name: /nueva factura/i }).click();
+    await page.getByRole('button', { name: /new invoice/i }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
 
-    await page.getByLabel(/monto/i).fill('250');
-    await page.getByRole('button', { name: /guardar/i }).click();
+    await page.getByLabel(/amount/i).fill('250');
+    await page.getByRole('button', { name: /save/i }).click();
 
     await expect(page.getByRole('dialog')).toBeHidden();
   });
@@ -143,10 +143,10 @@ test.describe('Billing Feature (/billing)', () => {
 
 ---
 
-## 4. Linting y Formateo con OXC (`oxlint` / `oxfmt`)
+## 4. Linting and Formatting with OXC (`oxlint` / `oxfmt`)
 
-### 4.1 Configuración de `.oxlintrc.json`
-`oxlint` reemplaza cadenas pesadas de plugins de ESLint con verificación instantánea en Rust:
+### 4.1 `.oxlintrc.json` Configuration
+`oxlint` replaces heavy chains of ESLint plugins with instant checks in Rust:
 
 ```json
 {
@@ -167,13 +167,13 @@ test.describe('Billing Feature (/billing)', () => {
 }
 ```
 
-### 4.2 Secuencia de Calidad y Orden de Imports
-1. Formatear el código (`oxfmt` / Prettier).
-2. Organizar imports siguiendo las reglas de la skill `ts-import-organizer` (agrupación por bloques, orden por longitud y conversión de rutas relativas a alias `@/*`).
-3. Ejecutar `oxlint` y `tsc --noEmit`.
-4. Ejecutar `vitest run --coverage` ($\ge 90\%$) y `playwright test`.
+### 4.2 Quality Sequence and Import Order
+1. Format the code (`oxfmt` / Prettier).
+2. Organize imports following the `ts-import-organizer` skill's rules (block grouping, length ordering and converting relative paths to `@/*` aliases).
+3. Run `oxlint` and `tsc --noEmit`.
+4. Run `vitest run --coverage` ($\ge 90\%$) and `playwright test`.
 
-### 4.3 Scripts Estándar en `package.json`
+### 4.3 Standard Scripts in `package.json`
 ```json
 {
   "scripts": {

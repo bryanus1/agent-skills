@@ -4,31 +4,31 @@
     {
       "id": 1,
       "prompt": "Crea el módulo de facturas (invoice) en mi API NestJS 12 con Prisma y Vitest siguiendo la arquitectura del proyecto.",
-      "expected_output": "El agente ejecuta scaffold-module.mjs invoice --orm prisma (primero con --dry-run). Genera los 18 archivos en src/modules/invoices/ (carpeta plural, archivos singulares): entidad sin any, DTOs (incluido InvoiceResponseDto y PaginatedInvoiceResponseDto), contrato IInvoiceRepository con INVOICE_REPOSITORY_TOKEN en repositories/repository.ts, InvoiceRepository con PrismaService, servicio que inyecta solo la interfaz por token, controlador con Swagger completo devolviendo PaginatedInvoiceResponseDto en findAll, y specs con Vitest. Sin index.ts en la raíz del módulo y exportando solo InvoiceService en InvoiceModule.",
+      "expected_output": "The agent runs scaffold-module.mjs invoice --orm prisma (first with --dry-run). It generates the 18 files in src/modules/invoices/ (plural folder, singular files): an entity without any, DTOs (including InvoiceResponseDto and PaginatedInvoiceResponseDto), the IInvoiceRepository contract with INVOICE_REPOSITORY_TOKEN in repositories/repository.ts, InvoiceRepository with PrismaService, a service that injects only the interface by token, a controller with full Swagger that returns PaginatedInvoiceResponseDto in findAll, and Vitest specs. No index.ts at the module root, and InvoiceModule exports only InvoiceService. The reply is in Spanish.",
       "files": []
     },
     {
       "id": 2,
-      "prompt": "Revisa este controlador: `@Get(':id') findOne(@Param('id') id: string) { return this.prisma.invoice.findUnique({ where: { id } }); }`",
-      "expected_output": "El agente señala que el controlador usa el ORM directamente y devuelve el registro de base de datos sin validar UUID ni autorizar. Propone mover el acceso a datos a InvoiceRepository detrás de IInvoiceRepository, delegar en InvoiceService con check de existencia y ownership, devolver InvoiceResponseDto.fromEntity(...), validar id con ParseUUIDPipe({ version: '4' }) y añadir @ApiOperation, @ApiOkResponse, @ApiParam y las respuestas de error (400, 401, 403, 404).",
+      "prompt": "Review this controller: `@Get(':id') findOne(@Param('id') id: string) { return this.prisma.invoice.findUnique({ where: { id } }); }`",
+      "expected_output": "The agent points out that the controller uses the ORM directly and returns the database record without validating the UUID or authorizing. It proposes moving data access into InvoiceRepository behind IInvoiceRepository, delegating to InvoiceService with existence and ownership checks, returning InvoiceResponseDto.fromEntity(...), validating id with ParseUUIDPipe({ version: '4' }) and adding @ApiOperation, @ApiOkResponse, @ApiParam and the error responses (400, 401, 403, 404).",
       "files": []
     },
     {
       "id": 3,
       "prompt": "Un usuario normal puede borrar facturas de otros usuarios con DELETE /invoices/:id aunque tenemos @Roles, y GET /invoices le muestra facturas ajenas. ¿Cómo lo corrijo?",
-      "expected_output": "El agente explica la doble barrera: JwtAuthGuard antes que RolesGuard como APP_GUARD en el perímetro HTTP, y en el servicio validar la propiedad (requesterRole === Role.ADMIN o entity.ownerId === requesterId) lanzando ForbiddenException en findOne/update/remove y filtrando findAll por ownerId cuando no es admin. Muestra el cambio en el servicio y un test unitario con Vitest del caso prohibido.",
+      "expected_output": "The agent explains the double barrier: JwtAuthGuard before RolesGuard as APP_GUARD at the HTTP perimeter, and in the service checking ownership (requesterRole === Role.ADMIN or entity.ownerId === requesterId), throwing ForbiddenException in findOne/update/remove and filtering findAll by ownerId for non-admins. It shows the service change and a Vitest unit test for the forbidden case. The reply is in Spanish.",
       "files": []
     },
     {
       "id": 4,
-      "prompt": "Necesito que OrdersService consulte datos de un usuario en UsersModule. ¿Puedo importar USER_REPOSITORY_TOKEN en OrdersModule?",
-      "expected_output": "El agente explica que está prohibido el acceso cruzado a repositorios entre módulos y que los módulos nunca exportan su REPOSITORY_TOKEN. Indica que UsersModule debe exportar únicamente UserService, OrdersModule debe importar UsersModule, y OrderService debe inyectar UserService importado desde '@/modules/users/services'.",
+      "prompt": "I need OrdersService to read a user's data from UsersModule. Can I import USER_REPOSITORY_TOKEN in OrdersModule?",
+      "expected_output": "The agent explains that cross-module repository access is forbidden and that modules never export their REPOSITORY_TOKEN. It says UsersModule must export only UserService, OrdersModule must import UsersModule, and OrderService must inject UserService imported from '@/modules/users/services'.",
       "files": []
     },
     {
       "id": 5,
-      "prompt": "¿Cómo configuro el arranque de NestJS 12 con SWC, Vitest, OXC y NodeAdapter?",
-      "expected_output": "El agente muestra src/main.ts usando NodeAdapter de @nestjs/platform-node con ValidationPipe global (whitelist, forbidNonWhitelisted, transform), nest-cli.json con builder 'swc' y tsc --noEmit para typecheck, vitest.config.ts con unplugin-swc (legacyDecorator y decoratorMetadata) y vite-tsconfig-paths con exclusiones de cobertura, y scripts de oxlint/oxfmt.",
+      "prompt": "How do I set up the NestJS 12 bootstrap with SWC, Vitest, OXC and NodeAdapter?",
+      "expected_output": "The agent shows src/main.ts using NodeAdapter from @nestjs/platform-node with a global ValidationPipe (whitelist, forbidNonWhitelisted, transform), nest-cli.json with builder 'swc' and tsc --noEmit for type checking, vitest.config.ts with unplugin-swc (legacyDecorator and decoratorMetadata) and vite-tsconfig-paths with coverage exclusions, and oxlint/oxfmt scripts.",
       "files": []
     }
   ]

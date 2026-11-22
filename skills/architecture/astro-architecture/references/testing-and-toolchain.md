@@ -1,22 +1,22 @@
-# 🧪 Toolchain y Testing: OXC y Playwright
+# 🧪 Toolchain and Testing: OXC and Playwright
 
-Esta guía define el estándar de análisis estático ultrarrápido con **OXC** (`oxlint` / `oxfmt`) y pruebas End-to-End (E2E) con **Playwright** para proyectos Astro.
+This guide defines the standard for ultra-fast static analysis with **OXC** (`oxlint` / `oxfmt`) and End-to-End (E2E) tests with **Playwright** for Astro projects.
 
 ---
 
-## 1. Visión General del Toolchain
+## 1. Toolchain Overview
 
-| Herramienta | Rol | Propósito en Astro |
+| Tool | Role | Purpose in Astro |
 | :--- | :--- | :--- |
-| **`astro check`** | Type-checker de Astro | Valida tipos TypeScript y plantillas `.astro` (props, slots, Content Collections). |
-| **OXC (`oxlint` / `oxfmt`)** | Linter y Formateador en Rust | Análisis estático instantáneo (`correctness`, `suspicious`, `perf`) en `src/` (`*.ts`, `*.tsx`, `*.mjs`) y formateo consistente. |
-| **Playwright** | End-to-End (E2E) Testing | Verifica el build estático/SSR real (`astro preview`): SEO, HTML semántico, islas `client:*`, responsive y cero errores de consola. |
+| **`astro check`** | Astro type checker | Validates TypeScript types and `.astro` templates (props, slots, Content Collections). |
+| **OXC (`oxlint` / `oxfmt`)** | Rust linter and formatter | Instant static analysis (`correctness`, `suspicious`, `perf`) over `src/` (`*.ts`, `*.tsx`, `*.mjs`) and consistent formatting. |
+| **Playwright** | End-to-End (E2E) testing | Checks the real static/SSR build (`astro preview`): SEO, semantic HTML, `client:*` islands, responsiveness and zero console errors. |
 
 ---
 
-## 2. Linting y Formateo con OXC (`oxlint` / `oxfmt`)
+## 2. Linting and Formatting with OXC (`oxlint` / `oxfmt`)
 
-### 2.1 Configuración de Referencia (`.oxlintrc.json`)
+### 2.1 Reference Configuration (`.oxlintrc.json`)
 
 ```json
 {
@@ -31,9 +31,9 @@ Esta guía define el estándar de análisis estático ultrarrápido con **OXC** 
 }
 ```
 
-> Si el proyecto usa islas con React, añadir `"react"` a `plugins`.
+> If the project uses React islands, add `"react"` to `plugins`.
 
-### 2.2 Comandos en `package.json`
+### 2.2 Commands in `package.json`
 
 ```json
 {
@@ -48,11 +48,11 @@ Esta guía define el estándar de análisis estático ultrarrápido con **OXC** 
 
 ---
 
-## 3. Pruebas E2E con Playwright (`@playwright/test`)
+## 3. E2E Tests with Playwright (`@playwright/test`)
 
-En Astro, las pruebas E2E deben ejecutarse contra el **build de producción** (`astro preview`), no solo contra `astro dev`, para validar exactamente los assets optimizados, las islas hidratadas y los metadatos finales.
+In Astro, E2E tests must run against the **production build** (`astro preview`), not only against `astro dev`, to validate exactly the optimized assets, the hydrated islands and the final metadata.
 
-### 3.1 Configuración de Referencia (`playwright.config.ts`)
+### 3.1 Reference Configuration (`playwright.config.ts`)
 
 ```typescript
 import { defineConfig, devices } from '@playwright/test';
@@ -79,9 +79,9 @@ export default defineConfig({
 });
 ```
 
-### 3.2 Suite Mínima Recomendada (`e2e/landing.spec.ts`)
+### 3.2 Recommended Minimum Suite (`e2e/landing.spec.ts`)
 
-Toda landing page debe contar al menos con estas verificaciones automatizadas:
+Every landing page must have at least these automated checks:
 
 ```typescript
 import { expect, test } from '@playwright/test';

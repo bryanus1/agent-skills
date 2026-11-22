@@ -1,10 +1,10 @@
-# Paquetes Compartidos y Contratos Cross-Platform
+# Shared Packages and Cross-Platform Contracts
 
 ---
 
-## 1. Paquetes Internos Compilados y Compatibilidad Multi-Bundler
+## 1. Compiled Internal Packages and Multi-Bundler Compatibility
 
-Todo paquete de `packages/` con código TypeScript se compila con `tsc` a `dist/` y expone únicamente sus rutas en `exports`:
+Every package in `packages/` with TypeScript code compiles with `tsc` to `dist/` and exposes only its routes in `exports`:
 
 ```json
 {
@@ -27,30 +27,30 @@ Todo paquete de `packages/` con código TypeScript se compila con `tsc` a `dist/
 }
 ```
 
-**¿Por qué compilados a `dist/`?**
-- **NestJS (`Node16`)**, **Next.js (`Bundler`)**, **Expo Metro (`unstable_enablePackageExports`)** y **Astro/Vite (`Bundler`)** resuelven el mismo contrato `exports` sin configurar `transpilePackages` ni alias hacia `src/` ajenos.
-- `library.json` compila con `module: Node16` (CommonJS + `.d.ts`). Todos los bundlers modernos (Next, Astro/Vite, Metro) y NestJS consumen CJS + tipos sin fricción.
-- **Excepción ESM-only:** si algún paquete interno envuelve una dependencia externa publicada solo en ESM, añade `tsup` para emitir salida dual (`.mjs` + `.cjs`) actualizando `exports` con `"import"` y `"require"`.
+**Why compile to `dist/`?**
+- **NestJS (`Node16`)**, **Next.js (`Bundler`)**, **Expo Metro (`unstable_enablePackageExports`)** and **Astro/Vite (`Bundler`)** resolve the same `exports` contract without configuring `transpilePackages` or aliases into other packages' `src/`.
+- `library.json` compiles with `module: Node16` (CommonJS + `.d.ts`). Every modern bundler (Next, Astro/Vite, Metro) and NestJS consume CJS + types without friction.
+- **ESM-only exception:** if an internal package wraps an external dependency published only as ESM, add `tsup` to emit dual output (`.mjs` + `.cjs`), updating `exports` with `"import"` and `"require"`.
 
 ---
 
-## 2. Catálogo de Paquetes (`scaffold-package.mjs`)
+## 2. Package Catalog (`scaffold-package.mjs`)
 
-| `--kind` | Plataforma | Para qué sirve | Regla de uso |
+| `--kind` | Platform | What it is for | Usage rule |
 | :--- | :--- | :--- | :--- |
-| `contracts` | `universal` | Esquemas Zod por dominio (`./common`, `./<nouns>`) | Cero dependencias de React/Next/Nest/RN/Astro |
-| `api-client` | `universal` | Cliente tipado OpenAPI + `getHeaders` cross-platform | Regenerar contra Swagger en el mismo PR del cambio |
-| `design-tokens` | `universal` | Colores, spacing, radios y tipografía (`tailwindThemeExtend`) | Compartible entre Next.js, Astro y Expo NativeWind |
-| `ui-web` | `web` | Componentes React DOM compartidos | Solo cuando existan **2+ apps web** (ej. `web` + `admin` o islas React de `landing`). Nunca importar desde `mobile` |
-| `ui-native` | `native` | Primitivas/contratos React Native | Solo cuando existan **2+ apps móviles**. Nunca importar desde `web` o `landing` |
-| `lib` | `universal` | Utilidades puras (fechas, dinero, formato, i18n) | Al menos 2 consumidores compatibles |
-| `config` | `universal` | Configs compartidas sin compilación (`tsconfig`, `oxc-config`, `eslint-config`) | Sin código de runtime |
+| `contracts` | `universal` | Zod schemas per domain (`./common`, `./<nouns>`) | Zero dependencies on React/Next/Nest/RN/Astro |
+| `api-client` | `universal` | Typed OpenAPI client + cross-platform `getHeaders` | Regenerate against Swagger in the same PR as the change |
+| `design-tokens` | `universal` | Colors, spacing, radii and typography (`tailwindThemeExtend`) | Shareable across Next.js, Astro and Expo NativeWind |
+| `ui-web` | `web` | Shared React DOM components | Only when there are **2+ web apps** (e.g. `web` + `admin`, or `landing` React islands). Never import from `mobile` |
+| `ui-native` | `native` | React Native primitives/contracts | Only when there are **2+ mobile apps**. Never import from `web` or `landing` |
+| `lib` | `universal` | Pure utilities (dates, money, formatting, i18n) | At least 2 compatible consumers |
+| `config` | `universal` | Shared configs with no compilation (`tsconfig`, `oxc-config`, `eslint-config`) | No runtime code |
 
 ---
 
-## 3. Modo `zod`: `packages/contracts`
+## 3. `zod` Mode: `packages/contracts`
 
-Un esquema Zod por dominio compartido entre backend y clientes TypeScript (`web`, `mobile` y formularios en islas de `landing`).
+One Zod schema per domain, shared between the backend and TypeScript clients (`web`, `mobile` and forms in `landing` islands).
 
 ```ts
 // packages/contracts/src/invoices/invoice.schema.ts
@@ -71,32 +71,32 @@ export type CreateInvoiceInput = z.infer<typeof createInvoiceSchema>;
 export type Invoice = z.infer<typeof invoiceSchema>;
 ```
 
-- **En la API (`apps/api`, NestJS):**
+- **In the API (`apps/api`, NestJS):**
   ```ts
   import { createZodDto } from 'nestjs-zod';
   import { createInvoiceSchema } from '@acme/contracts/invoices';
 
   export class CreateInvoiceDto extends createZodDto(createInvoiceSchema) {}
   ```
-  Mantén `InvoiceResponseDto.fromEntity()` con `@ApiProperty` tal como exige `nestjs-architecture`.
-- **En Web (`apps/web`, Next.js) y Mobile (`apps/mobile`, Expo):**
-  Extiende el esquema con reglas solo de UI cuando haga falta, nunca lo dupliques:
+  Keep `InvoiceResponseDto.fromEntity()` with `@ApiProperty`, as `nestjs-architecture` requires.
+- **In Web (`apps/web`, Next.js) and Mobile (`apps/mobile`, Expo):**
+  Extend the schema with UI-only rules when needed, never duplicate it:
   ```ts
   import { createInvoiceSchema } from '@acme/contracts/invoices';
   export const createInvoiceFormSchema = createInvoiceSchema.extend({ acceptTerms: z.literal(true) });
   ```
-- **En Landing (`apps/landing`, Astro):**
-  Útil para validar formularios de contacto, newsletter o waitlist compartidos con endpoints públicos de la API.
+- **In Landing (`apps/landing`, Astro):**
+  Useful for validating contact, newsletter or waitlist forms shared with the API's public endpoints.
 
 ---
 
-## 4. Modo `openapi`: `packages/api-client` (Web + Astro + Mobile + Políglotas)
+## 4. `openapi` Mode: `packages/api-client` (Web + Astro + Mobile + Polyglot)
 
-Cuando la API la consumen **app móvil (`apps/mobile`)**, **partners externos** o **servicios políglotas (`services/*`)**, Swagger/OpenAPI es la fuente de verdad:
+When the API is consumed by the **mobile app (`apps/mobile`)**, **external partners** or **polyglot services (`services/*`)**, Swagger/OpenAPI is the source of truth:
 
-1. **API (`apps/api` o servicio Python/Go):** expone `/api-json` (o archivo `openapi.json`).
-2. **Generación:** `OPENAPI_SCHEMA_URL=http://localhost:3000/api-json pnpm --filter @acme/api-client generate` escribe `src/generated/schema.ts` (commitéalo para que CI no necesite levantar la API).
-3. **Consumo cross-platform con `getHeaders`:**
+1. **API (`apps/api` or a Python/Go service):** exposes `/api-json` (or an `openapi.json` file).
+2. **Generation:** `OPENAPI_SCHEMA_URL=http://localhost:3000/api-json pnpm --filter @acme/api-client generate` writes `src/generated/schema.ts` (commit it so CI does not need to start the API).
+3. **Cross-platform consumption with `getHeaders`:**
    - **Web (Next.js):**
      ```ts
      import { createApiClient } from '@acme/api-client/client';
@@ -115,13 +115,13 @@ Cuando la API la consumen **app móvil (`apps/mobile`)**, **partners externos** 
      });
      ```
    - **Landing (Astro):**
-     En páginas `.astro` (build/SSR) usa `import.meta.env.PUBLIC_API_URL`; en islas interactivas de cliente usa `createApiClient` igual que en web.
+     In `.astro` pages (build/SSR) use `import.meta.env.PUBLIC_API_URL`; in interactive client islands use `createApiClient` as on web.
 
 ---
 
-## 5. Diseño Compartido con `packages/design-tokens`
+## 5. Shared Design with `packages/design-tokens`
 
-Para mantener consistencia visual entre **Next.js (Tailwind)**, **Astro (Tailwind)** y **Expo (NativeWind)** sin mezclar primitivas DOM con nativas:
+To keep visual consistency across **Next.js (Tailwind)**, **Astro (Tailwind)** and **Expo (NativeWind)** without mixing DOM and native primitives:
 
 ```ts
 // apps/web/tailwind.config.ts | apps/landing/tailwind.config.mjs | apps/mobile/tailwind.config.js
@@ -132,5 +132,5 @@ export default {
 };
 ```
 
-- `design-tokens` es `platform: "universal"` → permitido en `web`, `landing` y `mobile`.
-- Los componentes concretos viven en cada app (`apps/web/src/components`, `apps/landing/src/components`, `apps/mobile/src/components`), o en `ui-web` / `ui-native` solo si existen 2+ apps de esa misma plataforma.
+- `design-tokens` is `platform: "universal"` → allowed in `web`, `landing` and `mobile`.
+- Concrete components live in each app (`apps/web/src/components`, `apps/landing/src/components`, `apps/mobile/src/components`), or in `ui-web` / `ui-native` only if there are 2+ apps on that same platform.

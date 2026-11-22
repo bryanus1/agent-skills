@@ -4,20 +4,39 @@
     {
       "id": 1,
       "prompt": "Crea la arquitectura base para una landing page de un SaaS llamado 'PulseMetrics' usando Astro y Tailwind CSS.",
-      "expected_output": "El agente previsualiza con `node <skill-dir>/scripts/scaffold-landing.mjs --dry-run --target-dir .` y luego genera la estructura modular: `src/layouts/BaseLayout.astro` con SEO técnico (title, description, canonical, Open Graph, Twitter Cards y skip-link), secciones Zero-JS en `src/components/sections/` (`HeroSection`, `FeaturesSection`, `FaqSection` con `<details>`/`<summary>` nativos sin JS, `CtaSection`), datos tipados en `src/data/site.ts`, `src/styles/global.css` con Tailwind y `src/pages/index.astro`.",
-      "files": []
+      "expected_output": "The agent previews with `node <skill-dir>/scripts/scaffold-landing.mjs --dry-run --target-dir .` and then generates the modular structure: `src/layouts/BaseLayout.astro` with technical SEO (title, description, canonical, Open Graph, Twitter Cards and a skip link), Zero-JS sections in `src/components/sections/` (`HeroSection`, `FeaturesSection`, `FaqSection` with native JS-free `<details>`/`<summary>`, `CtaSection`), typed data in `src/data/site.ts`, `src/styles/global.css` with Tailwind and `src/pages/index.astro`. The reply is in Spanish.",
+      "files": [],
+      "assertions": [
+        "Runs the scaffold with --dry-run before writing files",
+        "Generates BaseLayout.astro with title, description, canonical, Open Graph and Twitter Cards",
+        "Builds the FAQ with native <details>/<summary> and no client:* directive",
+        "Keeps the copy in typed data under src/data/",
+        "Replies in Spanish"
+      ]
     },
     {
       "id": 2,
-      "prompt": "Audita mi proyecto Astro y configura el linting con OXC y las pruebas E2E con Playwright antes de desplegar.",
-      "expected_output": "El agente ejecuta `node <skill-dir>/scripts/audit-astro.mjs --target-dir .`, configura `.oxlintrc.json` con plugins `typescript`, `unicorn` y `jsx-a11y`, configura `playwright.config.ts` ejecutando `webServer` sobre `npm run build && npm run preview -- --port 4321`, crea `e2e/landing.spec.ts` verificando metadatos SEO, un único `<h1>`, ausencia de overflow horizontal y cero errores de consola, y valida con `npx oxlint --deny-warnings src/`, `npx astro check` y `npx playwright test`.",
-      "files": []
+      "prompt": "Audit my Astro project and set up OXC linting and Playwright E2E tests before deploying.",
+      "expected_output": "The agent runs `node <skill-dir>/scripts/audit-astro.mjs --target-dir .`, configures `.oxlintrc.json` with the `typescript`, `unicorn` and `jsx-a11y` plugins, configures `playwright.config.ts` with a `webServer` running `npm run build && npm run preview -- --port 4321`, creates `e2e/landing.spec.ts` checking SEO metadata, a single `<h1>`, no horizontal overflow and zero console errors, and validates with `npx oxlint --deny-warnings src/`, `npx astro check` and `npx playwright test`.",
+      "files": [],
+      "assertions": [
+        "Runs audit-astro.mjs against the project",
+        "Creates .oxlintrc.json with the typescript, unicorn and jsx-a11y plugins",
+        "Runs Playwright against the production build via astro preview",
+        "The E2E suite checks SEO metadata, a single h1 and zero console errors"
+      ]
     },
     {
       "id": 3,
       "prompt": "Tengo una landing en Astro con `client:load` en el acordeón de FAQ y etiquetas `<img>` normales en el Hero y las features. ¿Cómo lo optimizo según el estándar?",
-      "expected_output": "El agente reemplaza el acordeón hidratado por HTML nativo `<details>`/`<summary>` (Zero-JS) o usa `client:visible` solo si hay interactividad compleja *below-the-fold*, y sustituye las etiquetas `<img>` por `<Image />` de `astro:assets` con `loading=\"eager\"` y `fetchpriority=\"high\"` en la imagen del Hero para proteger el LCP y evitar CLS.",
-      "files": []
+      "expected_output": "The agent replaces the hydrated accordion with native HTML `<details>`/`<summary>` (Zero-JS), or uses `client:visible` only if there is complex *below-the-fold* interactivity, and replaces the `<img>` tags with `<Image />` from `astro:assets`, using `loading=\"eager\"` and `fetchpriority=\"high\"` on the Hero image to protect LCP and avoid CLS. The reply is in Spanish.",
+      "files": [],
+      "assertions": [
+        "Removes client:load from the FAQ accordion in favor of native <details>/<summary>",
+        "Replaces <img> with <Image /> from astro:assets",
+        "Uses loading=\"eager\" and fetchpriority=\"high\" on the Hero image",
+        "Replies in Spanish"
+      ]
     }
   ]
 }

@@ -1,10 +1,10 @@
-# Patrón de datos: servicios + TanStack Query
+# Data Pattern: Services + TanStack Query
 
-En móvil no hay Server Actions: el flujo es `service` (I/O HTTP + validación) → `hook` (estado/caché TanStack Query) → `screen`.
+There are no Server Actions on mobile: the flow is `service` (HTTP I/O + validation) → `hook` (TanStack Query state/cache) → `screen`.
 
-## Cliente HTTP base (`src/config/api-client.ts`)
+## Base HTTP client (`src/config/api-client.ts`)
 
-Un único cliente HTTP tipado y reutilizable en toda la app:
+A single typed HTTP client reused across the whole app:
 
 ```ts
 // src/config/api-client.ts
@@ -35,9 +35,9 @@ export const apiClient = {
 
 ---
 
-## Servicio con validación de contrato
+## Service with contract validation
 
-Cada servicio encapsula I/O y valida la respuesta con su esquema Zod correspondiente antes de retornar el tipo del modelo.
+Each service wraps the I/O and validates the response with its matching Zod schema before returning the model type.
 
 ```ts
 // src/features/billing/services/get-invoices/get-invoices.service.ts
@@ -53,9 +53,9 @@ export async function getInvoices(): Promise<readonly IInvoice[]> {
 
 ---
 
-## Key Factory jerárquica (`hooks/<entity>-keys/`)
+## Hierarchical Key Factory (`hooks/<entity>-keys/`)
 
-Las keys de TanStack Query nunca se declaran dentro de un hook individual ni como strings sueltos. Viven en su propia subcarpeta hoja para que todas las queries y mutaciones las compartan sin acoplar hooks entre sí.
+TanStack Query keys are never declared inside an individual hook or as loose strings. They live in their own leaf subfolder so every query and mutation can share them without coupling hooks to each other.
 
 ```ts
 // src/features/billing/hooks/invoice-keys/invoice.keys.ts
@@ -79,9 +79,9 @@ export { invoiceKeys, type IInvoiceFilters } from './invoice.keys';
 
 ---
 
-## Hooks de consulta (`useQuery`)
+## Query hooks (`useQuery`)
 
-Los hooks importan la key factory y el servicio mediante alias `@/features/...`:
+Hooks import the key factory and the service through the `@/features/...` alias:
 
 ```ts
 // src/features/billing/hooks/use-invoices/use-invoices.hook.ts
@@ -99,9 +99,9 @@ export function useInvoices(filters?: IInvoiceFilters) {
 
 ---
 
-## Hooks de mutación (`useMutation`)
+## Mutation hooks (`useMutation`)
 
-Invalidan mediante la clave granular de la factory (`invoiceKeys.lists()` o `invoiceKeys.all`):
+They invalidate through the factory's granular key (`invoiceKeys.lists()` or `invoiceKeys.all`):
 
 ```ts
 // src/features/billing/hooks/use-create-invoice/use-create-invoice.hook.ts
@@ -115,7 +115,7 @@ export function useCreateInvoice() {
   return useMutation({
     mutationFn: (input: ICreateInvoiceInput) => createInvoice(input),
     onSuccess: () => {
-      // Invalida solo listas, preservando los detalles cacheados
+      // Invalidates only lists, preserving cached details
       queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
     },
   });
@@ -124,10 +124,10 @@ export function useCreateInvoice() {
 
 ---
 
-## Reglas críticas de datos
+## Critical data rules
 
-1. **Sin llamadas de red en componentes ni screens:** la UI solo consume hooks.
-2. **Validación estricta de respuestas:** los servicios usan `schema.parse()` para atrapar cambios de contrato del backend antes de que lleguen a la UI.
-3. **Key factories independientes:** cada entidad tiene su factory en `hooks/<entity>-keys/` con jerarquía `all → lists() → list(filters) → details() → detail(id)`.
-4. **Imports absolutos con alias:** `@/features/<feature>/...`, nunca rutas relativas `../../` entre diferentes capas.
-5. **Testing de hooks:** usar `renderHook` con un `QueryClientProvider` configurado con `retry: false`.
+1. **No network calls in components or screens:** the UI only consumes hooks.
+2. **Strict response validation:** services use `schema.parse()` to catch backend contract changes before they reach the UI.
+3. **Independent key factories:** each entity has its factory in `hooks/<entity>-keys/` with the hierarchy `all → lists() → list(filters) → details() → detail(id)`.
+4. **Absolute imports with the alias:** `@/features/<feature>/...`, never `../../` relative paths between different layers.
+5. **Hook testing:** use `renderHook` with a `QueryClientProvider` configured with `retry: false`.

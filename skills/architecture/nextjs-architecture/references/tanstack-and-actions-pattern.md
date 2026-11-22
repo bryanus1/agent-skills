@@ -1,17 +1,17 @@
-# Flujo de Datos: Server Actions vs TanStack Query
+# Data Flow: Server Actions vs TanStack Query
 
-Esta guía define las directrices y patrones de implementación para la capa de datos en Next.js (App Router), equilibrando **Server Actions** (con validación Zod en servidor) y **TanStack Query** (respetando la capa `services/` y la política de barrels en hojas).
+This guide defines the guidelines and implementation patterns for the data layer in Next.js (App Router), balancing **Server Actions** (with server-side Zod validation) and **TanStack Query** (respecting the `services/` layer and the leaf-folder barrel policy).
 
 ---
 
-## 1. Arquitectura General del Flujo de Datos
+## 1. Overall Data Flow Architecture
 
 ```text
-[ Componente UI / Screen ]
+[ UI Component / Screen ]
              │
              ├────────────────────────────────────────────┐
              ▼                                            ▼
-    [ Modo TanStack Query Hook ]               [ Modo Server Action Hook ]
+    [ TanStack Query Hook Mode ]               [ Server Action Hook Mode ]
  (hooks/use-<noun> → useQuery/useMutation)    (hooks/use-<verb>-<noun> → useTransition)
              │                                            │
              ▼                                            ▼
@@ -19,40 +19,40 @@ Esta guía define las directrices y patrones de implementación para la capa de 
        (fetch / API Client)                   ('use server' + Zod safeParse + fetch/DB)
 ```
 
-> **Regla Crítica**: Los componentes y los hooks **nunca** invocan `fetch` directamente. Toda llamada HTTP o acceso a datos reside en `src/features/<feature>/services/<verb>-<noun>/`.
+> **Critical Rule**: components and hooks **never** call `fetch` directly. Every HTTP call or data access lives in `src/features/<feature>/services/<verb>-<noun>/`.
 
 ---
 
-## 2. Matriz de Decisión: ¿Cuándo usar cada patrón?
+## 2. Decision Matrix: when to use each pattern?
 
-| Escenario | Enfoque Recomendado | Razón Técnica |
+| Scenario | Recommended Approach | Technical Reason |
 | :--- | :--- | :--- |
-| **Páginas Iniciales / SEO** | **Server Components (RSC)** | Renderizado en servidor con streaming y cero JavaScript de cliente para la carga inicial. |
-| **Mutaciones de Formularios / CRUD** | **Server Actions (`'use server'`)** | Validación con Zod en servidor, acceso seguro a `cookies()` y revalidación nativa (`revalidatePath` / `revalidateTag`). |
-| **Dashboards Interactivos / Tablas** | **TanStack Query (`useQuery`)** | Caching en cliente, paginación reactiva, polling en segundo plano y deduplicación de peticiones. |
-| **Mutaciones con Caché Optimista Local** | **TanStack Query (`useMutation`)** | Invalidación automática de query keys o actualización optimista de caché en cliente. |
+| **Initial Pages / SEO** | **Server Components (RSC)** | Server rendering with streaming and zero client JavaScript for the initial load. |
+| **Form Mutations / CRUD** | **Server Actions (`'use server'`)** | Server-side Zod validation, secure access to `cookies()` and native revalidation (`revalidatePath` / `revalidateTag`). |
+| **Interactive Dashboards / Tables** | **TanStack Query (`useQuery`)** | Client caching, reactive pagination, background polling and request deduplication. |
+| **Mutations with Local Optimistic Cache** | **TanStack Query (`useMutation`)** | Automatic query key invalidation or optimistic client cache updates. |
 
 ---
 
-## 3. Patrón 1: Server Actions con Validación Zod en Servidor
+## 3. Pattern 1: Server Actions with Server-Side Zod Validation
 
-Las Server Actions son endpoints HTTP `POST` públicos: **siempre** deben validar sus argumentos en el servidor con un esquema de `schemas/` antes de ejecutar lógica o llamadas externas.
+Server Actions are public HTTP `POST` endpoints: they must **always** validate their arguments on the server with a schema from `schemas/` before running logic or external calls.
 
-### 3.1 Esquema Zod (`src/features/billing/schemas/create-invoice.schema.ts`)
+### 3.1 Zod Schema (`src/features/billing/schemas/create-invoice.schema.ts`)
 ```typescript
 import { z } from 'zod';
 
 export const createInvoiceSchema = z.object({
-  customerId: z.string().uuid('Cliente inválido'),
-  amount: z.coerce.number().positive('El monto debe ser mayor a 0'),
+  customerId: z.string().uuid('Invalid customer'),
+  amount: z.coerce.number().positive('The amount must be greater than 0'),
   currency: z.enum(['USD', 'EUR', 'COP']),
 });
 
 export type TCreateInvoiceInput = z.infer<typeof createInvoiceSchema>;
 ```
-*(Reexportado en `src/features/billing/schemas/index.ts`)*
+*(Re-exported in `src/features/billing/schemas/index.ts`)*
 
-### 3.2 Servicio Server Action (`src/features/billing/services/create-invoice/create-invoice.service.ts`)
+### 3.2 Server Action Service (`src/features/billing/services/create-invoice/create-invoice.service.ts`)
 ```typescript
 'use server';
 
@@ -67,7 +67,7 @@ export interface IServiceResponse<T> {
 }
 
 /**
- * Server Action para validar y crear una nueva factura.
+ * Server Action that validates and creates a new invoice.
  */
 export async function createInvoice(
   input: TCreateInvoiceInput,
@@ -76,7 +76,7 @@ export async function createInvoice(
   if (!parsed.success) {
     return {
       success: false,
-      error: parsed.error.issues[0]?.message ?? 'Datos de factura inválidos',
+      error: parsed.error.issues[0]?.message ?? 'Invalid invoice data',
     };
   }
 
@@ -92,7 +92,7 @@ export async function createInvoice(
       const errorPayload = await response.json().catch(() => ({}));
       return {
         success: false,
-        error: errorPayload.message || 'Error al procesar la factura',
+        error: errorPayload.message || 'Failed to process the invoice',
       };
     }
 
@@ -102,13 +102,13 @@ export async function createInvoice(
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Error inesperado de red',
+      error: error instanceof Error ? error.message : 'Unexpected network error',
     };
   }
 }
 ```
 
-### 3.3 Hook de Orquestación (`src/features/billing/hooks/use-create-invoice/use-create-invoice.hook.ts`)
+### 3.3 Orchestration Hook (`src/features/billing/hooks/use-create-invoice/use-create-invoice.hook.ts`)
 ```typescript
 'use client';
 
@@ -127,10 +127,10 @@ export function useCreateInvoice() {
       const result = await createInvoice(input);
       if (result.success && result.data) {
         setCreatedInvoice(result.data);
-        toast.success('Factura generada exitosamente');
+        toast.success('Invoice created successfully');
         onSuccess?.();
       } else {
-        toast.error(result.error || 'Ocurrió un fallo');
+        toast.error(result.error || 'Something went wrong');
       }
     });
   };
@@ -141,11 +141,11 @@ export function useCreateInvoice() {
 
 ---
 
-## 4. Patrón 2: Servicios + Custom Hooks con TanStack Query
+## 4. Pattern 2: Services + Custom Hooks with TanStack Query
 
-Para respetar la **Regla de la Hoja Terminal**, `hooks/` solo contiene subcarpetas (`use-*/`) y **nunca** archivos sueltos como `hooks/query-keys.ts`. La *Query Key Factory* se exporta desde el hook principal de consulta (`hooks/use-invoices`) a través de su `index.ts`.
+To respect the **Leaf-Folder Rule**, `hooks/` contains only subfolders (`use-*/`) and **never** loose files such as `hooks/query-keys.ts`. The *Query Key Factory* is exported from the main query hook (`hooks/use-invoices`) through its `index.ts`.
 
-### 4.1 Servicio de Lectura (`src/features/billing/services/get-invoices/get-invoices.service.ts`)
+### 4.1 Read Service (`src/features/billing/services/get-invoices/get-invoices.service.ts`)
 ```typescript
 import type { IInvoice } from '@/features/billing/models';
 
@@ -160,12 +160,12 @@ export async function getInvoices(params: IGetInvoicesParams = {}): Promise<IInv
   if (status) searchParams.append('status', status);
 
   const res = await fetch(`/api/invoices?${searchParams.toString()}`);
-  if (!res.ok) throw new Error('Error al obtener el listado de facturas');
+  if (!res.ok) throw new Error('Failed to fetch the invoice list');
   return res.json();
 }
 ```
 
-### 4.2 Hook de Consulta + Key Factory (`src/features/billing/hooks/use-invoices/use-invoices.hook.ts`)
+### 4.2 Query Hook + Key Factory (`src/features/billing/hooks/use-invoices/use-invoices.hook.ts`)
 ```typescript
 'use client';
 
@@ -189,8 +189,8 @@ export function useInvoices(params: IGetInvoicesParams = {}) {
 }
 ```
 
-### 4.3 Hook de Mutación Encapsulado (`src/features/billing/hooks/use-delete-invoice/use-delete-invoice.hook.ts`)
-Cada hook adicional vive en su propia subcarpeta e importa `invoiceKeys` desde `@/features/billing/hooks/use-invoices`:
+### 4.3 Encapsulated Mutation Hook (`src/features/billing/hooks/use-delete-invoice/use-delete-invoice.hook.ts`)
+Each additional hook lives in its own subfolder and imports `invoiceKeys` from `@/features/billing/hooks/use-invoices`:
 
 ```typescript
 'use client';
@@ -207,10 +207,10 @@ export function useDeleteInvoice() {
     mutationFn: (id: string) => deleteInvoice(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: invoiceKeys.lists() });
-      toast.success('Factura eliminada');
+      toast.success('Invoice deleted');
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Error al eliminar');
+      toast.error(err.message || 'Failed to delete');
     },
   });
 }
@@ -218,9 +218,9 @@ export function useDeleteInvoice() {
 
 ---
 
-## 5. Cascarón Interactivo (UI Shell Feedback)
+## 5. Interactive Shell (UI Shell Feedback)
 
-Para pantallas o botones que representen funcionalidades en desarrollo o mockeables:
-- Nunca dejar botones sin respuesta o con estados colgados.
-- Emitir feedback accesible con `toast.info('Funcionalidad próximamente disponible')` de `sonner`.
-- Resetear limpiamente cualquier estado de carga o pending.
+For screens or buttons that represent features still in development or mocked:
+- Never leave buttons unresponsive or with stuck states.
+- Give accessible feedback with `toast.info('Coming soon')` from `sonner`.
+- Cleanly reset any loading or pending state.

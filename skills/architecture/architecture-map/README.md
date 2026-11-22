@@ -1,51 +1,51 @@
 # 🗺️ Architecture Map (`architecture-map`)
 
-> **Genera desde cero o mantiene al día la página de arquitectura leyendo el repositorio real: topología, diagrama Mermaid, módulos/apps, stack, datos, auth, flujos clave, integraciones y despliegue — en Notion (MCP) o en `docs/ARCHITECTURE.md`, preservando las notas manuales del equipo.**
+> **Generate from scratch, or keep up to date, the architecture page by reading the real repository: topology, Mermaid diagram, modules/apps, stack, data, auth, key flows, integrations and deployment — in Notion (MCP) or in `docs/ARCHITECTURE.md`, preserving the team's manual notes.**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `architecture-map` |
-| **Categoría** | `architecture` |
-| **Versión** | `1.0.0` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
-| **Destinos Soportados** | Notion (MCP) y Markdown local (`docs/ARCHITECTURE.md` / `ARCHITECTURE.md`) |
+| **Name** | `architecture-map` |
+| **Category** | `architecture` |
+| **Version** | `1.1.0` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Supported Destinations** | Notion (MCP) and local Markdown (`docs/ARCHITECTURE.md` / `ARCHITECTURE.md`) |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
 ```bash
-# Instalar en el proyecto actual con skills.sh:
+# Install in the current project with skills.sh:
 npx skills add bryanus1/agent-skills --skill architecture-map
 
-# Instalar globalmente en tu máquina:
+# Install globally on your machine:
 npx skills add bryanus1/agent-skills --skill architecture-map -g
 ```
 
 ---
 
-## 💡 Ejemplos de Uso
+## 💡 Usage Examples
 
-### 1. Generar la página inicial de arquitectura en el repo
-> *"mapa-arquitectura para este proyecto"*
+### 1. Generate the initial architecture page in the repo
+> *"mapa-arquitectura for this project"*
 
-Explora manifiestos, módulos, migraciones, `.env.example` (sin leer `.env` reales) y workflows de CI, traza los flujos principales y te muestra el borrador de `docs/ARCHITECTURE.md` con diagrama Mermaid para que lo apruebes antes de crearlo.
+Explores manifests, modules, migrations, `.env.example` (without reading real `.env` files) and CI workflows, traces the main flows and shows you the `docs/ARCHITECTURE.md` draft with a Mermaid diagram for you to approve before creating it.
 
-### 2. Actualizar una página existente en Notion sin perder ADRs
-> *"Actualiza la página de arquitectura en https://www.notion.so/acme/Arquitectura-12345 leyendo el estado actual del repo"*
+### 2. Update an existing Notion page without losing ADRs
+> *"Update the architecture page at https://www.notion.so/acme/Architecture-12345 by reading the current state of the repo"*
 
-Lee la página de Notion con `notion-fetch`, contrasta con el código real, resume la deriva detectada (módulos nuevos, cambios de stack), preserva las secciones manuales de ADRs y contexto de negocio, y espera tu confirmación antes de llamar a `notion-update-page`.
+Reads the Notion page with `notion-fetch`, compares it with the real code, summarizes the detected drift (new modules, stack changes), preserves the manual ADR and business context sections, and waits for your confirmation before calling `notion-update-page`.
 
-### 3. Sincronizar un `ARCHITECTURE.md` existente en un repo pequeño
-> *"mapa-arquitectura: actualiza la documentación de arquitectura de esta CLI"*
+### 3. Sync an existing `ARCHITECTURE.md` in a small repo
+> *"mapa-arquitectura: update the architecture docs for this CLI"*
 
-Detecta `ARCHITECTURE.md` en la raíz sin crear duplicados en `docs/`, omite secciones irrelevantes como base de datos o RLS, y actualiza solo comandos y módulos verificados tras tu visto bueno.
+Detects `ARCHITECTURE.md` at the root without creating duplicates in `docs/`, omits irrelevant sections such as database or RLS, and updates only verified commands and modules after your approval.
 
 ---
 
-## 📚 Documentación
+## 📚 Documentation
 
-- **[`SKILL.md`](SKILL.md)**: flujo paso a paso, puerta de revisión y reglas de seguridad.
-- **[Checklist de descubrimiento](references/repo-discovery.md)**: exploración ordenada por capas y archivos excluidos.
-- **[Plantilla de arquitectura](references/architecture-template.md)**: formato canónico, reglas seguras de Mermaid y ejemplo.
-- **[Destinos y preservación](references/destinations.md)**: soporte para Notion MCP, Markdown local y protección de ADRs manuales.
+- **[`SKILL.md`](SKILL.md)**: step-by-step workflow, review gate and safety rules.
+- **[Discovery checklist](references/repo-discovery.md)**: layer-by-layer exploration and excluded files.
+- **[Architecture template](references/architecture-template.md)**: canonical format, safe Mermaid rules and an example.
+- **[Destinations and preservation](references/destinations.md)**: support for Notion MCP, local Markdown and protection of manual ADRs.

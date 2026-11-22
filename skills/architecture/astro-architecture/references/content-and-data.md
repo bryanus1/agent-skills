@@ -1,8 +1,8 @@
-# 📦 Content Collections, Datos Tipados y `astro:assets`
+# 📦 Content Collections, Typed Data and `astro:assets`
 
-## 1. Datos Tipados para Landing Pages (`src/data/`)
+## 1. Typed Data for Landing Pages (`src/data/`)
 
-Para el copy estructurado de una landing page (navegación, features, precios, FAQs), centraliza el contenido en `src/data/*.ts` con interfaces explícitas:
+For the structured copy of a landing page (navigation, features, pricing, FAQs), centralize the content in `src/data/*.ts` with explicit interfaces:
 
 ```ts
 // src/data/site.ts
@@ -20,13 +20,13 @@ export interface SiteConfig {
 }
 ```
 
-**Ventaja:** Los componentes en `src/components/sections/` se mantienen limpios, reutilizables y fáciles de testear o traducir.
+**Benefit:** the components in `src/components/sections/` stay clean, reusable and easy to test or translate.
 
 ---
 
-## 2. Content Collections con Zod (`src/content.config.ts`)
+## 2. Content Collections with Zod (`src/content.config.ts`)
 
-Cuando el proyecto incluya **blog, casos de éxito, changelog, testimonios extensos o documentación**, usa Content Collections en lugar de archivos sueltos:
+When the project includes a **blog, case studies, changelog, long testimonials or documentation**, use Content Collections instead of loose files:
 
 ```ts
 // src/content.config.ts (Astro 5+)
@@ -50,9 +50,9 @@ export const collections = { blog };
 
 ---
 
-## 3. Optimización de Imágenes con `astro:assets`
+## 3. Image Optimization with `astro:assets`
 
-Usa siempre `<Image />` o `<Picture />` de `astro:assets` para imágenes importadas desde `src/assets/`:
+Always use `<Image />` or `<Picture />` from `astro:assets` for images imported from `src/assets/`:
 
 ```astro
 ---
@@ -62,7 +62,7 @@ import heroImg from '../../assets/hero-dashboard.png';
 
 <Image
   src={heroImg}
-  alt="Panel principal mostrando métricas en tiempo real"
+  alt="Main dashboard showing real-time metrics"
   widths={[480, 800, 1200]}
   sizes="(max-width: 768px) 100vw, 600px"
   loading="eager"
@@ -71,8 +71,8 @@ import heroImg from '../../assets/hero-dashboard.png';
 />
 ```
 
-### Reglas para imágenes
-- **Above-the-fold (Hero):** `loading="eager"` y `fetchpriority="high"`.
-- **Below-the-fold:** `loading="lazy"` (comportamiento por defecto en `<Image />`).
-- **Formato:** Astro convierte automáticamente a `webp`/`avif` en build.
-- **Imágenes decorativas:** Usar `alt=""` y `aria-hidden="true"`.
+### Image rules
+- **Above the fold (Hero):** `loading="eager"` and `fetchpriority="high"`.
+- **Below the fold:** `loading="lazy"` (the default behavior of `<Image />`).
+- **Format:** Astro converts to `webp`/`avif` automatically at build time.
+- **Decorative images:** use `alt=""` and `aria-hidden="true"`.

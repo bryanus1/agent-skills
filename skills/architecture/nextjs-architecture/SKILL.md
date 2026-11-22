@@ -1,8 +1,8 @@
 ---
 name: nextjs-architecture
-version: 1.2.1
+version: 1.3.0
 description: >-
-  Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions con Zod, hooks con TanStack Query, FormDialog, linting con OXC y testing con Vitest + SWC (>= 90%) y Playwright E2E.
+  Screaming Architecture standard for the Next.js App Router. Guides feature-based structure, encapsulated subfolders, Server Actions with Zod, TanStack Query hooks, FormDialog, OXC linting and testing with Vitest + SWC (>= 90%) and Playwright E2E.
 tags: [nextjs, react, screaming-architecture, frontend, app-router, tanstack-query, form-dialog, vitest, playwright, oxc, swc]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
@@ -13,7 +13,9 @@ triggers:
   - nextjs form dialog
   - arquitectura nextjs
   - crear feature nextjs
+  - create a nextjs feature
   - estructurar nextjs
+  - structure a nextjs app
   - nextjs vitest playwright
 requirements:
   tools: [run_command, view_file, replace_file_content, write_to_file]
@@ -22,139 +24,140 @@ requirements:
 
 # ⚡ Next.js Screaming Architecture Standard
 
-## 🎯 Propósito
+## 🎯 Purpose
 
-Estandarizar el diseño, modularización y construcción de aplicaciones en **Next.js (App Router)** siguiendo los principios de **Screaming Architecture** (Feature-Driven / Domain-First). Garantiza código desacoplado, mantenible y predecible mediante encapsulación en subcarpetas, App Router delgado, separación estricta de responsabilidades (UI, hooks, servicios, esquemas y modelos), linting ultrarrápido con **OXC** y estrategia dual de pruebas con **Vitest + SWC** ($\ge 90\%$ unit/integration) y **Playwright** (E2E).
+Standardize the design, modularization and build of **Next.js (App Router)** applications following the principles of **Screaming Architecture** (Feature-Driven / Domain-First). It keeps code decoupled, maintainable and predictable through subfolder encapsulation, a thin App Router, strict separation of concerns (UI, hooks, services, schemas and models), ultra-fast linting with **OXC** and a dual test strategy with **Vitest + SWC** ($\ge 90\%$ unit/integration) and **Playwright** (E2E).
 
-**Stack y Toolchain asumido:** Next.js App Router (SWC), React Server Components por defecto, TanStack Query, Zod, `shadcn/ui`, **OXC** (`oxlint` / `oxfmt`), **Vitest** (`@vitejs/plugin-react-swc` + `@testing-library/react` + `@vitest/coverage-v8`), **Playwright** (`@playwright/test`) y alias `@/*` → `src/*`.
-
----
-
-## ⚡ Cuándo Activar esta Skill
-
-- Al diseñar, crear o refactorizar módulos de negocio dentro de `src/features/<feature-name>/`.
-- Al crear componentes UI compartidos (`src/components/common/`) o específicos de feature.
-- Al conectar pantallas con rutas delgadas del App Router (`src/app/**`).
-- Al implementar flujos de datos: **Server Actions** (`'use server'` con validación Zod en servidor) o **TanStack Query custom hooks**.
-- Al construir modales de creación o edición siguiendo el estándar **FormDialog** (`*-form-dialog`).
-- Al definir esquemas de validación Zod (`*.schema.ts`) o contratos de dominio (`models/*.ts`).
-- Al configurar o ejecutar pruebas con **Vitest + SWC** ($\ge 90\%$), **Playwright E2E** (`e2e/`) y **OXC** (`oxlint`).
-- Al validar convenciones de nombres, sufijos de archivo y prohibición de barrel files contenedores.
-
-> **Monorepo:** si la web vive en un monorepo (`apps/web`), estas reglas aplican dentro de `apps/web/src/`. Para la estructura raíz, los paquetes compartidos, los contratos entre web y API y los límites de dependencias, usa también la skill [`monorepo-architecture`](../monorepo-architecture/SKILL.md). Genera las features con `--target-dir apps/web/src/features --app-dir apps/web/src/app`.
+**Assumed stack and toolchain:** Next.js App Router (SWC), React Server Components by default, TanStack Query, Zod, `shadcn/ui`, **OXC** (`oxlint` / `oxfmt`), **Vitest** (`@vitejs/plugin-react-swc` + `@testing-library/react` + `@vitest/coverage-v8`), **Playwright** (`@playwright/test`) and the `@/*` → `src/*` alias.
 
 ---
 
-## 📋 Flujo de Trabajo Paso a Paso
+## ⚡ When to Trigger This Skill
+
+- When designing, creating or refactoring business modules inside `src/features/<feature-name>/`.
+- When creating shared UI components (`src/components/common/`) or feature-specific ones.
+- When wiring screens to thin App Router routes (`src/app/**`).
+- When implementing data flows: **Server Actions** (`'use server'` with server-side Zod validation) or **custom TanStack Query hooks**.
+- When building create or edit modals following the **FormDialog** standard (`*-form-dialog`).
+- When defining Zod validation schemas (`*.schema.ts`) or domain contracts (`models/*.ts`).
+- When configuring or running tests with **Vitest + SWC** ($\ge 90\%$), **Playwright E2E** (`e2e/`) and **OXC** (`oxlint`).
+- When checking naming conventions, file suffixes and the ban on container barrel files.
+
+> **Monorepo:** if the web app lives in a monorepo (`apps/web`), these rules apply inside `apps/web/src/`. For the root structure, shared packages, web/API contracts and dependency boundaries, also use the [`monorepo-architecture`](../monorepo-architecture/SKILL.md) skill. Generate features with `--target-dir apps/web/src/features --app-dir apps/web/src/app`.
+
+---
+
+## 📋 Step-by-Step Workflow
 
 ```mermaid
 flowchart TD
-    A["1. Identificar Dominio o Feature"] --> B["2. Scaffolding de la Feature\n(scripts/scaffold-feature.mjs)"]
-    B --> C["3. Modelos de Dominio\n(models/*.ts - Archivo Plano)"]
-    C --> D["4. Esquemas Zod & Servicios\n(schemas/* y services/* con safeParse)"]
+    A["1. Identify the Domain or Feature"] --> B["2. Feature Scaffolding\n(scripts/scaffold-feature.mjs)"]
+    B --> C["3. Domain Models\n(models/*.ts - Flat Files)"]
+    C --> D["4. Zod Schemas & Services\n(schemas/* and services/* with safeParse)"]
     D --> E["5. Hooks & Key Factories\n(hooks/use-* - TanStack Query / useTransition)"]
-    E --> F["6. Componentes & Screens\n(components/* y screens/* - RSC por defecto)"]
-    F --> G["7. Conexión en App Router\n(src/app/** - Routing Delgado)"]
-    G --> H["8. Calidad: OXC + Vitest (>= 90%) + Playwright E2E"]
+    E --> F["6. Components & Screens\n(components/* and screens/* - RSC by default)"]
+    F --> G["7. App Router Wiring\n(src/app/** - Thin Routing)"]
+    G --> H["8. Quality: OXC + Vitest (>= 90%) + Playwright E2E"]
 ```
 
-### 1. Modelado de Dominio (`models/`)
-Definir las interfaces, tipos y enums del dominio en archivos planos dentro de `src/features/<feature>/models/<entity>.ts` (o `src/models/` para modelos globales compartidos).
-- **Regla**: Son archivos planos de TypeScript puro. Al contener archivos directamente sin subcarpetas, `models/` incluye su propio `index.ts` para reexportar sus contratos. Sin archivos `.test.ts`.
+### 1. Domain Modeling (`models/`)
+Define the domain's interfaces, types and enums in flat files inside `src/features/<feature>/models/<entity>.ts` (or `src/models/` for shared global models).
+- **Rule**: they are flat, pure TypeScript files. Since it holds files directly with no subfolders, `models/` has its own `index.ts` to re-export its contracts. No `.test.ts` files.
 
-### 2. Esquemas de Validación (`schemas/`)
-Definir validaciones de formularios y contratos en tiempo de ejecución con **Zod**:
-- **Archivos planos**: Se definen directamente dentro de `schemas/<name>.schema.ts` (ej. `create-invoice.schema.ts`).
-- **Sin pruebas unitarias**: Al igual que `models/`, son declaraciones de esquemas puras y no llevan archivos `.test.ts`.
-- **Barrel local**: Al ser una carpeta hoja con archivos directos, `schemas/index.ts` reexporta todos los esquemas de la feature.
-- **Identificador**: Constante en `camelCase` terminada en `Schema` (ej. `createInvoiceSchema`).
+### 2. Validation Schemas (`schemas/`)
+Define form validations and runtime contracts with **Zod**:
+- **Flat files**: defined directly in `schemas/<name>.schema.ts` (e.g. `create-invoice.schema.ts`).
+- **No unit tests**: like `models/`, they are pure schema declarations and have no `.test.ts` files.
+- **Local barrel**: as a leaf folder with direct files, `schemas/index.ts` re-exports all the feature's schemas.
+- **Identifier**: a `camelCase` constant ending in `Schema` (e.g. `createInvoiceSchema`).
 
-### 3. Servicios de Datos (`services/`)
-Implementar toda comunicación con APIs externas o base de datos (los componentes y hooks nunca llaman a `fetch` directamente):
-- Encapsular cada servicio en su propia subcarpeta: `<verb>-<noun>/<verb>-<noun>.service.ts` con su `.service.test.ts` e `index.ts`.
-- Declarar `'use server'` cuando actúe como Server Action de Next.js y **validar obligatoriamente la entrada en el servidor** con `schema.safeParse(input)` antes de tocar API/DB, invocando `revalidatePath` / `revalidateTag` cuando corresponda.
-- Usar `fetch` nativo con políticas de caché explícitas (`cache: 'no-store'` o `next: { revalidate }`).
+### 3. Data Services (`services/`)
+Implement all communication with external APIs or the database (components and hooks never call `fetch` directly):
+- Wrap each service in its own subfolder: `<verb>-<noun>/<verb>-<noun>.service.ts` with its `.service.test.ts` and `index.ts`.
+- Declare `'use server'` when it acts as a Next.js Server Action, and **always validate the input on the server** with `schema.safeParse(input)` before touching the API/DB, calling `revalidatePath` / `revalidateTag` when needed.
+- Use native `fetch` with explicit cache policies (`cache: 'no-store'` or `next: { revalidate }`).
 
-### 4. Orquestación de Estado y Consultas (`hooks/`)
-Aislar la lógica de estado fuera de los componentes de UI:
-- Subcarpeta: `hooks/use-<action>/use-<action>.hook.ts` (un hook por subcarpeta, con `.hook.test.ts` e `index.ts`).
-- Para mutaciones con Server Actions: usar `useTransition` o `useActionState` invocando al servicio de `services/`.
-- Para fetching y caché reactivo en cliente: usar **TanStack Query** (`useQuery` / `useMutation`) delegando el I/O a `services/`. La *Query Key Factory* (`<noun>Keys`) se exporta desde el hook principal de consulta (`hooks/use-<nouns>`) y nunca como archivo suelto en `hooks/`.
+### 4. State and Query Orchestration (`hooks/`)
+Keep state logic out of UI components:
+- Subfolder: `hooks/use-<action>/use-<action>.hook.ts` (one hook per subfolder, with `.hook.test.ts` and `index.ts`).
+- For mutations with Server Actions: use `useTransition` or `useActionState`, calling the service from `services/`.
+- For client-side fetching and reactive caching: use **TanStack Query** (`useQuery` / `useMutation`), delegating I/O to `services/`. The *Query Key Factory* (`<noun>Keys`) is exported from the main query hook (`hooks/use-<nouns>`), never as a loose file in `hooks/`.
 
-### 5. Componentes y Pantallas (`components/`, `screens/`)
-Construir los bloques de interfaz visual:
-- **Server Components por defecto**: Las `screens/` y `components/` son RSC por defecto; añadir `'use client'` únicamente en las hojas interactivas (`*-form-dialog`, controles con hooks o eventos).
-- Seguir el protocolo de 3 niveles: (1) Reutilizar de `src/components/`, (2) Añadir desde `shadcn/ui`, (3) Crear componente custom con `scaffold-component.mjs`.
-- Encapsular en subcarpeta con: implementación, test unitario en **Vitest** adyacente y local barrel `index.ts`.
-- Para modales de formularios: extender el estándar `FormDialog` en subcarpetas `*-form-dialog/` (`--type dialog`). Para bloques de página con encabezado semántico: usar `--type section` (`<section>` + `<h2>`).
-- Documentar todas las interfaces de props y componentes con **TSDoc**.
+### 5. Components and Screens (`components/`, `screens/`)
+Build the visual interface blocks:
+- **Server Components by default**: `screens/` and `components/` are RSC by default; add `'use client'` only to interactive leaves (`*-form-dialog`, controls with hooks or events).
+- Follow the 3-level protocol: (1) reuse from `src/components/`, (2) add from `shadcn/ui`, (3) create a custom component with `scaffold-component.mjs`.
+- Encapsulate in a subfolder with the implementation, an adjacent **Vitest** unit test and a local `index.ts` barrel.
+- For form modals: extend the `FormDialog` standard in `*-form-dialog/` subfolders (`--type dialog`). For page blocks with a semantic heading: use `--type section` (`<section>` + `<h2>`).
+- Document every props interface and component with **TSDoc**.
 
-### 6. Integración en App Router (`src/app/`)
-- Las páginas (`page.tsx`) y layouts (`layout.tsx`) deben ser ultra delgadas: importar y renderizar la screen correspondiente (`import { FeatureHome } from '@/features/<feature>/screens/<feature>-home'`), exportar `Metadata` y armar la composición visual. En Next.js 15+, `params` y `searchParams` se tipan como `Promise<...>`.
-- **Cero Pruebas Unitarias en `src/app/`**: No se colocan archivos `.test.tsx` dentro de `src/app/`. Si un layout o página requiere lógica (transformación de parámetros, verificación de acceso o ensamblado dinámico de metadatos), esta se extrae obligatoriamente a `src/features/<feature-name>/utils/` (reexportada en `utils/index.ts`) con sus pruebas en Vitest. Las rutas de `src/app/` se verifican E2E con **Playwright** en `e2e/`.
+### 6. App Router Integration (`src/app/`)
+- Pages (`page.tsx`) and layouts (`layout.tsx`) must be ultra-thin: import and render the matching screen (`import { FeatureHome } from '@/features/<feature>/screens/<feature>-home'`), export `Metadata` and assemble the visual composition. In Next.js 15+, `params` and `searchParams` are typed as `Promise<...>`.
+- **Zero Unit Tests in `src/app/`**: no `.test.tsx` files go inside `src/app/`. If a layout or page needs logic (parameter transformation, access checks or dynamic metadata assembly), it must be extracted to `src/features/<feature-name>/utils/` (re-exported in `utils/index.ts`) with its Vitest tests. The `src/app/` routes are verified E2E with **Playwright** in `e2e/`.
 
 ---
 
-## ⚠️ Reglas Críticas
+## ⚠️ Critical Rules
 
-1. **Regla de la Hoja Terminal para Barrels (*Leaf-Folder Barrel Policy*)**:
-   - Una carpeta **SOLO** debe tener `index.ts` si contiene **directamente archivos de implementación** (carpeta hoja).
-   - Si una carpeta agrupa **subcarpetas** (como la raíz de la feature `src/features/<feature>/`, agrupadores como `components/`, `hooks/`, `screens/`, `services/`, `sections/`), **NUNCA** lleva `index.ts` ni archivos sueltos.
-   - Únicamente las subcarpetas finales (`components/invoice-card/`, `hooks/use-invoices/`, `services/create-invoice/`) o carpetas con archivos directos (`models/`, `schemas/`, `utils/`) tienen `index.ts`.
-2. **Importaciones Directas con Alias `@/*` a la Carpeta con `index.ts`**:
-   - Importar siempre con alias `@/*` apuntando a la carpeta hoja que posee el `index.ts` (y ordenar imports tras formatear con [`ts-import-organizer`](../../tooling/ts-import-organizer/SKILL.md)):
+1. **Reply in the user's language**, even though this skill is written in English.
+2. **Leaf-Folder Barrel Policy**:
+   - A folder has an `index.ts` **ONLY** if it **directly contains implementation files** (a leaf folder).
+   - If a folder groups **subfolders** (such as the feature root `src/features/<feature>/`, or groupers like `components/`, `hooks/`, `screens/`, `services/`, `sections/`), it **NEVER** has an `index.ts` or loose files.
+   - Only the final subfolders (`components/invoice-card/`, `hooks/use-invoices/`, `services/create-invoice/`) or folders with direct files (`models/`, `schemas/`, `utils/`) have an `index.ts`.
+3. **Direct `@/*` Imports to the Folder That Has the `index.ts`**:
+   - Always import with the `@/*` alias pointing to the leaf folder that owns the `index.ts` (and sort imports after formatting with [`ts-import-organizer`](../../tooling/ts-import-organizer/SKILL.md)):
      ```typescript
-     // ✅ CORRECTO: Importación desde la carpeta hoja que posee index.ts
+     // ✅ CORRECT: import from the leaf folder that owns index.ts
      import { InvoiceCard } from '@/features/pets/components/invoice-card';
      import { usePetSearch } from '@/features/pets/hooks/use-pet-search';
      import { IPet } from '@/features/pets/models';
      import { createPetSchema } from '@/features/pets/schemas';
      import { parsePetFilters } from '@/features/pets/utils';
 
-     // ❌ PROHIBIDO: Importar desde carpetas contenedoras padre o saltar el barrel de utils/models/schemas
+     // ❌ FORBIDDEN: importing from parent container folders or skipping the utils/models/schemas barrel
      import { usePetSearch, IPet } from '@/features/pets';
      import { InvoiceCard } from '@/features/pets/components';
      import { parsePetFilters } from '@/features/pets/utils/parse-pet-filters';
      ```
-3. **Encapsulación por Subcarpeta**:
-   - Todo componente, screen, hook, servicio o contexto debe tener su subcarpeta en `kebab-case` con su implementación, test unitario en Vitest e `index.ts` local.
-4. **Toolchain y Cobertura Dual (Vitest + SWC $\ge 90\%$ & Playwright E2E)**:
-   - **Vitest + SWC**: Todo componente, screen, hook, servicio o función en `utils/` debe contar con su `.test.tsx` o `.test.ts` adyacente usando imports explícitos de `'vitest'` (`describe`, `it`, `expect`, `vi.fn()`). Prohibido usar globales de Jest (`jest.fn()`).
-   - **Exclusiones Explícitas de Pruebas Unitarias**: `models/`, `schemas/`, `src/config/`, `src/app/` y todos los `index.ts`.
-   - **Playwright E2E**: Los flujos de rutas en `src/app/**` y diálogos modales críticos se prueban en `e2e/<feature>.spec.ts`.
-   - **OXC (`oxlint`)**: Validar ausencia de ciclos (`import/no-cycle`), reglas de hooks y tipado estricto sin `any`.
+4. **Subfolder Encapsulation**:
+   - Every component, screen, hook, service or context must have its own `kebab-case` subfolder with its implementation, a Vitest unit test and a local `index.ts`.
+5. **Toolchain and Dual Coverage (Vitest + SWC $\ge 90\%$ & Playwright E2E)**:
+   - **Vitest + SWC**: every component, screen, hook, service or function in `utils/` must have an adjacent `.test.tsx` or `.test.ts` using explicit imports from `'vitest'` (`describe`, `it`, `expect`, `vi.fn()`). Jest globals (`jest.fn()`) are forbidden.
+   - **Explicit Unit Test Exclusions**: `models/`, `schemas/`, `src/config/`, `src/app/` and every `index.ts`.
+   - **Playwright E2E**: route flows in `src/app/**` and critical modal dialogs are tested in `e2e/<feature>.spec.ts`.
+   - **OXC (`oxlint`)**: check for no cycles (`import/no-cycle`), hook rules and strict typing without `any`.
 
 ---
 
-## 📚 Referencias
+## 📚 References
 
-- [Guía Detallada de Screaming Architecture](references/screaming-architecture-guide.md): Estructura exhaustiva de directorios, frontera RSC vs Client, capas, sufijos y convenciones de nombres.
-- [Patrones de Componentes y FormDialog](references/component-and-dialog-patterns.md): Protocolo de descubrimiento en 3 niveles, contenedor `FormDialog` conectado con Zod y TSDoc.
-- [Patrones de Datos: Server Actions & TanStack Query](references/tanstack-and-actions-pattern.md): Validación Zod en servidor, servicios dedicados y key factories en hooks hoja.
-- [Testing y Toolchain: Vitest, Playwright, OXC y SWC](references/testing-and-toolchain.md): Configuración de `vitest.config.ts` con SWC y cobertura $\ge 90\%$, Playwright E2E y `.oxlintrc.json`.
+- [Detailed Screaming Architecture Guide](references/screaming-architecture-guide.md): the full directory structure, the RSC vs Client boundary, layers, suffixes and naming conventions.
+- [Component and FormDialog Patterns](references/component-and-dialog-patterns.md): the 3-level discovery protocol, the `FormDialog` container wired to Zod, and TSDoc.
+- [Data Patterns: Server Actions & TanStack Query](references/tanstack-and-actions-pattern.md): server-side Zod validation, dedicated services and key factories in leaf hooks.
+- [Testing and Toolchain: Vitest, Playwright, OXC and SWC](references/testing-and-toolchain.md): `vitest.config.ts` setup with SWC and $\ge 90\%$ coverage, Playwright E2E and `.oxlintrc.json`.
 
 ---
 
 ## 🛠️ Scripts
 
-> **Rutas:** `<skill-dir>` es el directorio que contiene este `SKILL.md` (p. ej. `.claude/skills/<name>/` o `.agents/skills/<name>/`). Ejecuta los scripts desde la raíz del proyecto del usuario, no desde `<skill-dir>`.
+> **Paths:** `<skill-dir>` is the directory that holds this `SKILL.md` (e.g. `.claude/skills/<name>/` or `.agents/skills/<name>/`). Run the scripts from the user's project root, not from `<skill-dir>`.
 
-> **Seguridad:** los scripts abortan sin escribir nada si alguno de los archivos que generan ya existe. Ejecuta primero con `--dry-run` para ver qué se va a crear. Usa `--force` (sobrescribe esos archivos) solo con confirmación explícita del usuario.
+> **Safety:** the scripts abort without writing anything if any of the files they generate already exists. Run them with `--dry-run` first to see what will be created. Use `--force` (which overwrites those files) only with the user's explicit confirmation.
 
-La skill incluye scripts de Node.js ESM (sin dependencias externas) para acelerar el andamiaje del proyecto:
+The skill includes Node.js ESM scripts (no external dependencies) to speed up project scaffolding:
 
-### 1. Generar una Feature Completa
+### 1. Generate a Full Feature
 ```bash
 node <skill-dir>/scripts/scaffold-feature.mjs <feature-name> [--target-dir <path>] [--app-dir <path>] [--with-starter] [--with-route] [--dry-run] [--force]
 ```
-*Ejemplo:* `node <skill-dir>/scripts/scaffold-feature.mjs billing --with-starter --with-route`
+*Example:* `node <skill-dir>/scripts/scaffold-feature.mjs billing --with-starter --with-route`
 
-Crea las 7 subcarpetas de la feature (`components`, `hooks`, `models`, `schemas`, `screens`, `services`, `utils`). `--with-starter` genera además un modelo plano inicial (`models/<feature>.ts` + barrel) y una screen encapsulada (`screens/<feature>-home/`) con su test en Vitest. `--with-route` (requiere `--with-starter`) añade la ruta delgada `src/app/<feature>/page.tsx` con `Metadata` y renderizado de la screen.
+Creates the feature's 7 subfolders (`components`, `hooks`, `models`, `schemas`, `screens`, `services`, `utils`). `--with-starter` also generates an initial flat model (`models/<feature>.ts` + barrel) and an encapsulated screen (`screens/<feature>-home/`) with its Vitest test. `--with-route` (requires `--with-starter`) adds the thin route `src/app/<feature>/page.tsx` with `Metadata` that renders the screen.
 
-### 2. Generar un Componente Encapsulado
+### 2. Generate an Encapsulated Component
 ```bash
 node <skill-dir>/scripts/scaffold-component.mjs <component-name> [--target-dir <path>] [--type default|dialog|section] [--dry-run] [--force]
 ```
-*Ejemplo:* `node <skill-dir>/scripts/scaffold-component.mjs invoice-form-dialog --target-dir src/features/billing/components --type dialog`
+*Example:* `node <skill-dir>/scripts/scaffold-component.mjs invoice-form-dialog --target-dir src/features/billing/components --type dialog`
 
-Genera la subcarpeta `<component-name>/` con el componente (`default`, modal `'use client'` con `FormDialog` para `dialog`, o `<section>` semántico con `<h2>` para `section`), su test unitario en Vitest (`vi.fn()`) y su `index.ts`.
+Generates the `<component-name>/` subfolder with the component (`default`; a `'use client'` modal with `FormDialog` for `dialog`; or a semantic `<section>` with an `<h2>` for `section`), its Vitest unit test (`vi.fn()`) and its `index.ts`.

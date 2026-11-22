@@ -1,8 +1,8 @@
 ---
 name: monorepo-architecture
-version: 2.0.0
+version: 2.1.0
 description: >-
-  Estándar de monorepo con pnpm workspaces, Turborepo y OXC para apps web (Next.js), API (NestJS), mobile (Expo), landing (Astro), workers y servicios políglotas: paquetes compilados, design tokens, contratos Zod/OpenAPI, límites por plataforma y scaffolding multi-app.
+  Monorepo standard with pnpm workspaces, Turborepo and OXC for web (Next.js), API (NestJS), mobile (Expo), landing (Astro), workers and polyglot services: compiled packages, design tokens, Zod/OpenAPI contracts, per-platform boundaries and multi-app scaffolding.
 tags: [monorepo, turborepo, pnpm, workspaces, nextjs, nestjs, expo, react-native, astro, oxc, architecture, fullstack]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
@@ -10,7 +10,9 @@ triggers:
   - turborepo
   - pnpm workspaces
   - crear monorepo
+  - create a monorepo
   - estructurar monorepo
+  - structure a monorepo
   - paquete compartido
   - shared package
   - feature full-stack
@@ -18,6 +20,7 @@ triggers:
   - module boundaries
   - monorepo mobile web api landing
   - agregar app al monorepo
+  - add an app to the monorepo
 requirements:
   tools: [run_command, view_file, replace_file_content, write_to_file]
   bins: [node, pnpm]
@@ -26,150 +29,151 @@ requirements:
 
 # 🗂️ Monorepo Architecture Standard (pnpm + Turborepo + Multi-App)
 
-## 🎯 Propósito
+## 🎯 Purpose
 
-Estandarizar monorepos con **pnpm workspaces**, **Turborepo** y **OXC** capaces de alojar cualquier combinación de aplicaciones y servicios: **Web (`Next.js`)**, **API (`NestJS`)**, **Mobile (`Expo / React Native`)**, **Landing (`Astro`)**, SPAs/Docs, workers Node.js y servicios políglotas (`services/*`).
+Standardize monorepos with **pnpm workspaces**, **Turborepo** and **OXC** that can host any combination of applications and services: **Web (`Next.js`)**, **API (`NestJS`)**, **Mobile (`Expo / React Native`)**, **Landing (`Astro`)**, SPAs/Docs, Node.js workers and polyglot services (`services/*`).
 
-Define la estructura raíz (`apps/`, `packages/`, `services/`), el registro extensible de arquetipos (`APP_PRESETS`), el pipeline de tareas, cómo se compilan y consumen los paquetes internos por plataforma, cómo se comparten contratos y design tokens, y cómo verificar límites entre workspaces y plataformas.
+It defines the root structure (`apps/`, `packages/`, `services/`), the extensible archetype registry (`APP_PRESETS`), the task pipeline, how internal packages are compiled and consumed per platform, how contracts and design tokens are shared, and how to check boundaries between workspaces and platforms.
 
-Las reglas **internas** de cada app no cambian:
-- `apps/web` sigue [`nextjs-architecture`](../nextjs-architecture/SKILL.md)
-- `apps/api` sigue [`nestjs-architecture`](../nestjs-architecture/SKILL.md)
-- `apps/mobile` sigue [`react-native-architecture`](../react-native-architecture/SKILL.md)
-- `apps/landing` sigue [`astro-architecture`](../astro-architecture/SKILL.md)
+The **internal** rules of each app do not change:
+- `apps/web` follows [`nextjs-architecture`](../nextjs-architecture/SKILL.md)
+- `apps/api` follows [`nestjs-architecture`](../nestjs-architecture/SKILL.md)
+- `apps/mobile` follows [`react-native-architecture`](../react-native-architecture/SKILL.md)
+- `apps/landing` follows [`astro-architecture`](../astro-architecture/SKILL.md)
 
-Esta skill gobierna **la raíz y todo lo que conecta o separa** los workspaces entre sí.
-
----
-
-## ⚡ Cuándo Activar esta Skill
-
-- Al crear un monorepo nuevo (2, 3, 4 o más apps: `web`, `api`, `mobile`, `landing`, `worker`, `spa`, `docs`, `polyglot`).
-- Al añadir una app o servicio nuevo a un monorepo existente (`scaffold-app.mjs`).
-- Al crear un paquete interno compartido (`packages/<name>`): `contracts`, `api-client`, `design-tokens`, `ui-web`, `ui-native`, `lib` o `config`.
-- Al añadir un dominio de punta a punta entre `api`, `web` y `mobile` (`scaffold-fullstack-feature.mjs`).
-- Al decidir qué puede compartir cada plataforma (DOM vs React Native vs Node vs Astro) sin romper Metro, SSR ni bundles.
-- Al revisar imports entre workspaces, dependencias `workspace:*`, reglas de plataforma o errores de `turbo run`.
+This skill governs **the root and everything that connects or separates** the workspaces from each other.
 
 ---
 
-## 📋 Flujo de Trabajo Paso a Paso
+## ⚡ When to Trigger This Skill
+
+- When creating a new monorepo (2, 3, 4 or more apps: `web`, `api`, `mobile`, `landing`, `worker`, `spa`, `docs`, `polyglot`).
+- When adding a new app or service to an existing monorepo (`scaffold-app.mjs`).
+- When creating a shared internal package (`packages/<name>`): `contracts`, `api-client`, `design-tokens`, `ui-web`, `ui-native`, `lib` or `config`.
+- When adding an end-to-end domain across `api`, `web` and `mobile` (`scaffold-fullstack-feature.mjs`).
+- When deciding what each platform can share (DOM vs React Native vs Node vs Astro) without breaking Metro, SSR or bundles.
+- When reviewing imports between workspaces, `workspace:*` dependencies, platform rules or `turbo run` errors.
+
+---
+
+## 📋 Step-by-Step Workflow
 
 ```mermaid
 flowchart TD
-    A["1. ¿Existe el monorepo?\n(pnpm-workspace.yaml)"] -->|No| B["2. Elegir apps, contratos (zod|openapi)\ny linter (oxc|eslint|both)"]
-    B --> C["3. scaffold-monorepo.mjs --dry-run\n→ confirmar → ejecutar"]
-    C --> D["4. Crear / conectar cada app con\nscaffold-app.mjs + CLI del framework"]
-    A -->|Sí| E["5. check-boundaries.mjs\n(estado de partida)"]
+    A["1. Does the monorepo exist?\n(pnpm-workspace.yaml)"] -->|No| B["2. Choose apps, contracts (zod|openapi)\nand linter (oxc|eslint|both)"]
+    B --> C["3. scaffold-monorepo.mjs --dry-run\n→ confirm → run"]
+    C --> D["4. Create / connect each app with\nscaffold-app.mjs + the framework CLI"]
+    A -->|Yes| E["5. check-boundaries.mjs\n(baseline state)"]
     D --> E
-    E --> F{"Tarea"}
-    F -->|"App o servicio nuevo"| G["scaffold-app.mjs <name> --type <preset>"]
-    F -->|"Dominio nuevo"| H["scaffold-fullstack-feature.mjs --targets ..."]
-    F -->|"Código / tokens compartidos"| I["scaffold-package.mjs --kind <kind>"]
-    G --> J["6. Aplicar skill hermana dentro de cada app"]
+    E --> F{"Task"}
+    F -->|"New app or service"| G["scaffold-app.mjs <name> --type <preset>"]
+    F -->|"New domain"| H["scaffold-fullstack-feature.mjs --targets ..."]
+    F -->|"Shared code / tokens"| I["scaffold-package.mjs --kind <kind>"]
+    G --> J["6. Apply the sibling skill inside each app"]
     H --> J
     I --> J
     J --> K["7. pnpm install && pnpm turbo run lint typecheck test build\n+ pnpm check:boundaries"]
 ```
 
-1. **Detecta el contexto**: si existe `pnpm-workspace.yaml`, lee `package.json` raíz, `turbo.json` y los `package.json` de `apps/*`, `services/*` y `packages/*`. Ejecuta `node <skill-dir>/scripts/check-boundaries.mjs` para conocer las violaciones previas antes de tocar código.
-2. **Define topología y contratos**: determina qué apps tendrá el repo (`--apps web,api,mobile,landing,...`) y elige el modo de contratos con la matriz de abajo. Si no es evidente, pregunta al usuario.
-3. **Monorepo nuevo**: ejecuta `scaffold-monorepo.mjs --scope <scope> --contracts <modo> --apps <lista> --dry-run`, muestra los archivos a generar y ejecútalo sin `--dry-run` tras confirmar.
-4. **Conectar o añadir apps**: para cada app, usa `scaffold-app.mjs <name> --type <preset>` (con `--dry-run` primero). Ejecuta el CLI oficial del framework (`create-next-app`, `nest new`, `create-expo-app`, `create astro`, `create vite`) **solo tras confirmación** del usuario, porque descarga paquetes. Verifica que:
-   - su `tsconfig.json` extienda `@<scope>/tsconfig/<preset>.json`;
-   - declare `"monorepo": { "layer": "app", "type": "<preset>", "platform": "<platform>" }` en `package.json`;
-   - declare dependencias `workspace:*` y mantenga su alias local `@/*` hacia su propio `src/`.
-5. **Dominio nuevo multi-app**: `scaffold-fullstack-feature.mjs <noun> [--targets api,web,mobile] --dry-run`, y luego sin `--dry-run`. Genera el contrato (modo Zod) y dispara el scaffold correspondiente en `apps/api`, `apps/web` y/o `apps/mobile`. La landing (`apps/landing`) no usa features CRUD por dominio; consume `@<scope>/design-tokens`, `@<scope>/contracts` o `@<scope>/api-client` según necesite.
-6. **Código o tokens compartidos**: `scaffold-package.mjs <name> --kind <kind>`. Confirma antes que tiene al menos **dos consumidores compatibles en plataforma**; nunca mezcles UI DOM (`ui-web`) con React Native (`ui-native`).
-7. **Verifica**: `pnpm install`, `pnpm turbo run lint typecheck test build` (y `format:check` con OXC) y `pnpm check:boundaries`. No des la tarea por terminada con violaciones nuevas.
+1. **Detect the context**: if `pnpm-workspace.yaml` exists, read the root `package.json`, `turbo.json` and the `package.json` files of `apps/*`, `services/*` and `packages/*`. Run `node <skill-dir>/scripts/check-boundaries.mjs` to learn the existing violations before touching code.
+2. **Define topology and contracts**: determine which apps the repo will have (`--apps web,api,mobile,landing,...`) and pick the contracts mode with the matrix below. If it is not obvious, ask the user.
+3. **New monorepo**: run `scaffold-monorepo.mjs --scope <scope> --contracts <mode> --apps <list> --dry-run`, show the files to generate and run it without `--dry-run` after confirmation.
+4. **Connect or add apps**: for each app, use `scaffold-app.mjs <name> --type <preset>` (with `--dry-run` first). Run the framework's official CLI (`create-next-app`, `nest new`, `create-expo-app`, `create astro`, `create vite`) **only after the user confirms**, because it downloads packages. Check that:
+   - its `tsconfig.json` extends `@<scope>/tsconfig/<preset>.json`;
+   - it declares `"monorepo": { "layer": "app", "type": "<preset>", "platform": "<platform>" }` in `package.json`;
+   - it declares `workspace:*` dependencies and keeps its local `@/*` alias pointing to its own `src/`.
+5. **New multi-app domain**: `scaffold-fullstack-feature.mjs <noun> [--targets api,web,mobile] --dry-run`, then without `--dry-run`. It generates the contract (Zod mode) and triggers the matching scaffold in `apps/api`, `apps/web` and/or `apps/mobile`. The landing (`apps/landing`) does not use per-domain CRUD features; it consumes `@<scope>/design-tokens`, `@<scope>/contracts` or `@<scope>/api-client` as needed.
+6. **Shared code or tokens**: `scaffold-package.mjs <name> --kind <kind>`. First confirm it has at least **two platform-compatible consumers**; never mix DOM UI (`ui-web`) with React Native (`ui-native`).
+7. **Verify**: `pnpm install`, `pnpm turbo run lint typecheck test build` (and `format:check` with OXC) and `pnpm check:boundaries`. Do not call the task done with new violations.
 
-### Matriz de Contratos: ¿Zod u OpenAPI?
+### Contracts Matrix: Zod or OpenAPI?
 
-| Situación | Modo | Resultado |
+| Situation | Mode | Result |
 | :--- | :--- | :--- |
-| Mismo equipo, proyecto nuevo, consumidores TypeScript (`web` / `mobile` / `worker`) que comparten validación de formularios | **`zod`** | `packages/contracts/src/<nouns>/<noun>.schema.ts` (universal, sin deps de framework). Usado por formularios Web/Mobile/Landing y DTOs de NestJS (`createZodDto`) |
-| La API la consumen partners externos, servicios políglotas (`services/*`), Swagger es la fuente de verdad o la API usa `class-validator` | **`openapi`** | `packages/api-client` con tipos generados por `openapi-typescript` desde `/api-json` y `createApiClient(baseUrl, { getHeaders })` reutilizable en Web, Astro y Mobile (`SecureStore`) |
+| Same team, new project, TypeScript consumers (`web` / `mobile` / `worker`) that share form validation | **`zod`** | `packages/contracts/src/<nouns>/<noun>.schema.ts` (universal, no framework deps). Used by Web/Mobile/Landing forms and NestJS DTOs (`createZodDto`) |
+| The API is consumed by external partners or polyglot services (`services/*`), Swagger is the source of truth, or the API uses `class-validator` | **`openapi`** | `packages/api-client` with types generated by `openapi-typescript` from `/api-json` and a reusable `createApiClient(baseUrl, { getHeaders })` for Web, Astro and Mobile (`SecureStore`) |
 
-> Ambos modos pueden convivir si hay formularios Zod internos y además clientes externos OpenAPI. Ver [shared-packages-and-contracts.md](references/shared-packages-and-contracts.md).
+> Both modes can coexist if you have internal Zod forms plus external OpenAPI clients. See [shared-packages-and-contracts.md](references/shared-packages-and-contracts.md).
 
-### Arquetipos de Repositorio Soportados (`APP_PRESETS`)
+### Supported Repository Archetypes (`APP_PRESETS`)
 
-| Preset (`--type`) | Stack / Skill asociada | Plataforma | Caso de uso |
+| Preset (`--type`) | Stack / Associated skill | Platform | Use case |
 | :--- | :--- | :--- | :--- |
-| `web` | Next.js App Router ([`nextjs-architecture`](../nextjs-architecture/SKILL.md)) | `web` | App principal, dashboard SaaS, portal SSR/RSC |
-| `api` | NestJS Modular Monolith ([`nestjs-architecture`](../nestjs-architecture/SKILL.md)) | `node` | Backend REST/GraphQL, reglas de negocio y DB |
-| `mobile` | React Native + Expo Router ([`react-native-architecture`](../react-native-architecture/SKILL.md)) | `native` | App móvil iOS/Android con Metro configurado |
-| `landing` | Astro ([`astro-architecture`](../astro-architecture/SKILL.md)) | `astro` | Marketing site, landing Zero-JS, blog/SEO |
-| `spa` | Vite + React SPA | `web` | Backoffice o admin sin SSR |
-| `docs` | Astro Starlight / Docs | `astro` | Documentación técnica de producto/API |
-| `worker` | Node.js + TypeScript | `node` | Colas, cron jobs, CLIs, procesadores asíncronos |
-| `polyglot` | Python / Go / Rust (`services/*`) | `node` | Microservicios ML/IA/alta concurrencia vía shim + OpenAPI |
+| `web` | Next.js App Router ([`nextjs-architecture`](../nextjs-architecture/SKILL.md)) | `web` | Main app, SaaS dashboard, SSR/RSC portal |
+| `api` | NestJS Modular Monolith ([`nestjs-architecture`](../nestjs-architecture/SKILL.md)) | `node` | REST/GraphQL backend, business rules and DB |
+| `mobile` | React Native + Expo Router ([`react-native-architecture`](../react-native-architecture/SKILL.md)) | `native` | iOS/Android mobile app with Metro configured |
+| `landing` | Astro ([`astro-architecture`](../astro-architecture/SKILL.md)) | `astro` | Marketing site, Zero-JS landing, blog/SEO |
+| `spa` | Vite + React SPA | `web` | Backoffice or admin without SSR |
+| `docs` | Astro Starlight / Docs | `astro` | Product/API technical documentation |
+| `worker` | Node.js + TypeScript | `node` | Queues, cron jobs, CLIs, async processors |
+| `polyglot` | Python / Go / Rust (`services/*`) | `node` | ML/AI/high-concurrency microservices via a shim + OpenAPI |
 
-Cómo registrar nuevos stacks: [monorepo-structure-guide.md](references/monorepo-structure-guide.md#6-extender-con-nuevos-tipos-de-repo).
-
----
-
-## ⚠️ Reglas Críticas
-
-1. **Las apps y servicios son hojas**: ningún workspace importa una app ni un servicio (`apps/*`, `services/*`). Las apps se comunican **solo por HTTP / colas / OpenAPI**, nunca importando código fuente entre sí.
-2. **Los paquetes nunca importan de `apps/` ni `services/`**, y no forman ciclos entre sí.
-3. **Aislamiento estricto por plataforma (`platform-mismatch`)**:
-   - `universal` (`contracts`, `api-client`, `design-tokens`, `lib`): solo código TypeScript agnóstico; **prohibido** importar `react`, `react-dom`, `react-native`, `next`, `astro` o `@nestjs/*`.
-   - `native` (`apps/mobile`, `ui-native`): **prohibido** importar paquetes `web` (`ui-web`, `react-dom`).
-   - `node` (`apps/api`, `worker`): **prohibido** importar paquetes `web`, `astro` o `native`.
-   - `web` (`apps/web`, `spa`, `ui-web`) y `astro` (`apps/landing`, `docs`): **prohibido** importar paquetes `native` o `node` de servidor/ORM.
-4. **Imports por nombre de paquete y solo vía `exports`**: `import { createInvoiceSchema } from '@acme/contracts/invoices'`. Prohibido salir del workspace con rutas relativas (`../../packages/...`) o hacer imports profundos a `src/` o `dist/`.
-5. **Dependencias internas declaradas** con `"@<scope>/<pkg>": "workspace:*"` en el `package.json` de cada consumidor.
-6. **Paquetes compilados a `dist/`**: todo paquete compilable compila con `tsc` a `dist/`, expone `exports` apuntando a `dist/` y ordena builds con `dependsOn: ["^build"]` en `turbo.json`. En Expo (`mobile`), mantén `metro.config.js` con `watchFolders` y `unstable_enablePackageExports = true`.
-7. **Política de barrels de hoja terminal**: `packages/contracts/src/` agrupa carpetas por dominio y **no** lleva `index.ts`; cada `src/<nouns>/` sí, y se expone como `"./<nouns>"` en `exports`.
-8. **Acciones con efectos externos requieren confirmación**: `pnpm install`, CLIs de frameworks (`create-next-app`, `nest new`, `create-expo-app`, `create astro`, `create vite`), `pnpm add`, o regenerar `api-client` contra una API viva. Usa `--dry-run` primero en todos los scaffolds.
-9. **Nunca `--force` sobre un repo existente sin revisar el diff**: en repos existentes, migra paso a paso siguiendo [monorepo-structure-guide.md](references/monorepo-structure-guide.md).
+How to register new stacks: [monorepo-structure-guide.md](references/monorepo-structure-guide.md#6-extending-with-new-repo-types).
 
 ---
 
-## 🛠️ Scripts y Herramientas Auxiliares
+## ⚠️ Critical Rules
 
-> **Rutas:** `<skill-dir>` es el directorio que contiene este `SKILL.md` (p. ej. `.claude/skills/<name>/` o `.agents/skills/<name>/`). Ejecuta los scripts desde la raíz del monorepo del usuario, no desde `<skill-dir>`.
+1. **Reply in the user's language**, even though this skill is written in English.
+2. **Apps and services are leaves**: no workspace imports an app or a service (`apps/*`, `services/*`). Apps communicate **only over HTTP / queues / OpenAPI**, never by importing each other's source code.
+3. **Packages never import from `apps/` or `services/`**, and they do not form cycles among themselves.
+4. **Strict per-platform isolation (`platform-mismatch`)**:
+   - `universal` (`contracts`, `api-client`, `design-tokens`, `lib`): only framework-agnostic TypeScript; **forbidden** to import `react`, `react-dom`, `react-native`, `next`, `astro` or `@nestjs/*`.
+   - `native` (`apps/mobile`, `ui-native`): **forbidden** to import `web` packages (`ui-web`, `react-dom`).
+   - `node` (`apps/api`, `worker`): **forbidden** to import `web`, `astro` or `native` packages.
+   - `web` (`apps/web`, `spa`, `ui-web`) and `astro` (`apps/landing`, `docs`): **forbidden** to import `native` or server/ORM `node` packages.
+5. **Imports by package name and only through `exports`**: `import { createInvoiceSchema } from '@acme/contracts/invoices'`. It is forbidden to leave the workspace with relative paths (`../../packages/...`) or to deep-import into `src/` or `dist/`.
+6. **Internal dependencies declared** as `"@<scope>/<pkg>": "workspace:*"` in each consumer's `package.json`.
+7. **Packages compiled to `dist/`**: every compilable package compiles with `tsc` to `dist/`, exposes `exports` pointing to `dist/` and orders builds with `dependsOn: ["^build"]` in `turbo.json`. In Expo (`mobile`), keep `metro.config.js` with `watchFolders` and `unstable_enablePackageExports = true`.
+8. **Leaf-folder barrel policy**: `packages/contracts/src/` groups folders by domain and has **no** `index.ts`; each `src/<nouns>/` does, and is exposed as `"./<nouns>"` in `exports`.
+9. **Actions with external effects require confirmation**: `pnpm install`, framework CLIs (`create-next-app`, `nest new`, `create-expo-app`, `create astro`, `create vite`), `pnpm add`, or regenerating `api-client` against a live API. Use `--dry-run` first in every scaffold.
+10. **Never `--force` on an existing repo without reviewing the diff**: in existing repos, migrate step by step following [monorepo-structure-guide.md](references/monorepo-structure-guide.md).
 
-> **Seguridad:** los scaffolds abortan sin escribir nada si alguno de los archivos que generan ya existe. Ejecuta primero con `--dry-run`. Usa `--force` solo con confirmación explícita del usuario.
+---
 
-### 1. Raíz del monorepo
+## 🛠️ Helper Scripts and Tools
+
+> **Paths:** `<skill-dir>` is the directory that holds this `SKILL.md` (e.g. `.claude/skills/<name>/` or `.agents/skills/<name>/`). Run the scripts from the root of the user's monorepo, not from `<skill-dir>`.
+
+> **Safety:** the scaffolds abort without writing anything if any of the files they generate already exists. Run them with `--dry-run` first. Use `--force` only with the user's explicit confirmation.
+
+### 1. Monorepo root
 ```bash
 node <skill-dir>/scripts/scaffold-monorepo.mjs --scope <scope> --contracts <zod|openapi> [--apps web,api,mobile,landing] [--linter oxc|eslint|both] [--pnpm-version <x.y.z>] [--dry-run] [--force]
 ```
-Genera raíz (`package.json`, `pnpm-workspace.yaml`, `turbo.json`, `.npmrc`, `.gitignore`), `packages/tsconfig` (8 presets), `packages/oxc-config` y/o `packages/eslint-config`, paquete de contratos y `scripts/check-boundaries.mjs`.
+Generates the root (`package.json`, `pnpm-workspace.yaml`, `turbo.json`, `.npmrc`, `.gitignore`), `packages/tsconfig` (8 presets), `packages/oxc-config` and/or `packages/eslint-config`, the contracts package and `scripts/check-boundaries.mjs`.
 
-### 2. Añadir o conectar una app / servicio
+### 2. Add or connect an app / service
 ```bash
 node <skill-dir>/scripts/scaffold-app.mjs <name> --type <web|api|mobile|landing|spa|docs|worker|polyglot> [--dir <path>] [--scope <scope>] [--linter oxc|eslint|both] [--dry-run] [--force]
 ```
-Genera `package.json` (`monorepo.platform`, scripts y `workspace:*`), `tsconfig.json`, config de OXC/ESLint, `metro.config.js` en `mobile`, starter en `worker` o shim Turborepo en `services/<name>` para `polyglot`.
+Generates `package.json` (`monorepo.platform`, scripts and `workspace:*`), `tsconfig.json`, the OXC/ESLint config, `metro.config.js` in `mobile`, a starter in `worker`, or a Turborepo shim in `services/<name>` for `polyglot`.
 
-### 3. Paquete interno compartido
+### 3. Shared internal package
 ```bash
 node <skill-dir>/scripts/scaffold-package.mjs <name> [--kind lib|contracts|api-client|design-tokens|ui-web|ui-native|config] [--linter oxc|eslint|both] [--scope <scope>] [--dry-run] [--force]
 ```
 
-### 4. Feature full-stack / cross-platform
+### 4. Full-stack / cross-platform feature
 ```bash
 node <skill-dir>/scripts/scaffold-fullstack-feature.mjs <noun-singular> [--targets api,web,mobile] [--contracts zod|openapi] [--plural <name>] [--api-dir apps/api] [--web-dir apps/web] [--mobile-dir apps/mobile] [--dry-run] [--force]
 ```
-- Orquesta `nestjs-architecture`, `nextjs-architecture` y `react-native-architecture` (según `--targets` o los directorios detectados).
-- Ejecuta `--dry-run` en todas las partes antes de escribir: si falla una, no escribe nada.
+- Orchestrates `nestjs-architecture`, `nextjs-architecture` and `react-native-architecture` (according to `--targets` or the detected directories).
+- Runs `--dry-run` on every part before writing: if one fails, nothing is written.
 
-### 5. Validador de límites y plataformas
+### 5. Boundary and platform validator
 ```bash
 node <skill-dir>/scripts/check-boundaries.mjs [--root .] [--apps-dir apps,services] [--json]
 ```
-Detecta (en `.ts`, `.tsx`, `.js`, `.mjs`, `.cjs` y frontmatter/scripts de `.astro`) con `archivo:línea` y exit 1:
-- `app-import`, `package-imports-app`, `relative-escape`, `undeclared`, `deep-import`, `cycle` y `platform-mismatch`.
+Detects (in `.ts`, `.tsx`, `.js`, `.mjs`, `.cjs` and the frontmatter/scripts of `.astro`) with `file:line` and exit 1:
+- `app-import`, `package-imports-app`, `relative-escape`, `undeclared`, `deep-import`, `cycle` and `platform-mismatch`.
 
 ---
 
-## 📚 Referencias Adicionales
+## 📚 Additional References
 
-- [Guía de Estructura del Monorepo](references/monorepo-structure-guide.md): árbol `web + api + mobile + landing`, presets y extensión a nuevos stacks/políglotas.
-- [Turborepo y pnpm Workspaces](references/turborepo-and-pnpm.md): Metro + pnpm para Expo, Astro, `turbo.json`, caché, filtros y variables de entorno.
-- [Paquetes Compartidos y Contratos](references/shared-packages-and-contracts.md): compilación, ESM/CJS, `design-tokens`, `ui-web` vs `ui-native`, Zod y OpenAPI cross-platform.
-- [Límites y Dependencias](references/boundaries-and-dependencies.md): reglas del validador (incluyendo `platform-mismatch` y `.astro`) y CI.
-- [Ejemplos de Flujos](examples/workflows.md): monorepo 4-apps, añadir mobile/worker/políglota y feature cross-platform.
+- [Monorepo Structure Guide](references/monorepo-structure-guide.md): the `web + api + mobile + landing` tree, presets and extending to new stacks/polyglot services.
+- [Turborepo and pnpm Workspaces](references/turborepo-and-pnpm.md): Metro + pnpm for Expo, Astro, `turbo.json`, caching, filters and environment variables.
+- [Shared Packages and Contracts](references/shared-packages-and-contracts.md): compilation, ESM/CJS, `design-tokens`, `ui-web` vs `ui-native`, cross-platform Zod and OpenAPI.
+- [Boundaries and Dependencies](references/boundaries-and-dependencies.md): validator rules (including `platform-mismatch` and `.astro`) and CI.
+- [Workflow Examples](examples/workflows.md): a 4-app monorepo, adding mobile/worker/polyglot, and a cross-platform feature.

@@ -1,12 +1,12 @@
-# Testing y Tooling: Jest + OXC (Oxlint & Oxfmt)
+# Testing and Tooling: Jest + OXC (Oxlint & Oxfmt)
 
-El estándar combina la fidelidad de runtime móvil de **Jest** (`jest-expo`) con la velocidad Rust de **OXC** (**Oxlint** para análisis estático y **Oxfmt** para formateo instantáneo con ordenamiento de clases Tailwind).
+The standard combines the mobile runtime fidelity of **Jest** (`jest-expo`) with the Rust speed of **OXC** (**Oxlint** for static analysis and **Oxfmt** for instant formatting with Tailwind class sorting).
 
 ---
 
-## 🃏 Configuración de Jest (`jest.config.js`)
+## 🃏 Jest Configuration (`jest.config.js`)
 
-Jest es el runner recomendado por el equipo de Expo para simular con precisión el entorno nativo de React Native y soportar `expo-router/testing-library`.
+Jest is the runner the Expo team recommends to accurately simulate the native React Native environment and support `expo-router/testing-library`.
 
 ```js
 // jest.config.js
@@ -38,12 +38,12 @@ module.exports = {
 };
 ```
 
-### Setup de Tests (`src/test/setup.ts`)
+### Test Setup (`src/test/setup.ts`)
 
 ```ts
 import '@testing-library/react-native/extend-expect';
 
-// Mock de SecureStore
+// SecureStore mock
 jest.mock('expo-secure-store', () => ({
   getItemAsync: jest.fn(),
   setItemAsync: jest.fn(),
@@ -55,7 +55,7 @@ jest.mock('expo-secure-store', () => ({
 
 ## ⚡ Linter: Oxlint (`.oxlintrc.json`)
 
-Oxlint se ejecuta en milisegundos y aplica tanto las buenas prácticas de React/RN como las **reglas no negociables de Screaming Architecture**:
+Oxlint runs in milliseconds and applies both React/RN best practices and the **non-negotiable Screaming Architecture rules**:
 
 ```json
 {
@@ -69,17 +69,17 @@ Oxlint se ejecuta en milisegundos y aplica tanto las buenas prácticas de React/
     "react-hooks/exhaustive-deps": "warn",
     "no-restricted-globals": [
       "error",
-      { "name": "window", "message": "No uses window en React Native." },
-      { "name": "localStorage", "message": "Usa expo-secure-store o AsyncStorage." },
-      { "name": "document", "message": "No existe DOM en React Native." }
+      { "name": "window", "message": "Do not use window in React Native." },
+      { "name": "localStorage", "message": "Use expo-secure-store or AsyncStorage." },
+      { "name": "document", "message": "There is no DOM in React Native." }
     ],
     "no-restricted-imports": [
       "error",
       {
-        "paths": [{ "name": "react-dom", "message": "No uses react-dom en React Native." }],
+        "paths": [{ "name": "react-dom", "message": "Do not use react-dom in React Native." }],
         "patterns": [
-          { "regex": "^@/features/[^/]+$", "message": "Prohibido importar de la raíz de la feature; importa desde la carpeta hoja." },
-          { "regex": "^@/features/[^/]+/(components|hooks|screens|services)$", "message": "Prohibido importar de agrupadores; importa desde la carpeta hoja que posee el index.ts." }
+          { "regex": "^@/features/[^/]+$", "message": "Do not import from the feature root; import from the leaf folder." },
+          { "regex": "^@/features/[^/]+/(components|hooks|screens|services)$", "message": "Do not import from grouping folders; import from the leaf folder." }
         ]
       }
     ]
@@ -92,8 +92,8 @@ Oxlint se ejecuta en milisegundos y aplica tanto las buenas prácticas de React/
           "error",
           {
             "patterns": [
-              { "group": ["@tanstack/react-query"], "message": "Rutas delgadas: las queries van en hooks dentro de features." },
-              { "regex": "^@/features/[^/]+/services/", "message": "Rutas delgadas: la UI consume hooks, nunca servicios directamente." }
+              { "group": ["@tanstack/react-query"], "message": "Thin routes: queries belong in hooks inside features." },
+              { "regex": "^@/features/[^/]+/services/", "message": "Thin routes: the UI consumes hooks, never services directly." }
             ]
           }
         ]
@@ -107,7 +107,7 @@ Oxlint se ejecuta en milisegundos y aplica tanto las buenas prácticas de React/
 
 ## 🎨 Formatter: Oxfmt (`.oxfmtrc.json`)
 
-Oxfmt reemplaza a Prettier, formateando a velocidad Rust y ordenando automáticamente las clases de Tailwind de NativeWind gracias a su compatibilidad nativa:
+Oxfmt replaces Prettier, formatting at Rust speed and automatically sorting NativeWind's Tailwind classes thanks to its native support:
 
 ```json
 {
@@ -121,7 +121,7 @@ Oxfmt reemplaza a Prettier, formateando a velocidad Rust y ordenando automática
 
 ---
 
-## 🚀 Scripts en `package.json`
+## 🚀 Scripts in `package.json`
 
 ```json
 {

@@ -1,6 +1,6 @@
-# 📁 Ejemplo de Estructura y Composición en Astro
+# 📁 Astro Structure and Composition Example
 
-## 1. Árbol de Carpetas Recomendado
+## 1. Recommended Folder Tree
 
 ```text
 ├── public/
@@ -8,20 +8,20 @@
 │   ├── og-default.png
 │   └── robots.txt
 ├── src/
-│   ├── assets/                 # Imágenes optimizadas por astro:assets
+│   ├── assets/                 # Images optimized by astro:assets
 │   │   └── hero-preview.png
 │   ├── components/
-│   │   ├── sections/           # Secciones de página (Zero-JS)
+│   │   ├── sections/           # Page sections (Zero-JS)
 │   │   │   ├── HeroSection.astro
 │   │   │   ├── FeaturesSection.astro
 │   │   │   ├── FaqSection.astro
 │   │   │   └── CtaSection.astro
-│   │   ├── ui/                 # Primitivas reutilizables
+│   │   ├── ui/                 # Reusable primitives
 │   │   │   ├── Navbar.astro
 │   │   │   └── Footer.astro
-│   │   └── islands/            # Islas interactivas (solo si requieren JS)
+│   │   └── islands/            # Interactive islands (only if they need JS)
 │   │       └── PricingToggle.tsx
-│   ├── data/                   # Copy y configuración tipada
+│   ├── data/                   # Copy and typed configuration
 │   │   └── site.ts
 │   ├── layouts/
 │   │   └── BaseLayout.astro
@@ -35,7 +35,7 @@
 
 ---
 
-## 2. Composición de `src/pages/index.astro`
+## 2. Composition of `src/pages/index.astro`
 
 ```astro
 ---

@@ -1,8 +1,8 @@
 ---
 name: nestjs-architecture
-version: 2.0.0
+version: 2.1.0
 description: >-
-  Estándar de Modular Monolith para NestJS 12 (NodeAdapter, SWC, Vitest y OXC). Guía el andamiaje de módulos de dominio, contratos DTO/Zod, Swagger OpenAPI, repositorios ORM-agnósticos, doble barrera RBAC/ownership y testing >= 90%.
+  Modular Monolith standard for NestJS 12 (NodeAdapter, SWC, Vitest and OXC). Guides scaffolding of domain modules, DTO/Zod contracts, Swagger OpenAPI, ORM-agnostic repositories, a double RBAC/ownership barrier and >= 90% test coverage.
 tags: [nestjs, backend, modular-monolith, clean-architecture, swagger, rbac, orm-agnostic, swc, vitest, oxc, node-adapter]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
@@ -24,6 +24,9 @@ triggers:
   - crear modulo nestjs
   - estructurar nestjs
   - revisar modulo nestjs
+  - create a nestjs module
+  - structure a nestjs api
+  - review a nestjs module
 requirements:
   tools: [run_command, view_file, replace_file_content, write_to_file]
   bins: [node]
@@ -31,120 +34,121 @@ requirements:
 
 # 🏛️ NestJS Modular Monolith Architecture Standard
 
-## 🎯 Propósito
+## 🎯 Purpose
 
-Estandarizar el diseño, modularización y construcción de backends en **NestJS 12+** bajo el patrón **Modular Monolith (Monolito Modular)** y arquitectura limpia. Adopta el toolchain moderno de alto rendimiento (**`NodeAdapter`** sobre `node:http`, compilación con **SWC**, pruebas con **Vitest** y linting/formateo con **OXC**), aislamiento estricto de dominio (`src/modules/<nouns>/`), contratos DTO/Zod con paginación y Swagger OpenAPI, persistencia agnóstica al ORM mediante Repository/Entity y doble barrera de seguridad (RBAC + ownership).
-
----
-
-## ⚡ Cuándo Activar esta Skill
-
-- Al crear, revisar o refactorizar un módulo de negocio dentro de `src/modules/<nouns>/`.
-- Al configurar el bootstrap de NestJS 12 (`NodeAdapter`), compilación con SWC, Vitest (`unplugin-swc`) u OXC (`oxlint`/`oxfmt`).
-- Al generar el andamiaje completo de 18 archivos de un módulo (Entity, DTOs, Repository Contract & Impl, Service, Controller, Specs y Module).
-- Al implementar controladores REST paginados con documentación Swagger (`@ApiTags`, `@ApiOperation`, `@ApiOkResponse`, etc.).
-- Al estructurar DTOs de validación con `class-validator` o `nestjs-zod` y `ValidationPipe` global.
-- Al diseñar repositorios desacoplados del ORM (`repository.ts` + `<noun>.repository.ts`) o transacciones ORM-agnósticas.
-- Al implementar autorización: `JwtAuthGuard` + `RolesGuard` globales y verificación de propiedad (*ownership*) en servicios.
-
-> **Monorepo:** si la API vive en un monorepo (`apps/api`), estas reglas aplican dentro de `apps/api/src/`. Para la estructura raíz, paquetes compartidos, contratos entre web y API y límites de dependencias, usa también [`monorepo-architecture`](../monorepo-architecture/SKILL.md). En modo Zod usa `--target-dir apps/api/src/modules --contracts zod --scope <scope>`.
+Standardize the design, modularization and build of **NestJS 12+** backends under the **Modular Monolith** pattern and clean architecture. It adopts the modern high-performance toolchain (**`NodeAdapter`** over `node:http`, **SWC** compilation, **Vitest** tests and **OXC** linting/formatting), strict domain isolation (`src/modules/<nouns>/`), DTO/Zod contracts with pagination and Swagger OpenAPI, ORM-agnostic persistence through Repository/Entity, and a double security barrier (RBAC + ownership).
 
 ---
 
-## 📋 Flujo de Trabajo Paso a Paso
+## ⚡ When to Trigger This Skill
+
+- When creating, reviewing or refactoring a business module inside `src/modules/<nouns>/`.
+- When configuring the NestJS 12 bootstrap (`NodeAdapter`), SWC compilation, Vitest (`unplugin-swc`) or OXC (`oxlint`/`oxfmt`).
+- When generating the full 18-file scaffold of a module (Entity, DTOs, Repository Contract & Impl, Service, Controller, Specs and Module).
+- When implementing paginated REST controllers with Swagger documentation (`@ApiTags`, `@ApiOperation`, `@ApiOkResponse`, etc.).
+- When structuring validation DTOs with `class-validator` or `nestjs-zod` and a global `ValidationPipe`.
+- When designing repositories decoupled from the ORM (`repository.ts` + `<noun>.repository.ts`) or ORM-agnostic transactions.
+- When implementing authorization: global `JwtAuthGuard` + `RolesGuard` and ownership checks in services.
+
+> **Monorepo:** if the API lives in a monorepo (`apps/api`), these rules apply inside `apps/api/src/`. For the root structure, shared packages, web/API contracts and dependency boundaries, also use [`monorepo-architecture`](../monorepo-architecture/SKILL.md). In Zod mode use `--target-dir apps/api/src/modules --contracts zod --scope <scope>`.
+
+---
+
+## 📋 Step-by-Step Workflow
 
 ```mermaid
 flowchart TD
-    A["1. Identificar Sustantivo Singular\n(ej: 'invoice', 'pet', 'order')"] --> B["2. Scaffolding de 18 Archivos\n(scripts/scaffold-module.mjs --dry-run)"]
-    B --> C["3. Definir Entidad de Dominio\n(entities/<noun>.entity.ts)"]
-    C --> D["4. Contratos DTO / Zod & Swagger\n(create, update, query, response + paginated)"]
-    D --> E["5. Contrato de Repositorio\n(repositories/repository.ts)"]
-    E --> F["6. Implementación de Repositorio\n(repositories/<noun>.repository.ts)"]
-    F --> G["7. Servicio & Reglas de Negocio\n(@Inject(TOKEN) + ownership + errores)"]
-    G --> H["8. Controlador REST & Decoradores\n(PaginatedResponseDto + Swagger completo)"]
-    H --> I["9. Registrar en AppModule & Vitest\n(cobertura >= 90% + tsc --noEmit + oxlint)"]
+    A["1. Identify the Singular Noun\n(e.g. 'invoice', 'pet', 'order')"] --> B["2. 18-File Scaffolding\n(scripts/scaffold-module.mjs --dry-run)"]
+    B --> C["3. Define the Domain Entity\n(entities/<noun>.entity.ts)"]
+    C --> D["4. DTO / Zod Contracts & Swagger\n(create, update, query, response + paginated)"]
+    D --> E["5. Repository Contract\n(repositories/repository.ts)"]
+    E --> F["6. Repository Implementation\n(repositories/<noun>.repository.ts)"]
+    F --> G["7. Service & Business Rules\n(@Inject(TOKEN) + ownership + errors)"]
+    G --> H["8. REST Controller & Decorators\n(PaginatedResponseDto + full Swagger)"]
+    H --> I["9. Register in AppModule & Vitest\n(coverage >= 90% + tsc --noEmit + oxlint)"]
 ```
 
-### Stack Estándar (NestJS 12+)
+### Standard Stack (NestJS 12+)
 
-- **HTTP Platform:** `NodeAdapter` (`@nestjs/platform-node`) en `src/main.ts` como adaptador por defecto sobre `node:http`.
-- **Compilación:** **SWC** (`"builder": "swc"` en `nest-cli.json`) para builds rápidos; `tsc --noEmit` para verificación de tipos en paralelo/CI.
-- **Testing:** **Vitest** con `unplugin-swc` (`legacyDecorator: true`, `decoratorMetadata: true`) y `vite-tsconfig-paths`. (Soporte opcional `--test-runner jest` para proyectos existentes).
-- **Linter / Formatter:** **OXC** (`oxlint` y `oxfmt`). Aplicar formato antes de ordenar imports con `ts-import-organizer`.
+- **HTTP Platform:** `NodeAdapter` (`@nestjs/platform-node`) in `src/main.ts` as the default adapter over `node:http`.
+- **Compilation:** **SWC** (`"builder": "swc"` in `nest-cli.json`) for fast builds; `tsc --noEmit` for type checking in parallel/CI.
+- **Testing:** **Vitest** with `unplugin-swc` (`legacyDecorator: true`, `decoratorMetadata: true`) and `vite-tsconfig-paths`. (Optional `--test-runner jest` support for existing projects.)
+- **Linter / Formatter:** **OXC** (`oxlint` and `oxfmt`). Format before sorting imports with `ts-import-organizer`.
 
-### Secuencia Obligatoria de Scaffolding (18 Archivos en Orden)
+### Mandatory Scaffolding Sequence (18 Files in Order)
 
-1. `src/modules/<nouns>/entities/<noun>.entity.ts`: Clase inmutable con campos `readonly` y `static fromPersistence()` tipado sin `any`.
-2. `src/modules/<nouns>/entities/index.ts`: Re-export de la entidad.
-3. `src/modules/<nouns>/dto/create-<noun>.dto.ts`: Validación con `class-validator` + `@ApiProperty` (o `createZodDto` con `--contracts zod`).
-4. `src/modules/<nouns>/dto/update-<noun>.dto.ts`: `PartialType(OmitType(Create<Noun>Dto, [] as const))` (o `createZodDto(updateSchema)`).
-5. `src/modules/<nouns>/dto/find-<nouns>-query.dto.ts`: Paginación (`page`, `limit`) y filtros sanitizados.
-6. `src/modules/<nouns>/dto/<noun>-response.dto.ts`: `<Noun>ResponseDto` (`fromEntity`) y `Paginated<Noun>ResponseDto` (`fromPaginatedResult`).
-7. `src/modules/<nouns>/dto/index.ts`: Re-export de todos los DTOs.
-8. `src/modules/<nouns>/repositories/repository.ts`: Contrato `I<Noun>Repository` y token `<NOUN>_REPOSITORY_TOKEN`.
-9. `src/modules/<nouns>/repositories/<noun>.repository.ts`: Implementación `<Noun>Repository implements I<Noun>Repository`.
-10. `src/modules/<nouns>/repositories/<noun>.repository.spec.ts`: Tests unitarios de mapeo `fromPersistence()` y consultas.
-11. `src/modules/<nouns>/repositories/index.ts`: Re-export de contrato e implementación.
-12. `src/modules/<nouns>/services/<noun>.service.ts`: Inyecta `@Inject(<NOUN>_REPOSITORY_TOKEN) private readonly repo: I<Noun>Repository`.
-13. `src/modules/<nouns>/services/<noun>.service.spec.ts`: Tests de happy paths, `NotFoundException` y `ForbiddenException`.
-14. `src/modules/<nouns>/services/index.ts`: Re-export del servicio.
-15. `src/modules/<nouns>/controllers/<noun>.controller.ts`: Endpoints con Swagger completo y retorno exclusivo de Response DTOs (y sobre paginado en `findAll`).
-16. `src/modules/<nouns>/controllers/<noun>.controller.spec.ts`: Tests de delegación y transformación a DTOs.
-17. `src/modules/<nouns>/controllers/index.ts`: Re-export del controlador.
-18. `src/modules/<nouns>/<noun>.module.ts`: `@Module` vinculando el token y exportando **únicamente** `<Noun>Service`.
-
----
-
-## ⚠️ Reglas Críticas
-
-1. **Inversión de Dependencias en Repositorios (DIP) y Encapsulación:**
-   - El servicio inyecta exclusivamente la interfaz `I<Noun>Repository` mediante `@Inject(<NOUN>_REPOSITORY_TOKEN)` (usando `import type` para la interfaz en SWC/TS).
-   - `<Noun>Module` exporta **solo `<Noun>Service`**, **NUNCA** `<NOUN>_REPOSITORY_TOKEN` ni `<Noun>Repository`. La comunicación entre módulos ocurre únicamente vía servicios exportados o eventos de dominio (prohibido `forwardRef()`).
-2. **Retorno Estricto de Response DTOs y Paginación Completa:**
-   - Todo endpoint retorna `<Noun>ResponseDto` o `Paginated<Noun>ResponseDto` (`{ items, total, page, limit }`).
-   - **PROHIBIDO:** retornar entidades de dominio, modelos de ORM o descartar metadatos de paginación en listados.
-3. **Aislamiento Total del ORM / Base de Datos:**
-   - Ningún ORM se importa en controladores o servicios. El repositorio retorna siempre entidades de dominio inmutables y traduce errores de persistencia (p. ej. unique constraint → `ConflictException`).
-4. **Cero `any`, `import type` Estricto y `ValidationPipe` Global:**
-   - Prohibido `any` en entidades, DTOs, repositorios y controladores. Usar `import type` en tipos puros para compatibilidad con SWC y `oxlint`.
-   - Configurar `ValidationPipe` global con `whitelist: true`, `forbidNonWhitelisted: true` y `transform: true`.
-5. **Nomenclatura y Política de Barrels (*Leaf-Folder Barrel Policy*):**
-   - Carpeta de módulo en **plural** `kebab-case` (excepción: `auth`); archivos internos en **singular**.
-   - `src/modules/<nouns>/` **NUNCA** lleva `index.ts`. Solo las subcarpetas hoja (`controllers/`, `dto/`, `entities/`, `repositories/`, `services/`) llevan `index.ts`.
-6. **Doble Barrera de Autorización (RBAC + Ownership):**
-   - Barrera 1: `JwtAuthGuard` seguido de `RolesGuard` registrados como `APP_GUARD` + `@Roles(...)` / `@Public()` y `@CurrentUser()`. Nunca usar fallbacks como `req.user?.id || 'anonymous'`.
-   - Barrera 2: el servicio asigna `ownerId: requesterId` en `create`, filtra por `ownerId` en `findAll` para no-admin, y valida propiedad en `findOne`/`update`/`remove` lanzando `ForbiddenException`.
-7. **Swagger Exhaustivo:**
-   - Incluir `@ApiOperation`, `@ApiOkResponse` / `@ApiCreatedResponse` / `@ApiNoContentResponse`, `@ApiParam` con `format: 'uuid'`, `@ApiBadRequestResponse`, `@ApiUnauthorizedResponse` y `@ApiForbiddenResponse`.
-8. **Cobertura de Tests $\ge 90\%$ con Vitest y Exclusiones:**
-   - Probar ramas, errores (`404`, `403`, `409`) y mapeos `fromPersistence`/`fromEntity`.
-   - Excluir de cobertura en `vitest.config.ts` / Jest: `src/config/**`, `src/main.ts`, `**/*.module.ts`, `**/*.dto.ts` y `**/index.ts`.
+1. `src/modules/<nouns>/entities/<noun>.entity.ts`: immutable class with `readonly` fields and a typed `static fromPersistence()` without `any`.
+2. `src/modules/<nouns>/entities/index.ts`: re-export of the entity.
+3. `src/modules/<nouns>/dto/create-<noun>.dto.ts`: validation with `class-validator` + `@ApiProperty` (or `createZodDto` with `--contracts zod`).
+4. `src/modules/<nouns>/dto/update-<noun>.dto.ts`: `PartialType(OmitType(Create<Noun>Dto, [] as const))` (or `createZodDto(updateSchema)`).
+5. `src/modules/<nouns>/dto/find-<nouns>-query.dto.ts`: pagination (`page`, `limit`) and sanitized filters.
+6. `src/modules/<nouns>/dto/<noun>-response.dto.ts`: `<Noun>ResponseDto` (`fromEntity`) and `Paginated<Noun>ResponseDto` (`fromPaginatedResult`).
+7. `src/modules/<nouns>/dto/index.ts`: re-export of all DTOs.
+8. `src/modules/<nouns>/repositories/repository.ts`: the `I<Noun>Repository` contract and the `<NOUN>_REPOSITORY_TOKEN` token.
+9. `src/modules/<nouns>/repositories/<noun>.repository.ts`: the `<Noun>Repository implements I<Noun>Repository` implementation.
+10. `src/modules/<nouns>/repositories/<noun>.repository.spec.ts`: unit tests for the `fromPersistence()` mapping and queries.
+11. `src/modules/<nouns>/repositories/index.ts`: re-export of the contract and the implementation.
+12. `src/modules/<nouns>/services/<noun>.service.ts`: injects `@Inject(<NOUN>_REPOSITORY_TOKEN) private readonly repo: I<Noun>Repository`.
+13. `src/modules/<nouns>/services/<noun>.service.spec.ts`: tests for happy paths, `NotFoundException` and `ForbiddenException`.
+14. `src/modules/<nouns>/services/index.ts`: re-export of the service.
+15. `src/modules/<nouns>/controllers/<noun>.controller.ts`: endpoints with full Swagger that return only Response DTOs (and the paginated envelope in `findAll`).
+16. `src/modules/<nouns>/controllers/<noun>.controller.spec.ts`: tests for delegation and transformation into DTOs.
+17. `src/modules/<nouns>/controllers/index.ts`: re-export of the controller.
+18. `src/modules/<nouns>/<noun>.module.ts`: `@Module` binding the token and exporting **only** `<Noun>Service`.
 
 ---
 
-## 📚 Referencias
+## ⚠️ Critical Rules
 
-- [Guía del Monolito Modular y Stack (NodeAdapter + SWC + OXC)](references/modular-monolith-guide.md): Bootstrap NestJS 12, `nest-cli.json` con SWC, `oxlint`/`oxfmt`, estructura global `src/` y comunicación inter-módulos.
-- [Estándares de DTOs, Zod y Swagger OpenAPI](references/dto-and-swagger-standards.md): `ValidationPipe`, `ClassSerializerInterceptor`, `PaginatedResponseDto`, `nestjs-zod` y checklist Swagger.
-- [Patrón de Repositorios y Entidades de Dominio](references/repository-and-entity-pattern.md): Adaptadores Prisma/TypeORM/Drizzle, mappers `fromPersistence`, transacciones/Unit of Work y mapeo de errores.
-- [Estrategia de RBAC y Validación de Ownership](references/rbac-and-ownership.md): Orden de `APP_GUARD`, `@CurrentUser()`, `Role` compartido, filtrado en `findAll` y excepciones HTTP.
-- [Estrategia de Testing (Vitest + SWC + E2E)](references/testing-strategy.md): Configuración de `vitest.config.ts` con `unplugin-swc`, unit tests, E2E con Supertest y exclusiones de cobertura.
-- [Ejemplos de Flujos y Refactorización](examples/workflows.md): Refactor de *Fat Controller* y comunicación desacoplada entre módulos.
+1. **Reply in the user's language**, even though this skill is written in English.
+2. **Dependency Inversion in Repositories (DIP) and Encapsulation:**
+   - The service injects only the `I<Noun>Repository` interface through `@Inject(<NOUN>_REPOSITORY_TOKEN)` (using `import type` for the interface under SWC/TS).
+   - `<Noun>Module` exports **only `<Noun>Service`**, **NEVER** `<NOUN>_REPOSITORY_TOKEN` or `<Noun>Repository`. Modules communicate only through exported services or domain events (`forwardRef()` is forbidden).
+3. **Strict Response DTOs and Full Pagination:**
+   - Every endpoint returns `<Noun>ResponseDto` or `Paginated<Noun>ResponseDto` (`{ items, total, page, limit }`).
+   - **FORBIDDEN:** returning domain entities or ORM models, or dropping pagination metadata in listings.
+4. **Full Isolation of the ORM / Database:**
+   - No ORM is imported in controllers or services. The repository always returns immutable domain entities and translates persistence errors (e.g. unique constraint → `ConflictException`).
+5. **Zero `any`, Strict `import type` and a Global `ValidationPipe`:**
+   - `any` is forbidden in entities, DTOs, repositories and controllers. Use `import type` for pure types for compatibility with SWC and `oxlint`.
+   - Configure a global `ValidationPipe` with `whitelist: true`, `forbidNonWhitelisted: true` and `transform: true`.
+6. **Naming and the Leaf-Folder Barrel Policy:**
+   - Module folder in **plural** `kebab-case` (exception: `auth`); internal files in **singular**.
+   - `src/modules/<nouns>/` **NEVER** has an `index.ts`. Only the leaf subfolders (`controllers/`, `dto/`, `entities/`, `repositories/`, `services/`) have an `index.ts`.
+7. **Double Authorization Barrier (RBAC + Ownership):**
+   - Barrier 1: `JwtAuthGuard` followed by `RolesGuard`, registered as `APP_GUARD`, + `@Roles(...)` / `@Public()` and `@CurrentUser()`. Never use fallbacks such as `req.user?.id || 'anonymous'`.
+   - Barrier 2: the service sets `ownerId: requesterId` in `create`, filters by `ownerId` in `findAll` for non-admins, and checks ownership in `findOne`/`update`/`remove`, throwing `ForbiddenException`.
+8. **Exhaustive Swagger:**
+   - Include `@ApiOperation`, `@ApiOkResponse` / `@ApiCreatedResponse` / `@ApiNoContentResponse`, `@ApiParam` with `format: 'uuid'`, `@ApiBadRequestResponse`, `@ApiUnauthorizedResponse` and `@ApiForbiddenResponse`.
+9. **Test Coverage $\ge 90\%$ with Vitest, and Exclusions:**
+   - Test branches, errors (`404`, `403`, `409`) and the `fromPersistence`/`fromEntity` mappings.
+   - Exclude from coverage in `vitest.config.ts` / Jest: `src/config/**`, `src/main.ts`, `**/*.module.ts`, `**/*.dto.ts` and `**/index.ts`.
+
+---
+
+## 📚 References
+
+- [Modular Monolith and Stack Guide (NodeAdapter + SWC + OXC)](references/modular-monolith-guide.md): NestJS 12 bootstrap, `nest-cli.json` with SWC, `oxlint`/`oxfmt`, the global `src/` structure and inter-module communication.
+- [DTO, Zod and Swagger OpenAPI Standards](references/dto-and-swagger-standards.md): `ValidationPipe`, `ClassSerializerInterceptor`, `PaginatedResponseDto`, `nestjs-zod` and the Swagger checklist.
+- [Repository and Domain Entity Pattern](references/repository-and-entity-pattern.md): Prisma/TypeORM/Drizzle adapters, `fromPersistence` mappers, transactions/Unit of Work and error mapping.
+- [RBAC and Ownership Validation Strategy](references/rbac-and-ownership.md): `APP_GUARD` order, `@CurrentUser()`, a shared `Role`, filtering in `findAll` and HTTP exceptions.
+- [Testing Strategy (Vitest + SWC + E2E)](references/testing-strategy.md): `vitest.config.ts` setup with `unplugin-swc`, unit tests, E2E with Supertest and coverage exclusions.
+- [Workflow and Refactoring Examples](examples/workflows.md): refactoring a *Fat Controller* and decoupled communication between modules.
 
 ---
 
 ## 🛠️ Scripts
 
-> **Rutas:** `<skill-dir>` es el directorio que contiene este `SKILL.md` (p. ej. `.claude/skills/<name>/` o `.agents/skills/<name>/`). Ejecuta los scripts desde la raíz del proyecto del usuario, no desde `<skill-dir>`.
+> **Paths:** `<skill-dir>` is the directory that holds this `SKILL.md` (e.g. `.claude/skills/<name>/` or `.agents/skills/<name>/`). Run the scripts from the user's project root, not from `<skill-dir>`.
 
-> **Seguridad:** el script aborta sin escribir nada si alguno de los archivos que genera ya existe. Ejecuta primero con `--dry-run` para previsualizar. Usa `--force` solo con confirmación explícita del usuario.
+> **Safety:** the script aborts without writing anything if any of the files it generates already exists. Run it with `--dry-run` first to preview. Use `--force` only with the user's explicit confirmation.
 
-### Generar un Módulo NestJS Completo (18 archivos)
+### Generate a Full NestJS Module (18 files)
 
 ```bash
 node <skill-dir>/scripts/scaffold-module.mjs <noun-singular> [--target-dir <path>] [--plural <name>] [--orm custom|prisma|typeorm|drizzle] [--contracts class-validator|zod] [--scope <scope>] [--test-runner vitest|jest] [--dry-run] [--force]
 ```
 
-*Ejemplos:*
+*Examples:*
 - `node <skill-dir>/scripts/scaffold-module.mjs invoice --target-dir src/modules --orm prisma --dry-run`
 - `node <skill-dir>/scripts/scaffold-module.mjs invoice --target-dir apps/api/src/modules --contracts zod --scope acme`

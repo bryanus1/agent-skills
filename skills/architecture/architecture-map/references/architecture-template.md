@@ -1,122 +1,122 @@
-# Plantilla de Arquitectura y Reglas Mermaid (`architecture-map`)
+# Architecture Template and Mermaid Rules (`architecture-map`)
 
-Usa esta plantilla como estructura base al crear la página de arquitectura y como referencia para sincronizar secciones técnicas al actualizar una existente.
+Use this template as the base structure when creating the architecture page, and as a reference to sync technical sections when updating an existing one. Write the headings and content in the language of the existing page or, for a new page, the user's language.
 
 ---
 
-## 📐 Proporcionalidad por Tamaño del Proyecto
+## 📐 Proportionality by Project Size
 
-| Tipo de repo | Qué incluir | Qué omitir |
+| Repo type | What to include | What to omit |
 | :--- | :--- | :--- |
-| **CLI / Librería pequeña** | Resumen, diagrama de flujo interno, módulos principales, comandos, testing/CI | BD, RLS, despliegue cloud o colas si no existen |
-| **App monolítica (web o API)** | Resumen, diagrama de capas/módulos, stack, datos/auth, 1–2 flujos clave, env vars, despliegue | Tabla de múltiples apps |
-| **Monorepo / Multi-servicio** | Resumen, diagrama de apps/paquetes/servicios, tabla de apps y paquetes compartidos, datos/auth, 2–3 flujos cross-app, integraciones, CI/despliegue por app | Detalle interno archivo por archivo |
+| **CLI / small library** | Summary, internal flow diagram, main modules, commands, testing/CI | DB, RLS, cloud deployment or queues if they don't exist |
+| **Monolithic app (web or API)** | Summary, layers/modules diagram, stack, data/auth, 1–2 key flows, env vars, deployment | Multi-app table |
+| **Monorepo / multi-service** | Summary, apps/packages/services diagram, table of apps and shared packages, data/auth, 2–3 cross-app flows, integrations, CI/deployment per app | File-by-file internal detail |
 
 ---
 
-## 🧩 Reglas para Diagramas Mermaid
+## 🧩 Rules for Mermaid Diagrams
 
-- Usa únicamente `flowchart TD` o `flowchart LR` (son compatibles con GitHub, Notion y visores estándar).
-- **Cita entre comillas** cualquier etiqueta con paréntesis, corchetes, dos puntos o barras: `api["API NestJS (src/apps/api)"]` en lugar de `api[API NestJS (src/apps/api)]`.
-- Evita etiquetas HTML (`<br/>`, `<b>`) dentro de nodos.
-- Mantén entre **5 y 15 nodos** para que el diagrama sea legible; representa límites del sistema, no cada archivo.
+- Use only `flowchart TD` or `flowchart LR` (they work in GitHub, Notion and standard viewers).
+- **Quote** any label with parentheses, brackets, colons or slashes: `api["NestJS API (src/apps/api)"]` instead of `api[NestJS API (src/apps/api)]`.
+- Avoid HTML tags (`<br/>`, `<b>`) inside nodes.
+- Keep between **5 and 15 nodes** so the diagram stays readable; show system boundaries, not every file.
 
 ---
 
-## 📄 Plantilla Canónica
+## 📄 Canonical Template
 
 ```markdown
-# Arquitectura — <Nombre del Proyecto>
+# Architecture — <Project Name>
 
-> **Última actualización:** <YYYY-MM-DD> · **Commit:** `<short-sha>`
+> **Last updated:** <YYYY-MM-DD> · **Commit:** `<short-sha>`
 
-## 1. Resumen del Sistema
-<!-- 2–4 líneas: qué hace el proyecto, quién lo usa y qué estilo arquitectónico sigue (ej. monorepo pnpm, modular monolith, CLI Node). -->
+## 1. System Summary
+<!-- 2–4 lines: what the project does, who uses it and which architectural style it follows (e.g. pnpm monorepo, modular monolith, Node CLI). -->
 
-## 2. Diagrama de Alto Nivel
+## 2. High-Level Diagram
 ```mermaid
 flowchart LR
-    U["Usuario / Cliente"] --> Web["Web App (apps/web)"]
+    U["User / Client"] --> Web["Web App (apps/web)"]
     Web --> API["API (apps/api)"]
-    API --> DB[("Base de datos")]
+    API --> DB[("Database")]
 ```
 
-## 3. Apps y Módulos
-| Componente | Ubicación | Responsabilidad | Depende de |
+## 3. Apps and Modules
+| Component | Location | Responsibility | Depends on |
 |---|---|---|---|
-| `<nombre>` | `ruta/` | <qué resuelve> | `<otros módulos / externo>` |
+| `<name>` | `path/` | <what it solves> | `<other modules / external>` |
 
-## 4. Stack Verificado
-- **Lenguaje / Runtime:** …
+## 4. Verified Stack
+- **Language / Runtime:** …
 - **Framework(s):** …
-- **Datos / ORM:** … *(omitir si no aplica)*
+- **Data / ORM:** … *(omit if not applicable)*
 - **Testing / Lint:** …
 
-## 5. Datos, Auth y Seguridad *(omitir lo que no aplique)*
-- **Persistencia:** <motor, ubicación de migraciones/esquema, entidades centrales>
-- **Autenticación y permisos:** <mecanismo, guards/middlewares, RLS si existe>
+## 5. Data, Auth and Security *(omit what does not apply)*
+- **Persistence:** <engine, location of migrations/schema, core entities>
+- **Authentication and permissions:** <mechanism, guards/middleware, RLS if present>
 
-## 6. Flujos Clave
-1. **<Nombre del flujo principal>:** `<entrypoint>` → `<servicio/caso de uso>` → `<persistencia o salida>`.
+## 6. Key Flows
+1. **<Main flow name>:** `<entrypoint>` → `<service/use case>` → `<persistence or output>`.
 
-## 7. Integraciones Externas y Variables de Entorno *(omitir si no aplica)*
-- **Servicios:** <Stripe, Resend, S3, etc. con archivo donde se integran>
-- **Variables clave (solo nombres):** `DATABASE_URL`, `AUTH_SECRET`, …
+## 7. External Integrations and Environment Variables *(omit if not applicable)*
+- **Services:** <Stripe, Resend, S3, etc. with the file where they are integrated>
+- **Key variables (names only):** `DATABASE_URL`, `AUTH_SECRET`, …
 
-## 8. Comandos y Despliegue
-- **Desarrollo:** `<comando>`
-- **Tests / Lint:** `<comando>`
-- **Build / CI / Despliegue:** `<workflow o plataforma verificada>`
+## 8. Commands and Deployment
+- **Development:** `<command>`
+- **Tests / Lint:** `<command>`
+- **Build / CI / Deployment:** `<verified workflow or platform>`
 
-## 9. Decisiones y Notas del Equipo *(preservado manualmente)*
-<!-- Mantener aquí ADRs, contexto histórico, deuda conocida o acuerdos del equipo sin sobrescribir en futuras actualizaciones. -->
+## 9. Team Decisions and Notes *(preserved manually)*
+<!-- Keep ADRs, historical context, known debt or team agreements here, without overwriting them in future updates. -->
 ```
 
 ---
 
-## 📌 Ejemplo Compacto (App Web + BD)
+## 📌 Compact Example (Web App + DB)
 
 ```markdown
-# Arquitectura — FacturaFlow
+# Architecture — InvoiceFlow
 
-> **Última actualización:** 2026-11-19 · **Commit:** `a4f24bc`
+> **Last updated:** 2026-11-19 · **Commit:** `a4f24bc`
 
-## 1. Resumen del Sistema
-Aplicación web para emisión y conciliación de facturas B2B. Sigue una arquitectura modular con Next.js App Router como interfaz y BFF, respaldada por Postgres y Supabase Auth/RLS.
+## 1. System Summary
+Web application for issuing and reconciling B2B invoices. It follows a modular architecture with the Next.js App Router as UI and BFF, backed by Postgres and Supabase Auth/RLS.
 
-## 2. Diagrama de Alto Nivel
+## 2. High-Level Diagram
 ```mermaid
 flowchart LR
-    Client["Navegador"] --> App["Next.js App (src/app)"]
-    App --> Actions["Server Actions y API (src/features)"]
+    Client["Browser"] --> App["Next.js App (src/app)"]
+    App --> Actions["Server Actions and API (src/features)"]
     Actions --> DB[("Postgres / Supabase")]
     Actions --> Stripe["Stripe API"]
 ```
 
-## 3. Apps y Módulos
-| Componente | Ubicación | Responsabilidad | Depende de |
+## 3. Apps and Modules
+| Component | Location | Responsibility | Depends on |
 |---|---|---|---|
-| Rutas y UI | `src/app/` | Páginas App Router y layouts | `src/features/*` |
-| Facturación | `src/features/invoices/` | Creación, filtros y exportación CSV | `src/shared/db/`, Stripe |
-| Clientes | `src/features/customers/` | Alta y validación fiscal | `src/shared/db/` |
-| Infra compartida | `src/shared/` | Cliente Supabase, env y helpers | `@supabase/supabase-js` |
+| Routes and UI | `src/app/` | App Router pages and layouts | `src/features/*` |
+| Billing | `src/features/invoices/` | Creation, filters and CSV export | `src/shared/db/`, Stripe |
+| Customers | `src/features/customers/` | Sign-up and tax validation | `src/shared/db/` |
+| Shared infra | `src/shared/` | Supabase client, env and helpers | `@supabase/supabase-js` |
 
-## 4. Stack Verificado
-- **Runtime / Lenguaje:** Node.js 22 · TypeScript
+## 4. Verified Stack
+- **Runtime / Language:** Node.js 22 · TypeScript
 - **Framework:** Next.js 15 (App Router) + Tailwind CSS
-- **Datos / Auth:** Postgres (Supabase) + políticas RLS en `supabase/migrations/`
+- **Data / Auth:** Postgres (Supabase) + RLS policies in `supabase/migrations/`
 - **Testing / Lint:** Vitest (`pnpm test`), Playwright (`pnpm test:e2e`), Oxlint (`pnpm lint`)
 
-## 5. Flujos Clave
-1. **Cobro por webhook:** Stripe envía evento a `src/app/api/webhooks/stripe/route.ts` → verifica firma → actualiza estado en `invoices` vía `src/features/invoices/mark-paid.ts`.
+## 5. Key Flows
+1. **Payment by webhook:** Stripe sends an event to `src/app/api/webhooks/stripe/route.ts` → verifies the signature → updates the status in `invoices` through `src/features/invoices/mark-paid.ts`.
 
-## 6. Integraciones Externas y Variables de Entorno
-- **Stripe:** cobros y webhooks (`src/shared/stripe.ts`).
-- **Variables clave:** `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`.
+## 6. External Integrations and Environment Variables
+- **Stripe:** payments and webhooks (`src/shared/stripe.ts`).
+- **Key variables:** `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`.
 
-## 7. Comandos y Despliegue
-- **Desarrollo:** `pnpm dev` · **Tests:** `pnpm test` · **CI:** `.github/workflows/ci.yml` · **Deploy:** Vercel (`vercel.json`)
+## 7. Commands and Deployment
+- **Development:** `pnpm dev` · **Tests:** `pnpm test` · **CI:** `.github/workflows/ci.yml` · **Deploy:** Vercel (`vercel.json`)
 
-## 8. Decisiones y Notas del Equipo
-- **ADR-001 (manual):** Se eligió mantener las consultas de lectura en Server Actions en lugar de un backend separado hasta superar 50k facturas/mes.
+## 8. Team Decisions and Notes
+- **ADR-001 (manual):** read queries were kept in Server Actions instead of a separate backend until the volume goes over 50k invoices/month.
 ```

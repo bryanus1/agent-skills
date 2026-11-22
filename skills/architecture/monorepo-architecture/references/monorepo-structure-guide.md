@@ -1,117 +1,117 @@
-# Guía de Estructura del Monorepo
+# Monorepo Structure Guide
 
 ---
 
-## 1. Árbol Estándar Multi-App
+## 1. Standard Multi-App Tree
 
 ```
 <repo>/
-├── apps/                               # Desplegables JS/TS. Nadie los importa.
+├── apps/                               # Deployable JS/TS apps. Nobody imports them.
 │   ├── web/                            # Next.js App Router → nextjs-architecture
-│   │   ├── src/app/                    # routing delgado
+│   │   ├── src/app/                    # thin routing
 │   │   ├── src/features/<nouns>/       # screaming architecture
 │   │   ├── package.json                # monorepo: { layer: "app", type: "web", platform: "web" }
 │   │   └── tsconfig.json               # extends "@acme/tsconfig/nextjs.json"
 │   ├── api/                            # NestJS Modular Monolith → nestjs-architecture
-│   │   ├── src/modules/<nouns>/        # 18 archivos por módulo
+│   │   ├── src/modules/<nouns>/        # 18 files per module
 │   │   ├── package.json                # monorepo: { layer: "app", type: "api", platform: "node" }
 │   │   └── tsconfig.json               # extends "@acme/tsconfig/nestjs.json"
 │   ├── mobile/                         # Expo + React Native → react-native-architecture
-│   │   ├── src/app/                    # Expo Router delgado
-│   │   ├── src/features/<nouns>/       # screaming architecture móvil
+│   │   ├── src/app/                    # thin Expo Router
+│   │   ├── src/features/<nouns>/       # mobile screaming architecture
 │   │   ├── metro.config.js             # watchFolders + nodeModulesPaths + exports
 │   │   ├── package.json                # monorepo: { layer: "app", type: "mobile", platform: "native" }
 │   │   └── tsconfig.json               # extends "@acme/tsconfig/expo.json"
 │   ├── landing/                        # Astro Marketing / SEO → astro-architecture
-│   │   ├── src/pages/                  # rutas estáticas / islas
-│   │   ├── src/components/sections/    # bloques Zero-JS
+│   │   ├── src/pages/                  # static routes / islands
+│   │   ├── src/components/sections/    # Zero-JS blocks
 │   │   ├── package.json                # monorepo: { layer: "app", type: "landing", platform: "astro" }
 │   │   └── tsconfig.json               # extends "@acme/tsconfig/astro.json"
-│   └── worker/                         # Node.js Worker / CLI / Cron (opcional)
-├── services/                           # Servicios políglotas opcionales (Python/Go/Rust)
-│   └── ml-service/                     # package.json shim para Turborepo + OpenAPI
-├── packages/                           # Librerías internas compiladas a dist/.
+│   └── worker/                         # Node.js Worker / CLI / Cron (optional)
+├── services/                           # Optional polyglot services (Python/Go/Rust)
+│   └── ml-service/                     # package.json shim for Turborepo + OpenAPI
+├── packages/                           # Internal libraries compiled to dist/.
 │   ├── tsconfig/                       # base, library, node, nestjs, nextjs, expo, astro, react-spa
 │   ├── oxc-config/                     # base.json (.oxlintrc) + oxfmt.json
-│   ├── eslint-config/                  # opcional (--linter eslint|both)
+│   ├── eslint-config/                  # optional (--linter eslint|both)
 │   ├── contracts/                      # modo zod: src/<nouns>/ → export "./<nouns>" (universal)
 │   ├── api-client/                     # modo openapi: src/generated + src/client (universal)
-│   ├── design-tokens/                  # colores, spacing y tipografía (universal)
-│   ├── ui-web/                         # componentes React DOM (solo 2+ apps web/landing)
-│   └── ui-native/                      # componentes React Native (solo 2+ apps móviles)
-├── scripts/check-boundaries.mjs        # validador de límites y plataformas (vendorizado)
-├── package.json                        # privado; scripts = turbo run <task>
-├── pnpm-workspace.yaml                 # apps/*, packages/* (y services/* si hay políglotas)
-└── turbo.json                          # pipeline de tareas
+│   ├── design-tokens/                  # colors, spacing and typography (universal)
+│   ├── ui-web/                         # React DOM components (only 2+ web/landing apps)
+│   └── ui-native/                      # React Native components (only 2+ mobile apps)
+├── scripts/check-boundaries.mjs        # boundary and platform validator (vendored)
+├── package.json                        # private; scripts = turbo run <task>
+├── pnpm-workspace.yaml                 # apps/*, packages/* (and services/* if there are polyglot services)
+└── turbo.json                          # task pipeline
 ```
 
 ---
 
-## 2. Responsabilidades y Plataformas
+## 2. Responsibilities and Platforms
 
-| Ubicación | Plataforma | Contiene | No contiene |
+| Location | Platform | Contains | Does not contain |
 | :--- | :--- | :--- | :--- |
-| `apps/web` | `web` | UI Next.js, RSC/Client, hooks, llamadas HTTP a la API | Lógica de negocio del servidor, DB de la API, código RN |
-| `apps/api` | `node` | Módulos de dominio, repositorios, reglas de negocio, Swagger | Componentes UI, código importado por otras apps |
-| `apps/mobile` | `native` | Pantallas Expo Router, NativeWind, `expo-secure-store`, hooks | APIs DOM (`window`, `localStorage`), paquetes `ui-web` |
-| `apps/landing` | `astro` | Páginas `.astro` Zero-JS, SEO, islas interactivas, Content Collections | Lógica de negocio API, paquetes `native` o servidor/ORM |
-| `apps/worker` / `spa` / `docs` | `node` / `web` / `astro` | Procesos asíncronos, admin SPA o documentación | Lógica duplicada que debería vivir en `packages/*` |
-| `services/<name>` | `node` | Servicios Python/Go/Rust integrados vía OpenAPI y shim Turborepo | Imports de código JS/TS entre workspaces |
-| `packages/contracts` | `universal` | Esquemas Zod y tipos inferidos puros | Imports de React, Next, Nest, Expo o Astro |
-| `packages/api-client` | `universal` | Tipos OpenAPI generados y `createApiClient` cross-platform | Código manual en `src/generated/` |
-| `packages/design-tokens` | `universal` | Paleta, spacing, radios, tipografía para Tailwind y NativeWind | JSX, DOM o componentes de plataforma |
-| `packages/ui-web` / `ui-native` | `web` / `native` | Primitivas compartidas por 2+ apps de la misma plataforma | Código de una sola app o mezcla DOM+RN |
+| `apps/web` | `web` | Next.js UI, RSC/Client, hooks, HTTP calls to the API | Server business logic, the API's DB, RN code |
+| `apps/api` | `node` | Domain modules, repositories, business rules, Swagger | UI components, code imported by other apps |
+| `apps/mobile` | `native` | Expo Router screens, NativeWind, `expo-secure-store`, hooks | DOM APIs (`window`, `localStorage`), `ui-web` packages |
+| `apps/landing` | `astro` | Zero-JS `.astro` pages, SEO, interactive islands, Content Collections | API business logic, `native` or server/ORM packages |
+| `apps/worker` / `spa` / `docs` | `node` / `web` / `astro` | Async processes, an admin SPA or documentation | Duplicated logic that should live in `packages/*` |
+| `services/<name>` | `node` | Python/Go/Rust services integrated through OpenAPI and a Turborepo shim | JS/TS code imports between workspaces |
+| `packages/contracts` | `universal` | Zod schemas and pure inferred types | Imports from React, Next, Nest, Expo or Astro |
+| `packages/api-client` | `universal` | Generated OpenAPI types and a cross-platform `createApiClient` | Hand-written code in `src/generated/` |
+| `packages/design-tokens` | `universal` | Palette, spacing, radii and typography for Tailwind and NativeWind | JSX, DOM or platform components |
+| `packages/ui-web` / `ui-native` | `web` / `native` | Primitives shared by 2+ apps on the same platform | Code for a single app, or a DOM+RN mix |
 
 ---
 
-## 3. Nombres
+## 3. Naming
 
-- **Paquetes internos:** `@<scope>/<name>` en kebab-case (`@acme/contracts`, `@acme/design-tokens`, `@acme/oxc-config`). El scope sale del `name` del `package.json` raíz.
-- **Apps y servicios:** nombre corto sin scope (`web`, `api`, `mobile`, `landing`, `admin`, `worker`). Se filtran con `pnpm --filter mobile`.
-- **Dominios:** el mismo nombre en todos los lados:
+- **Internal packages:** `@<scope>/<name>` in kebab-case (`@acme/contracts`, `@acme/design-tokens`, `@acme/oxc-config`). The scope comes from the root `package.json`'s `name`.
+- **Apps and services:** a short name without a scope (`web`, `api`, `mobile`, `landing`, `admin`, `worker`). Filter them with `pnpm --filter mobile`.
+- **Domains:** the same name everywhere:
   - `apps/api/src/modules/invoices` ↔ `apps/web/src/features/invoices` ↔ `apps/mobile/src/features/invoices` ↔ `packages/contracts/src/invoices`.
-  - Carpetas en plural y archivos internos en singular.
+  - Plural folders and singular internal files.
 
 ---
 
-## 4. Conectar una App (Con `scaffold-app.mjs`)
+## 4. Connecting an App (with `scaffold-app.mjs`)
 
-1. **Crea la app con su CLI oficial** (solo tras confirmación del usuario, porque descarga paquetes):
+1. **Create the app with its official CLI** (only after the user confirms, because it downloads packages):
    - **Web (Next.js):** `pnpm create next-app@latest apps/web --ts --app --src-dir --eslint --import-alias "@/*" --use-pnpm --skip-install --yes`
    - **API (NestJS):** `pnpm dlx @nestjs/cli new api --directory apps/api --package-manager pnpm --skip-git --skip-install`
    - **Mobile (Expo):** `pnpm dlx create-expo-app@latest apps/mobile --template tabs`
    - **Landing (Astro):** `pnpm create astro@latest apps/landing -- --template minimal --typescript strict --no-install --no-git`
    - **SPA (Vite):** `pnpm create vite@latest apps/admin --template react-ts`
-2. **Conecta la app al monorepo**:
+2. **Connect the app to the monorepo**:
    ```bash
    node <skill-dir>/scripts/scaffold-app.mjs <name> --type <web|api|mobile|landing|spa|docs|worker|polyglot> --dry-run
-   node <skill-dir>/scripts/scaffold-app.mjs <name> --type <preset> --force   # tras revisar el diff si ya existe package.json
+   node <skill-dir>/scripts/scaffold-app.mjs <name> --type <preset> --force   # after reviewing the diff if package.json already exists
    ```
-   Esto deja configurados:
-   - `tsconfig.json` extendiendo `@<scope>/tsconfig/<preset>.json` y conservando `@/*` → `./src/*`;
-   - `.oxlintrc.json` (y/o `eslint.config.mjs`) y scripts homogéneos (`build`, `dev`, `lint`, `format:check`, `typecheck`, `test`);
-   - `"monorepo": { "layer": "app", "type": "<preset>", "platform": "<platform>" }` y dependencias `workspace:*`;
-   - `metro.config.js` listo para monorepo si `--type mobile`.
-3. **Verifica**: `pnpm install && pnpm turbo run typecheck --filter <name>... && pnpm check:boundaries`.
+   This sets up:
+   - `tsconfig.json` extending `@<scope>/tsconfig/<preset>.json` and keeping `@/*` → `./src/*`;
+   - `.oxlintrc.json` (and/or `eslint.config.mjs`) and uniform scripts (`build`, `dev`, `lint`, `format:check`, `typecheck`, `test`);
+   - `"monorepo": { "layer": "app", "type": "<preset>", "platform": "<platform>" }` and `workspace:*` dependencies;
+   - a monorepo-ready `metro.config.js` if `--type mobile`.
+3. **Verify**: `pnpm install && pnpm turbo run typecheck --filter <name>... && pnpm check:boundaries`.
 
 ---
 
-## 5. Integrar en un Repositorio Existente
+## 5. Integrating into an Existing Repository
 
-`scaffold-monorepo.mjs` aborta si el `package.json` raíz ya existe. No uses `--force` a ciegas; migra por pasos:
+`scaffold-monorepo.mjs` aborts if the root `package.json` already exists. Do not use `--force` blindly; migrate step by step:
 
-1. **Workspaces:** crea `pnpm-workspace.yaml` y mueve cada proyecto existente a `apps/<name>` (o `services/<name>`) con `git mv` para conservar el historial.
-2. **Raíz:** añade `turbo.json` y los scripts `turbo run` al `package.json` raíz.
-3. **Paquetes compartidos:** genera `tsconfig`, `oxc-config` y `contracts`/`api-client` en un directorio temporal con `scaffold-monorepo.mjs`, y cópialos.
-4. **Conectar apps:** aplica los `extends` de `tsconfig.json`, añade `monorepo.platform` en los `package.json` y `metro.config.js` si hay app Expo.
-5. **Validación:** ejecuta `pnpm check:boundaries` y corrige las violaciones antes de activarlo en CI.
+1. **Workspaces:** create `pnpm-workspace.yaml` and move each existing project to `apps/<name>` (or `services/<name>`) with `git mv` to keep the history.
+2. **Root:** add `turbo.json` and the `turbo run` scripts to the root `package.json`.
+3. **Shared packages:** generate `tsconfig`, `oxc-config` and `contracts`/`api-client` in a temporary directory with `scaffold-monorepo.mjs`, and copy them over.
+4. **Connect apps:** apply the `tsconfig.json` `extends`, add `monorepo.platform` to the `package.json` files, and add `metro.config.js` if there is an Expo app.
+5. **Validation:** run `pnpm check:boundaries` and fix the violations before enabling it in CI.
 
 ---
 
-## 6. Extender con Nuevos Tipos de Repo
+## 6. Extending with New Repo Types
 
-El motor de arquetipos vive en `scripts/lib/presets.mjs` (`APP_PRESETS`). Para soportar un stack nuevo (ej. `sveltekit`, `remix`, `fastify`, `tauri`):
+The archetype engine lives in `scripts/lib/presets.mjs` (`APP_PRESETS`). To support a new stack (e.g. `sveltekit`, `remix`, `fastify`, `tauri`):
 
-1. **Añade el preset en `APP_PRESETS`** definiendo `id`, `platform` (`universal|web|native|node|astro`), `defaultDir`, `tsconfigPreset`, `envVars`, `turboOutputs`, `createCommand` y `skill` (si tiene skill propia).
-2. **Añade su `tsconfig`** en `tsconfigPackageFiles()` dentro de `scripts/lib/templates.mjs` si requiere opciones específicas de compilador.
-3. **Si es no-Node (Python, Go, Rust)**: usa `--type polyglot`, ubica el código en `services/<name>/`, envuelve sus comandos nativos (`uv run pytest`, `go test ./...`, `cargo test`) en los scripts del `package.json` shim y comparte contratos vía OpenAPI.
+1. **Add the preset to `APP_PRESETS`**, defining `id`, `platform` (`universal|web|native|node|astro`), `defaultDir`, `tsconfigPreset`, `envVars`, `turboOutputs`, `createCommand` and `skill` (if it has its own skill).
+2. **Add its `tsconfig`** in `tsconfigPackageFiles()` inside `scripts/lib/templates.mjs` if it needs specific compiler options.
+3. **If it is not Node (Python, Go, Rust)**: use `--type polyglot`, put the code in `services/<name>/`, wrap its native commands (`uv run pytest`, `go test ./...`, `cargo test`) in the shim `package.json` scripts and share contracts through OpenAPI.

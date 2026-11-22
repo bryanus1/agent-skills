@@ -1,29 +1,29 @@
-# Plataforma, Rendimiento Nativo y Accesibilidad
+# Platform, Native Performance and Accessibility
 
-Una app móvil requiere contemplar diferencias de sistema operativo (iOS vs Android), optimizaciones de renderizado para 60/120 fps y estándares estrictos de accesibilidad.
+A mobile app has to account for operating system differences (iOS vs Android), rendering optimizations for 60/120 fps and strict accessibility standards.
 
 ---
 
-## 📱 Extensiones Específicas de Plataforma (`.ios` / `.android`)
+## 📱 Platform-Specific Extensions (`.ios` / `.android`)
 
-Cuando la implementación de un componente o servicio difiere sustancialmente entre plataformas:
+When a component's or service's implementation differs substantially between platforms:
 
-1. **Ubicación:** coloca las variantes dentro de la **misma carpeta hoja** del componente:
+1. **Location:** place the variants inside the component's **same leaf folder**:
    ```
    src/features/billing/components/payment-sheet/
-   ├── payment-sheet.ios.tsx       # Implementación Apple Pay / StoreKit
-   ├── payment-sheet.android.tsx   # Implementación Google Pay
-   ├── payment-sheet.test.tsx      # Test que verifica comportamiento común
-   └── index.ts                    # Reexporta './payment-sheet' (Metro resuelve la extensión)
+   ├── payment-sheet.ios.tsx       # Apple Pay / StoreKit implementation
+   ├── payment-sheet.android.tsx   # Google Pay implementation
+   ├── payment-sheet.test.tsx      # Test that checks shared behavior
+   └── index.ts                    # Re-exports './payment-sheet' (Metro resolves the extension)
    ```
-2. **Barrel agnóstico:** `index.ts` solo debe exportar `export * from './payment-sheet'`; el bundler (Metro) resuelve automáticamente `.ios.tsx` o `.android.tsx`.
+2. **Platform-agnostic barrel:** `index.ts` must only export `export * from './payment-sheet'`; the bundler (Metro) resolves `.ios.tsx` or `.android.tsx` automatically.
 
 ---
 
-## ⚡ Rendimiento Nativo y 60 FPS
+## ⚡ Native Performance and 60 FPS
 
 ### 1. `react-native-safe-area-context`
-Evita márgenes fijos en pantallas completas; usa `useSafeAreaInsets` o envuelve con `SafeAreaView` para muescas (notches), Dynamic Island y barras de navegación en Android:
+Avoid fixed margins on full screens; use `useSafeAreaInsets` or wrap with `SafeAreaView` to handle notches, the Dynamic Island and Android navigation bars:
 
 ```tsx
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -38,8 +38,8 @@ export function ScreenContainer({ children }: { children: React.ReactNode }) {
 }
 ```
 
-### 2. Listas de Alto Rendimiento (`@shopify/flash-list`)
-Para feeds o listas de más de 20 elementos, sustituye `FlatList` por `FlashList` y memoiza los ítems:
+### 2. High-Performance Lists (`@shopify/flash-list`)
+For feeds or lists of more than 20 items, replace `FlatList` with `FlashList` and memoize the items:
 
 ```tsx
 import { FlashList } from '@shopify/flash-list';
@@ -56,22 +56,22 @@ export function InvoiceList({ items }: { items: readonly IInvoice[] }) {
 }
 ```
 
-### 3. Imágenes con `expo-image`
-Usa `Image` de `expo-image` en lugar del primitivo de React Native. Proporciona caché automática en disco y memoria, decodificación progresiva y transiciones suaves (`transition={200}`).
+### 3. Images with `expo-image`
+Use `Image` from `expo-image` instead of React Native's primitive. It provides automatic disk and memory caching, progressive decoding and smooth transitions (`transition={200}`).
 
-### 4. Animaciones en el Hilo Nativo
-Usa `react-native-reanimated` para animaciones complejas (gestos, arrastres, transiciones de layout) asegurando que corran al 100% en el UI Thread sin saturar el bridge JS.
+### 4. Animations on the Native Thread
+Use `react-native-reanimated` for complex animations (gestures, drags, layout transitions), making sure they run 100% on the UI thread without saturating the JS bridge.
 
 ---
 
-## ♿ Accesibilidad (a11y) Móvil
+## ♿ Mobile Accessibility (a11y)
 
-La accesibilidad garantiza que VoiceOver (iOS) y TalkBack (Android) puedan interactuar fluidamente con la app.
+Accessibility ensures that VoiceOver (iOS) and TalkBack (Android) can interact smoothly with the app.
 
-### Reglas Críticas:
-1. **Roles y Labels Semánticos:**
-   - En `Pressable`, especifica siempre `accessibilityRole="button"`.
-   - Si el botón solo contiene un ícono, añade obligatoriamente `accessibilityLabel="Cerrar modal"`.
-2. **Área táctil mínima:** todo elemento interactivo debe tener un área táctil de al menos **44x44 pt** (usa `hitSlop` si el elemento visual es menor).
-3. **Escalado Dinámico de Fuentes (Dynamic Type):** no limites `maxFontSizeMultiplier` salvo requerimientos de diseño estrictos para evitar truncado severo.
-4. **Queries de Test:** consulta la UI en tests con `@testing-library/react-native` usando `getByRole`, `getByLabelText` o `getByText`; nunca consultes selectores de estilo o clases CSS.
+### Critical Rules:
+1. **Semantic Roles and Labels:**
+   - On `Pressable`, always specify `accessibilityRole="button"`.
+   - If the button contains only an icon, you must add `accessibilityLabel="Close modal"`.
+2. **Minimum touch target:** every interactive element must have a touch area of at least **44x44 pt** (use `hitSlop` if the visual element is smaller).
+3. **Dynamic Type font scaling:** do not limit `maxFontSizeMultiplier` unless there are strict design requirements, to avoid severe truncation.
+4. **Test queries:** query the UI in tests with `@testing-library/react-native` using `getByRole`, `getByLabelText` or `getByText`; never query by style selectors or CSS classes.

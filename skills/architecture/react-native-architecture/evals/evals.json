@@ -4,61 +4,78 @@
     {
       "id": 1,
       "prompt": "Estructura la feature de facturación (billing) en mi app Expo con Expo Router, con archivos iniciales y su ruta.",
-      "expected_output": "El agente ejecuta scaffold-feature.mjs billing --with-starter --with-route (primero con --dry-run). Crea src/features/billing/ con components, hooks, models, schemas, screens, services y utils, models/billing.ts con su barrel, la screen screens/billing-home/ con test e index.ts y una ruta delgada src/app/billing/index.tsx que solo reexporta la screen. No crea index.ts en la raíz de la feature ni en components/.",
-      "files": []
+      "expected_output": "The agent runs scaffold-feature.mjs billing --with-starter --with-route (first with --dry-run). It creates src/features/billing/ with components, hooks, models, schemas, screens, services and utils, models/billing.ts with its barrel, the screens/billing-home/ screen with a test and index.ts, and a thin route src/app/billing/index.tsx that only re-exports the screen. It does not create an index.ts at the feature root or in components/. The reply is in Spanish.",
+      "files": [],
+      "assertions": [
+        "Runs scaffold-feature.mjs with --dry-run first",
+        "Creates the thin route src/app/billing/index.tsx that only re-exports the screen",
+        "Does not create index.ts at the feature root or in components/",
+        "Replies in Spanish"
+      ]
     },
     {
       "id": 2,
-      "prompt": "Crea un modal para crear facturas dentro de la feature billing.",
-      "expected_output": "El agente usa scaffold-component.mjs create-invoice-modal --target-dir src/features/billing/components --type modal. Genera un componente con Modal de React Native y NativeWind, TSDoc, un test con @testing-library/react-native y un index.ts en la carpeta hoja.",
+      "prompt": "Create a modal to create invoices inside the billing feature.",
+      "expected_output": "The agent uses scaffold-component.mjs create-invoice-modal --target-dir src/features/billing/components --type modal. It generates a component with React Native's Modal and NativeWind, TSDoc, a test with @testing-library/react-native and an index.ts in the leaf folder.",
       "files": []
     },
     {
       "id": 3,
-      "prompt": "Revisa estos imports: `import { usePetSearch, IPet } from '@/features/pets';` y `import { InvoiceCard } from '@/features/pets/components';`",
-      "expected_output": "El agente señala que ambos importan desde carpetas contenedoras sin barrel (política de barrels solo en carpetas hoja) y los reescribe: '@/features/pets/hooks/use-pet-search', '@/features/pets/models' y '@/features/pets/components/invoice-card'. Indica eliminar cualquier index.ts de carpetas contenedoras.",
+      "prompt": "Review these imports: `import { usePetSearch, IPet } from '@/features/pets';` and `import { InvoiceCard } from '@/features/pets/components';`",
+      "expected_output": "The agent points out that both import from container folders without a barrel (barrels only in leaf folders) and rewrites them: '@/features/pets/hooks/use-pet-search', '@/features/pets/models' and '@/features/pets/components/invoice-card'. It says to delete any index.ts in container folders.",
       "files": []
     },
     {
       "id": 4,
       "prompt": "Tengo esta ruta en Expo Router con lógica de negocio: `// src/app/invoices/index.tsx\nexport default function InvoicesRoute() {\n  const { data } = useQuery({ queryKey: ['invoices'], queryFn: fetchInvoices });\n  return <FlatList data={data} renderItem={...} />;\n}`. ¿Cómo la refactorizo según Screaming Architecture?",
-      "expected_output": "El agente indica que las rutas en src/app/** deben ser estrictamente delgadas y sin useQuery ni FlatList directo. Extrae la lógica a src/features/billing/ (un hook useInvoices en hooks/use-invoices, un servicio en services/get-invoices y una screen InvoicesHome en screens/invoices-home) y deja la ruta como un adaptador de una línea: export { InvoicesHome as default } from '@/features/billing/screens/invoices-home'.",
-      "files": []
+      "expected_output": "The agent says routes in src/app/** must be strictly thin, with no useQuery or direct FlatList. It extracts the logic to src/features/billing/ (a useInvoices hook in hooks/use-invoices, a service in services/get-invoices and an InvoicesHome screen in screens/invoices-home) and leaves the route as a one-line adapter: export { InvoicesHome as default } from '@/features/billing/screens/invoices-home'. The reply is in Spanish.",
+      "files": [],
+      "assertions": [
+        "Says src/app/** routes must be thin",
+        "Moves the query into a hook and a service inside the feature",
+        "Leaves the route as a one-line re-export of the screen",
+        "Replies in Spanish"
+      ]
     },
     {
       "id": 5,
-      "prompt": "Un compañero escribió esto en un componente móvil: `localStorage.setItem('auth_token', token); const w = window.innerWidth; return <div><button onClick={...}>Guardar</button></div>;`",
-      "expected_output": "El agente señala las violaciones críticas de móvil: localStorage no existe en React Native y nunca debe usarse para tokens (usar expo-secure-store), window.innerWidth no existe (usar useWindowDimensions o Dimensions de RN), y los elementos DOM div/button no existen (usar View y Pressable con accessibilityRole='button').",
+      "prompt": "A teammate wrote this in a mobile component: `localStorage.setItem('auth_token', token); const w = window.innerWidth; return <div><button onClick={...}>Save</button></div>;`",
+      "expected_output": "The agent points out the critical mobile violations: localStorage does not exist in React Native and must never be used for tokens (use expo-secure-store), window.innerWidth does not exist (use useWindowDimensions or RN's Dimensions), and the DOM elements div/button do not exist (use View and Pressable with accessibilityRole='button').",
       "files": []
     },
     {
       "id": 6,
-      "prompt": "Crea un hook de mutación para registrar una factura en la feature billing que invalide la lista de facturas.",
-      "expected_output": "El agente usa scaffold-hook.mjs use-create-invoice --feature billing --kind mutation --entity invoice. Genera la key factory jerárquica invoiceKeys en hooks/invoice-keys con all, lists(), list(filters), details(), detail(id) y el hook useCreateInvoice con useMutation invalidando invoiceKeys.lists().",
+      "prompt": "Create a mutation hook to register an invoice in the billing feature that invalidates the invoice list.",
+      "expected_output": "The agent uses scaffold-hook.mjs use-create-invoice --feature billing --kind mutation --entity invoice. It generates the hierarchical invoiceKeys key factory in hooks/invoice-keys with all, lists(), list(filters), details(), detail(id) and the useCreateInvoice hook with useMutation invalidating invoiceKeys.lists().",
       "files": []
     },
     {
       "id": 7,
-      "prompt": "Estoy en un monorepo Turborepo + pnpm con la app móvil en `apps/mobile`. Estructura la feature orders con screen inicial y su ruta.",
-      "expected_output": "El agente ejecuta scaffold-feature.mjs orders --target-dir apps/mobile/src/features --app-dir apps/mobile/src/app --with-starter --with-route (usando primero --dry-run) respetando la arquitectura móvil dentro del workspace del monorepo.",
+      "prompt": "I'm in a Turborepo + pnpm monorepo with the mobile app in `apps/mobile`. Structure the orders feature with a starter screen and its route.",
+      "expected_output": "The agent runs scaffold-feature.mjs orders --target-dir apps/mobile/src/features --app-dir apps/mobile/src/app --with-starter --with-route (using --dry-run first), respecting the mobile architecture inside the monorepo workspace.",
       "files": []
     },
     {
       "id": 8,
       "prompt": "¿Cómo protejo el grupo de rutas `(app)` en Expo Router para que requiera sesión activa?",
-      "expected_output": "El agente explica el uso de Stack.Protected (SDK 53+) o redirección en src/app/(app)/_layout.tsx consumiendo el estado de sesión desde src/features/auth/hooks/use-auth-session, esperando a la hidratación segura de tokens desde expo-secure-store antes de redirigir a /(auth)/login.",
-      "files": []
+      "expected_output": "The agent explains using Stack.Protected (SDK 53+) or a redirect in src/app/(app)/_layout.tsx, consuming the session state from src/features/auth/hooks/use-auth-session and waiting for the secure token hydration from expo-secure-store before redirecting to /(auth)/login. The reply is in Spanish.",
+      "files": [],
+      "assertions": [
+        "Uses Stack.Protected or a redirect in src/app/(app)/_layout.tsx",
+        "Waits for secure token hydration before redirecting",
+        "Replies in Spanish"
+      ]
     },
     {
       "id": 9,
-      "prompt": "Configura el tooling estándar de lint y formato para mi app Expo con NativeWind y Expo Router.",
-      "expected_output": "El agente ejecuta o recomienda setup-tooling.mjs (con --dry-run previo) para generar .oxlintrc.json con reglas arquitectónicas (no-restricted-imports para barrels y rutas delgadas), .oxfmtrc.json con sortTailwindcss: true y jest.config.js con preset jest-expo y umbral de cobertura del 90%.",
+      "prompt": "Set up the standard lint and format tooling for my Expo app with NativeWind and Expo Router.",
+      "expected_output": "The agent runs or recommends setup-tooling.mjs (with a prior --dry-run) to generate .oxlintrc.json with architectural rules (no-restricted-imports for barrels and thin routes), .oxfmtrc.json with sortTailwindcss: true and jest.config.js with the jest-expo preset and a 90% coverage threshold.",
       "files": []
     },
     {
       "id": 10,
-      "prompt": "Estructura la feature de facturación en mi app Next.js con App Router y Server Actions.",
-      "expected_output": "El agente detecta que la solicitud es para Next.js con Server Actions (web) y no para React Native móvil / Expo Router, por lo que NO activa react-native-architecture y deriva a nextjs-architecture.",
+      "prompt": "Structure the billing feature in my Next.js app with the App Router and Server Actions.",
+      "expected_output": "The agent detects that the request is for Next.js with Server Actions (web) and not for React Native mobile / Expo Router, so it does NOT activate react-native-architecture and defers to nextjs-architecture.",
       "files": []
     }
   ]

@@ -1,58 +1,58 @@
-# Guía de Screaming Architecture (Feature-Driven / Domain-First)
+# Screaming Architecture Guide (Feature-Driven / Domain-First)
 
-Esta guía define el estándar de organización de directorios, límites de capas, convenciones de nomenclatura y políticas de importación para aplicaciones modernas en Next.js (App Router).
-
----
-
-## 1. Principio Fundamental: Screaming Architecture
-
-La estructura de carpetas del proyecto debe "gritar" el dominio del negocio antes que los detalles técnicos del framework.
-- **Orientado al Dominio**: Cada capacidad de negocio vive en un módulo autónomo dentro de `src/features/<feature-name>/`.
-- **Desacoplamiento Estricto**: La capa visual (`screens/`, `components/`), los contratos de datos (`models/`), la validación (`schemas/`), la orquestación (`hooks/`) y la comunicación con servicios (`services/`) están claramente separadas.
-- **Thin App Router**: Los archivos bajo `src/app/**` actúan únicamente como despachadores de rutas. Su función es montar pantallas (`screens`), proveer metadatos (`Metadata`) y configurar layouts, sin contener lógica de negocio ni estado.
-- **Server Components por Defecto**: Las pantallas (`screens/`) y componentes (`components/`) son **React Server Components (RSC)** por defecto. La directiva `'use client'` se empuja exclusivamente hacia las hojas interactivas (`*-form-dialog`, controles con estado local o consumidores de hooks).
+This guide defines the standard for directory organization, layer boundaries, naming conventions and import policies for modern Next.js (App Router) applications.
 
 ---
 
-## 2. Árbol de Directorios Estándar
+## 1. Core Principle: Screaming Architecture
+
+The project's folder structure must "scream" the business domain before the framework's technical details.
+- **Domain-Oriented**: each business capability lives in a self-contained module inside `src/features/<feature-name>/`.
+- **Strict Decoupling**: the visual layer (`screens/`, `components/`), data contracts (`models/`), validation (`schemas/`), orchestration (`hooks/`) and service communication (`services/`) are clearly separated.
+- **Thin App Router**: files under `src/app/**` act only as route dispatchers. Their job is to mount screens (`screens`), provide metadata (`Metadata`) and configure layouts, with no business logic or state.
+- **Server Components by Default**: screens (`screens/`) and components (`components/`) are **React Server Components (RSC)** by default. The `'use client'` directive is pushed only to interactive leaves (`*-form-dialog`, controls with local state or hook consumers).
+
+---
+
+## 2. Standard Directory Tree
 
 ```text
-├── e2e/                  # Especificaciones E2E con Playwright (<feature>.spec.ts)
+├── e2e/                  # Playwright E2E specs (<feature>.spec.ts)
 └── src/
-    ├── app/              # Capa de routing delgada (layout.tsx, page.tsx, route.ts)
-    ├── config/           # Configuración global (env, constantes, feature flags)
-    ├── contexts/         # Subcarpetas de contextos React globales (ej: auth, theme)
-    ├── features/         # Módulos de dominio de negocio
+    ├── app/              # Thin routing layer (layout.tsx, page.tsx, route.ts)
+    ├── config/           # Global configuration (env, constants, feature flags)
+    ├── contexts/         # Subfolders for global React contexts (e.g. auth, theme)
+    ├── features/         # Business domain modules
     │   └── <feature-name>/   # e.g., landing, auth, billing, users
-    │       ├── components/   # Componentes UI exclusivos de la feature
-    │       │   └── sections/ # Subcomponentes de secciones de página (opcional)
-    │       ├── hooks/        # Hooks de React específicos de la feature
-    │       ├── models/       # Modelos de dominio planos (con index.ts)
-    │       ├── schemas/      # Esquemas de validación Zod planos (con index.ts)
-    │       ├── screens/      # Pantallas completas ensambladas
-    │       ├── services/     # Server Actions / llamadas API ('use server' o fetch)
-    │       └── utils/        # Utilidades de feature y lógica extraída de rutas/layouts (con tests + index.ts)
-    ├── components/       # Elementos UI compartidos y agnósticos de dominio
-    │   ├── ui/           # Primitivas base (ej. componentes de shadcn/ui)
-    │   ├── common/       # Componentes compuestos compartidos (FormDialog, Logo, etc.)
-    │   └── icons/        # Subcarpetas de iconos SVG (con componente + index.ts)
-    ├── hooks/            # Hooks de React globales y agnósticos (ej: use-debounce)
-    ├── lib/              # Utilidades compartidas (ej: utils.ts, client config)
-    ├── models/           # Modelos de dominio globales y compartidos (archivos planos)
-    └── types/            # Declaraciones de tipos ambientales de TypeScript
+    │       ├── components/   # UI components exclusive to the feature
+    │       │   └── sections/ # Page section subcomponents (optional)
+    │       ├── hooks/        # React hooks specific to the feature
+    │       ├── models/       # Flat domain models (with index.ts)
+    │       ├── schemas/      # Flat Zod validation schemas (with index.ts)
+    │       ├── screens/      # Fully assembled screens
+    │       ├── services/     # Server Actions / API calls ('use server' or fetch)
+    │       └── utils/        # Feature utilities and logic extracted from routes/layouts (with tests + index.ts)
+    ├── components/       # Shared, domain-agnostic UI elements
+    │   ├── ui/           # Base primitives (e.g. shadcn/ui components)
+    │   ├── common/       # Shared composite components (FormDialog, Logo, etc.)
+    │   └── icons/        # SVG icon subfolders (with component + index.ts)
+    ├── hooks/            # Global, agnostic React hooks (e.g. use-debounce)
+    ├── lib/              # Shared utilities (e.g. utils.ts, client config)
+    ├── models/           # Global, shared domain models (flat files)
+    └── types/            # Ambient TypeScript type declarations
 ```
 
 ---
 
-## 3. Patrón de Encapsulación en Subcarpeta & Sufijos
+## 3. Subfolder Encapsulation Pattern & Suffixes
 
-### 3.1 Estándar de Subcarpeta Encapsulada
-Cada componente, screen, hook, servicio, contexto e icono reside en su propia subcarpeta dedicada con nombre en `kebab-case`. La subcarpeta contiene:
-1. **Archivo de implementación**: `<entity-name>.<suffix>.<ext>`
-2. **Archivo de test colocalizado (Vitest)**: `<entity-name>.<suffix>.test.<ext>`
-3. **Local barrel file**: `index.ts` que exporta únicamente esa entidad (`export * from './<entity-name>.<suffix>';`).
+### 3.1 Encapsulated Subfolder Standard
+Each component, screen, hook, service, context and icon lives in its own dedicated subfolder named in `kebab-case`. The subfolder contains:
+1. **Implementation file**: `<entity-name>.<suffix>.<ext>`
+2. **Colocated test file (Vitest)**: `<entity-name>.<suffix>.test.<ext>`
+3. **Local barrel file**: an `index.ts` that exports only that entity (`export * from './<entity-name>.<suffix>';`).
 
-#### Ejemplo de Hook:
+#### Hook example:
 ```text
 src/features/billing/hooks/use-invoices/
 ├── index.ts
@@ -60,7 +60,7 @@ src/features/billing/hooks/use-invoices/
 └── use-invoices.hook.ts
 ```
 
-#### Ejemplo de Componente:
+#### Component example:
 ```text
 src/features/billing/components/invoice-card/
 ├── index.ts
@@ -68,8 +68,8 @@ src/features/billing/components/invoice-card/
 └── invoice-card.tsx
 ```
 
-### 3.2 Carpetas Hoja de Archivos Planos (`models/`, `schemas/`, `utils/`)
-Los modelos de dominio (`models/`), los esquemas de validación (`schemas/`) y las funciones utilitarias (`utils/`) residen directamente como **archivos planos** dentro de su respectiva carpeta, acompañados de un único `index.ts`:
+### 3.2 Flat-File Leaf Folders (`models/`, `schemas/`, `utils/`)
+Domain models (`models/`), validation schemas (`schemas/`) and utility functions (`utils/`) live directly as **flat files** inside their folder, alongside a single `index.ts`:
 
 ```text
 src/features/billing/models/
@@ -88,58 +88,58 @@ src/features/billing/utils/
 └── parse-billing-search-params.ts
 ```
 
-- **Sin subcarpetas individuales**: No se crean subcarpetas individuales por modelo, esquema o utilidad.
-- **Política de tests en carpetas planas**:
-  - `models/` y `schemas/` son contratos declarativos y esquemas puros; **no** llevan archivos `.test.ts`.
-  - `utils/` contiene lógica pura y transformaciones; **sí** lleva su archivo `.test.ts` adyacente a cada utilidad.
-- **Barrel local**: Al ser carpetas hoja con archivos directos, `models/index.ts`, `schemas/index.ts` y `utils/index.ts` reexportan todos sus miembros para un consumo limpio.
+- **No individual subfolders**: no subfolder is created per model, schema or utility.
+- **Test policy in flat folders**:
+  - `models/` and `schemas/` are declarative contracts and pure schemas; they have **no** `.test.ts` files.
+  - `utils/` contains pure logic and transformations; it **does** have a `.test.ts` next to each utility.
+- **Local barrel**: as leaf folders with direct files, `models/index.ts`, `schemas/index.ts` and `utils/index.ts` re-export all their members for clean consumption.
 
-### 3.3 Tabla de Sufijos y Convenciones
+### 3.3 Suffixes and Conventions Table
 
-| Capa / Tipo | Casing de Subcarpeta | Sufijo de Archivo | Sufijo de Test (Vitest) | Ejemplo de Ruta |
+| Layer / Type | Subfolder Casing | File Suffix | Test Suffix (Vitest) | Path Example |
 | :--- | :--- | :--- | :--- | :--- |
-| **Componente React** | `kebab-case` | `.tsx` | `.test.tsx` | `billing-header/billing-header.tsx` |
-| **Screen (Pantalla)** | `kebab-case` | `.tsx` | `.test.tsx` | `billing-overview/billing-overview.tsx` |
+| **React component** | `kebab-case` | `.tsx` | `.test.tsx` | `billing-header/billing-header.tsx` |
+| **Screen** | `kebab-case` | `.tsx` | `.test.tsx` | `billing-overview/billing-overview.tsx` |
 | **Form Dialog** | `kebab-case` (`*-form-dialog`) | `.tsx` | `.test.tsx` | `invoice-form-dialog/invoice-form-dialog.tsx` |
-| **Hook de React** | `kebab-case` | `.hook.ts` | `.hook.test.ts` | `use-invoices/use-invoices.hook.ts` |
-| **Esquema Zod** | *Carpeta Hoja* | `.schema.ts` | — | `schemas/create-invoice.schema.ts` + `schemas/index.ts` |
-| **Servicio / Action** | `kebab-case` | `.service.ts` | `.service.test.ts` | `create-invoice/create-invoice.service.ts` |
-| **Contexto React** | `kebab-case` | `.context.tsx` | `.context.test.tsx` | `billing/billing.context.tsx` |
-| **Modelos de Dominio** | *Carpeta Hoja* | `.ts` | — | `models/invoice.ts` + `models/index.ts` |
-| **Utilidades** | *Carpeta Hoja* | `.ts` | `.test.ts` | `utils/parse-billing-params.ts` + `utils/index.ts` |
-| **Icono SVG** | `kebab-case` | `.tsx` | — | `icons/credit-card/credit-card.tsx` |
-| **Test E2E (Playwright)** | *Raíz `e2e/`* | `.spec.ts` | `.spec.ts` | `e2e/billing.spec.ts` |
+| **React hook** | `kebab-case` | `.hook.ts` | `.hook.test.ts` | `use-invoices/use-invoices.hook.ts` |
+| **Zod schema** | *Leaf folder* | `.schema.ts` | — | `schemas/create-invoice.schema.ts` + `schemas/index.ts` |
+| **Service / Action** | `kebab-case` | `.service.ts` | `.service.test.ts` | `create-invoice/create-invoice.service.ts` |
+| **React context** | `kebab-case` | `.context.tsx` | `.context.test.tsx` | `billing/billing.context.tsx` |
+| **Domain models** | *Leaf folder* | `.ts` | — | `models/invoice.ts` + `models/index.ts` |
+| **Utilities** | *Leaf folder* | `.ts` | `.test.ts` | `utils/parse-billing-params.ts` + `utils/index.ts` |
+| **SVG icon** | `kebab-case` | `.tsx` | — | `icons/credit-card/credit-card.tsx` |
+| **E2E test (Playwright)** | *`e2e/` root* | `.spec.ts` | `.spec.ts` | `e2e/billing.spec.ts` |
 
 ---
 
-## 4. Política de Barrel Files: Regla de la Hoja Terminal (*Leaf-Folder Policy*)
+## 4. Barrel File Policy: the Leaf-Folder Rule
 
-El estándar sigue un principio estricto y predecible:
+The standard follows a strict, predictable principle:
 
-> **Regla de Oro**:
-> - Una carpeta **SOLO** debe tener `index.ts` si contiene **directamente archivos de implementación** (carpeta hoja).
-> - Si una carpeta contiene **subcarpetas** (carpetas intermedias o contenedoras), **NUNCA** debe tener `index.ts`.
+> **Golden Rule**:
+> - A folder has an `index.ts` **ONLY** if it **directly contains implementation files** (a leaf folder).
+> - If a folder contains **subfolders** (intermediate or container folders), it **NEVER** has an `index.ts`.
 
-### 4.1 Matriz de Barrels
+### 4.1 Barrel Matrix
 
-| Ruta de Directorio | ¿Contiene Subcarpetas o Archivos? | ¿Lleva `index.ts`? | Motivo |
+| Directory Path | Contains Subfolders or Files? | Has an `index.ts`? | Reason |
 | :--- | :--- | :---: | :--- |
-| `src/features/<feature>/` | Contiene subcarpetas (`components/`, `hooks/`, etc.) | ❌ **NO** | Carpeta raíz contenedora de feature. Rompe tree-shaking. |
-| `src/features/<feature>/components/` | Contiene subcarpetas de componentes | ❌ **NO** | Agrupador intermedio. |
-| `src/features/<feature>/components/invoice-card/` | Contiene archivos (`invoice-card.tsx`, `.test.tsx`) | ✅ **SÍ** | Carpeta hoja con archivos directos. |
-| `src/features/<feature>/components/sections/` | Contiene subcarpetas (`hero/`, `pricing/`) | ❌ **NO** | Agrupador intermedio de secciones. |
-| `src/features/<feature>/components/sections/hero/` | Contiene archivos directos (`hero.tsx`, `.test.tsx`) | ✅ **SÍ** | Carpeta hoja final. |
-| `src/features/<feature>/models/` | Contiene archivos directos (`invoice.ts`, `customer.ts`) | ✅ **SÍ** | Carpeta hoja con archivos directos. |
-| `src/features/<feature>/schemas/` | Contiene archivos directos (`create-invoice.schema.ts`) | ✅ **SÍ** | Carpeta hoja con archivos directos. |
-| `src/features/<feature>/utils/` | Contiene archivos directos (`parse-params.ts`, etc.) | ✅ **SÍ** | Carpeta hoja con archivos directos. |
-| `src/features/<feature>/hooks/` | Contiene subcarpetas (`use-invoices/`, etc.) | ❌ **NO** | Agrupador intermedio (no colocar archivos sueltos aquí). |
-| `src/features/<feature>/hooks/use-invoices/` | Contiene archivos directos (`.hook.ts`, `.test.ts`) | ✅ **SÍ** | Carpeta hoja final. |
+| `src/features/<feature>/` | Contains subfolders (`components/`, `hooks/`, etc.) | ❌ **NO** | Feature root container. Breaks tree-shaking. |
+| `src/features/<feature>/components/` | Contains component subfolders | ❌ **NO** | Intermediate grouper. |
+| `src/features/<feature>/components/invoice-card/` | Contains files (`invoice-card.tsx`, `.test.tsx`) | ✅ **YES** | Leaf folder with direct files. |
+| `src/features/<feature>/components/sections/` | Contains subfolders (`hero/`, `pricing/`) | ❌ **NO** | Intermediate section grouper. |
+| `src/features/<feature>/components/sections/hero/` | Contains direct files (`hero.tsx`, `.test.tsx`) | ✅ **YES** | Final leaf folder. |
+| `src/features/<feature>/models/` | Contains direct files (`invoice.ts`, `customer.ts`) | ✅ **YES** | Leaf folder with direct files. |
+| `src/features/<feature>/schemas/` | Contains direct files (`create-invoice.schema.ts`) | ✅ **YES** | Leaf folder with direct files. |
+| `src/features/<feature>/utils/` | Contains direct files (`parse-params.ts`, etc.) | ✅ **YES** | Leaf folder with direct files. |
+| `src/features/<feature>/hooks/` | Contains subfolders (`use-invoices/`, etc.) | ❌ **NO** | Intermediate grouper (do not put loose files here). |
+| `src/features/<feature>/hooks/use-invoices/` | Contains direct files (`.hook.ts`, `.test.ts`) | ✅ **YES** | Final leaf folder. |
 
-### 4.2 Convención de Importaciones
-Las importaciones siempre deben usar el alias `@/*` apuntando a la carpeta hoja que posee el `index.ts`:
+### 4.2 Import Convention
+Imports must always use the `@/*` alias pointing to the leaf folder that owns the `index.ts`:
 
 ```typescript
-// ✅ CORRECTO: Importar desde la carpeta hoja que posee index.ts
+// ✅ CORRECT: import from the leaf folder that owns index.ts
 import { BillingOverview } from '@/features/billing/screens/billing-overview';
 import { useInvoices } from '@/features/billing/hooks/use-invoices';
 import { createInvoice } from '@/features/billing/services/create-invoice';
@@ -148,7 +148,7 @@ import { createInvoiceSchema } from '@/features/billing/schemas';
 import { parseBillingSearchParams } from '@/features/billing/utils';
 import { FormDialog } from '@/components/common/form-dialog';
 
-// ❌ PROHIBIDO: Importar desde contenedores padre sin barrel o saltar el barrel de utils/models/schemas
+// ❌ FORBIDDEN: importing from parent containers without a barrel, or skipping the utils/models/schemas barrel
 import { BillingOverview, useInvoices } from '@/features/billing';
 import { FormDialog } from '@/components/common';
 import { InvoiceCard } from '@/features/billing/components';
@@ -157,37 +157,37 @@ import { parseBillingSearchParams } from '@/features/billing/utils/parse-billing
 
 ---
 
-## 5. Convenciones de Identificadores en Código
+## 5. Identifier Conventions in Code
 
-| Entidad | Casing | Regla / Prefijo | Ejemplo |
+| Entity | Casing | Rule / Prefix | Example |
 | :--- | :--- | :--- | :--- |
-| **Componentes & Screens** | `PascalCase` | Sustantivo descriptivo | `InvoiceCard`, `BillingOverview` |
-| **Form Dialogs** | `PascalCase` | Sufijo `FormDialog` | `InvoiceFormDialog`, `PaymentFormDialog` |
-| **Hooks de React** | `camelCase` | Prefijo `use` | `useInvoices`, `useDebounce` |
-| **Esquemas Zod** | `camelCase` | Sufijo `Schema` | `createInvoiceSchema`, `loginSchema` |
-| **Servicios / Actions** | `camelCase` | Verbo + sustantivo | `createInvoice`, `getInvoices` |
-| **Interfaces de Dominio** | `PascalCase` | Prefijo `I` | `IInvoice`, `IPaymentMethod` |
-| **Tipos y Enums** | `PascalCase` | Sustantivo | `InvoiceStatus`, `PaymentGateway` |
-| **Utilidades y Helpers** | `camelCase` | Verbo / Acción | `formatCurrency`, `cn` |
-| **Constantes Globales** | `UPPER_SNAKE_CASE` | Inmutable | `DEFAULT_PAGE_SIZE`, `MAX_ATTACHMENT_MB` |
+| **Components & Screens** | `PascalCase` | Descriptive noun | `InvoiceCard`, `BillingOverview` |
+| **Form Dialogs** | `PascalCase` | `FormDialog` suffix | `InvoiceFormDialog`, `PaymentFormDialog` |
+| **React hooks** | `camelCase` | `use` prefix | `useInvoices`, `useDebounce` |
+| **Zod schemas** | `camelCase` | `Schema` suffix | `createInvoiceSchema`, `loginSchema` |
+| **Services / Actions** | `camelCase` | Verb + noun | `createInvoice`, `getInvoices` |
+| **Domain interfaces** | `PascalCase` | `I` prefix | `IInvoice`, `IPaymentMethod` |
+| **Types and Enums** | `PascalCase` | Noun | `InvoiceStatus`, `PaymentGateway` |
+| **Utilities and helpers** | `camelCase` | Verb / action | `formatCurrency`, `cn` |
+| **Global constants** | `UPPER_SNAKE_CASE` | Immutable | `DEFAULT_PAGE_SIZE`, `MAX_ATTACHMENT_MB` |
 
 ---
 
-## 6. Política de Testing Dual: Vitest (Unit) + Playwright (E2E)
+## 6. Dual Testing Policy: Vitest (Unit) + Playwright (E2E)
 
-### 6.1 Exclusiones de Pruebas Unitarias (Vitest)
-Para evitar tests redundantes sobre código declarativo o pegamento de enrutamiento, las siguientes carpetas **NO llevan pruebas unitarias (`.test.tsx` / `.test.ts`)**:
-- **`src/app/`**: Capa de entrega delgada (Thin App Router). Se verifica de extremo a extremo con **Playwright** en `e2e/`.
-- **`src/config/`**: Constantes inmutables, feature flags y validación de variables de entorno estáticas.
-- **`models/`**: Interfaces, tipos y enums de TypeScript sin lógica en tiempo de ejecución.
-- **`schemas/`**: Esquemas declarativos de validación Zod (se ejercitan en los tests de los servicios y hooks que los consumen).
+### 6.1 Unit Test Exclusions (Vitest)
+To avoid redundant tests over declarative code or routing glue, the following folders have **NO unit tests (`.test.tsx` / `.test.ts`)**:
+- **`src/app/`**: thin delivery layer (Thin App Router). It is verified end to end with **Playwright** in `e2e/`.
+- **`src/config/`**: immutable constants, feature flags and static environment variable validation.
+- **`models/`**: TypeScript interfaces, types and enums with no runtime logic.
+- **`schemas/`**: declarative Zod validation schemas (exercised in the tests of the services and hooks that consume them).
 
-### 6.2 Extracción Obligatoria de Lógica de Rutas a `utils/`
-En Next.js 15+, `params` y `searchParams` son promesas (`Promise<...>`). Si una página o layout requiere procesar datos (extraer y transformar query params, formatear metadatos dinámicos o verificar condiciones de redirección):
+### 6.2 Mandatory Extraction of Route Logic to `utils/`
+In Next.js 15+, `params` and `searchParams` are promises (`Promise<...>`). If a page or layout needs to process data (extracting and transforming query params, formatting dynamic metadata or checking redirect conditions):
 
-1. **Extraer la lógica a una función pura en `src/features/<feature>/utils/<util-name>.ts`** (y reexportarla en `utils/index.ts`).
-2. **Escribir pruebas unitarias con Vitest en `utils/<util-name>.test.ts`** asegurando cobertura $\ge 90\%$.
-3. **Consumir desde el barrel `@/features/<feature>/utils` en `page.tsx`**:
+1. **Extract the logic to a pure function in `src/features/<feature>/utils/<util-name>.ts`** (and re-export it in `utils/index.ts`).
+2. **Write Vitest unit tests in `utils/<util-name>.test.ts`**, ensuring $\ge 90\%$ coverage.
+3. **Consume it from the `@/features/<feature>/utils` barrel in `page.tsx`**:
    ```tsx
    // src/app/(dashboard)/billing/page.tsx
    import type { Metadata } from 'next';

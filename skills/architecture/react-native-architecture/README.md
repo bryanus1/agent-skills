@@ -1,35 +1,35 @@
 # 📱 React Native Screaming Architecture (`react-native-architecture`)
 
-> **Estándar de Screaming Architecture para React Native con Expo Router. Guía la estructuración por features, rutas delgadas en `src/app`, hooks con TanStack Query, estilos NativeWind, tests con Jest ($\ge 90\%$), análisis estático ultra-rápido con Oxlint y formato Oxfmt.**
+> **Screaming Architecture standard for React Native with Expo Router. Guides feature-based structure, thin routes in `src/app`, TanStack Query hooks, NativeWind styling, Jest tests ($\ge 90\%$), ultra-fast static analysis with Oxlint and Oxfmt formatting.**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `react-native-architecture` |
-| **Categoría** | `architecture` |
-| **Versión** | `1.1.0` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
-| **Requisitos** | `node` |
+| **Name** | `react-native-architecture` |
+| **Category** | `architecture` |
+| **Version** | `1.2.0` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Requirements** | `node` |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
-### Vía `skills.sh` CLI (Recomendado)
+### Via the `skills.sh` CLI (Recommended)
 
 ```bash
-# Instalar en el proyecto actual:
+# Install in the current project:
 npx skills add bryanus1/agent-skills --skill react-native-architecture
 
-# Instalar globalmente en tu máquina:
+# Install globally on your machine:
 npx skills add bryanus1/agent-skills --skill react-native-architecture -g
 ```
 
-### Vía Enlace Simbólico Local
+### Via a Local Symlink
 
 ```bash
 # Google Antigravity:
 mkdir -p .agents/skills
-ln -s /ruta/a/agent-skills/skills/architecture/react-native-architecture .agents/skills/react-native-architecture
+ln -s /path/to/agent-skills/skills/architecture/react-native-architecture .agents/skills/react-native-architecture
 
 # Claude Code:
 mkdir -p .claude/skills
@@ -38,43 +38,43 @@ ln -s ../../.agents/skills/react-native-architecture .claude/skills/react-native
 
 ---
 
-## 💡 Ejemplos de Uso con Agentes de IA
+## 💡 Usage Examples with AI Agents
 
-* **Andamiar una feature móvil completa con ruta en Expo Router y layout**:
-  > *"Crea la feature de facturación (billing) en React Native con screen inicial, layout y ruta en (tabs)/billing"*
+* **Scaffold a full mobile feature with an Expo Router route and layout**:
+  > *"Create the billing feature in React Native with a starter screen, a layout and a route at (tabs)/billing"*
   >
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-feature.mjs billing --with-starter --with-route --route-path "(tabs)/billing" --with-layout`  
-  > ➔ Genera las subcarpetas en `src/features/billing/`, el modelo plano, la screen `billing-home` con NativeWind y test unitario, y la ruta delgada con `_layout.tsx` en `src/app/(tabs)/billing/`.
+  > 🤖 **The agent will run**: `node <skill-dir>/scripts/scaffold-feature.mjs billing --with-starter --with-route --route-path "(tabs)/billing" --with-layout`  
+  > ➔ Generates the subfolders in `src/features/billing/`, the flat model, the `billing-home` screen with NativeWind and a unit test, and the thin route with `_layout.tsx` in `src/app/(tabs)/billing/`.
 
-* **Crear un hook de mutación con TanStack Query y key factory**:
-  > *"Crea el hook use-create-invoice en la feature billing"*
+* **Create a TanStack Query mutation hook with a key factory**:
+  > *"Create the use-create-invoice hook in the billing feature"*
   >
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-hook.mjs use-create-invoice --feature billing --kind mutation --entity invoice`  
-  > ➔ Genera la key factory jerárquica `invoiceKeys` en `hooks/invoice-keys/`, el hook `useCreateInvoice` con invalidación automática de listas y su test con `QueryClientProvider`.
+  > 🤖 **The agent will run**: `node <skill-dir>/scripts/scaffold-hook.mjs use-create-invoice --feature billing --kind mutation --entity invoice`  
+  > ➔ Generates the hierarchical `invoiceKeys` key factory in `hooks/invoice-keys/`, the `useCreateInvoice` hook with automatic list invalidation and its test with a `QueryClientProvider`.
 
-* **Crear un servicio de datos**:
-  > *"Crea el servicio get-invoices para la feature billing"*
+* **Create a data service**:
+  > *"Create the get-invoices service for the billing feature"*
   >
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-service.mjs get-invoices --feature billing`  
-  > ➔ Genera `services/get-invoices/get-invoices.service.ts` con tipado de `apiClient` y su test con mocks.
+  > 🤖 **The agent will run**: `node <skill-dir>/scripts/scaffold-service.mjs get-invoices --feature billing`  
+  > ➔ Generates `services/get-invoices/get-invoices.service.ts` with `apiClient` typing and its test with mocks.
 
-* **Configurar tooling Jest + OXC en el proyecto**:
-  > *"Configura Oxlint, Oxfmt y Jest con las reglas de arquitectura en mi app móvil"*
+* **Set up Jest + OXC tooling in the project**:
+  > *"Set up Oxlint, Oxfmt and Jest with the architecture rules in my mobile app"*
   >
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/setup-tooling.mjs`  
-  > ➔ Genera `.oxlintrc.json` con restricciones de imports arquitectónicos, `.oxfmtrc.json` con ordenamiento de clases Tailwind y `jest.config.js`.
+  > 🤖 **The agent will run**: `node <skill-dir>/scripts/setup-tooling.mjs`  
+  > ➔ Generates `.oxlintrc.json` with architectural import restrictions, `.oxfmtrc.json` with Tailwind class sorting, and `jest.config.js`.
 
-* **Validar cumplimiento de la arquitectura**:
-  > *"Verifica si mi código cumple con Screaming Architecture"*
+* **Validate architecture compliance**:
+  > *"Check whether my code follows Screaming Architecture"*
   >
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/check-architecture.mjs --include-imports`  
-  > ➔ Audita barrels en carpetas contenedoras, rutas no delgadas en `src/app/`, tests ausentes y uso accidental de APIs del navegador.
+  > 🤖 **The agent will run**: `node <skill-dir>/scripts/check-architecture.mjs --include-imports`  
+  > ➔ Audits barrels in container folders, non-thin routes in `src/app/`, missing tests and accidental use of browser APIs.
 
 ---
 
-## 🛠️ Scripts y Opciones CLI
+## 🛠️ Scripts and CLI Options
 
-> `<skill-dir>` es el directorio donde está instalada esta skill (p. ej. `.agents/skills/react-native-architecture` o `.claude/skills/react-native-architecture`).
+> `<skill-dir>` is the directory where this skill is installed (e.g. `.agents/skills/react-native-architecture` or `.claude/skills/react-native-architecture`).
 
 - **[`scripts/scaffold-feature.mjs`](scripts/scaffold-feature.mjs)**:
   ```bash
@@ -103,24 +103,24 @@ ln -s ../../.agents/skills/react-native-architecture .claude/skills/react-native
 
 ---
 
-## ⚡ Migrar de ESLint/Prettier a OXC
+## ⚡ Migrating from ESLint/Prettier to OXC
 
-OXC reemplaza a ESLint y Prettier reduciendo los tiempos de CI de minutos a milisegundos:
+OXC replaces ESLint and Prettier, cutting CI times from minutes to milliseconds:
 
-1. **Instalación de paquetes:**
+1. **Install the packages:**
    ```bash
    pnpm add -D oxlint oxfmt
    ```
-2. **Generar configuraciones estándar:**
+2. **Generate the standard configurations:**
    ```bash
    node <skill-dir>/scripts/setup-tooling.mjs --only lint
    node <skill-dir>/scripts/setup-tooling.mjs --only format
    ```
-3. **Reglas de arquitectura incluidas:**
-   - `no-restricted-imports`: prohíbe importar desde la raíz de una feature (`@/features/billing`) o desde agrupadores (`@/features/billing/components`).
-   - `overrides` en `src/app/**`: prohíbe invocar `@tanstack/react-query` o servicios directamente en las rutas de Expo Router.
-   - `sortTailwindcss`: ordena automáticamente las clases utilitarias de NativeWind a velocidad Rust sin necesidad de plugins pesados de Prettier.
-4. **Scripts en `package.json`:**
+3. **Included architecture rules:**
+   - `no-restricted-imports`: forbids importing from a feature root (`@/features/billing`) or from groupers (`@/features/billing/components`).
+   - `overrides` for `src/app/**`: forbids calling `@tanstack/react-query` or services directly in Expo Router routes.
+   - `sortTailwindcss`: automatically sorts NativeWind utility classes at Rust speed, without heavy Prettier plugins.
+4. **Scripts in `package.json`:**
    ```json
    {
      "scripts": {
@@ -133,14 +133,14 @@ OXC reemplaza a ESLint y Prettier reduciendo los tiempos de CI de minutos a mili
 
 ---
 
-## 📚 Documentación y Referencias
+## 📚 Documentation and References
 
-- **[`SKILL.md`](SKILL.md)**: Especificación operativa completa, flujo de trabajo y reglas críticas para el agente.
-- **[Guía de Screaming Architecture](references/screaming-architecture-guide.md)**: Estructura de directorios, capas y convenciones de nombres.
-- **[Rutas Delgadas con Expo Router](references/expo-router-thin-routes.md)**: Cómo conectar screens a `src/app`.
-- **[Navegación y Autenticación](references/navigation-and-auth.md)**: Grupos de rutas `(auth)`/`(app)`, `Stack.Protected` y almacenamiento de tokens en SecureStore.
-- **[Patrón TanStack Query](references/tanstack-query-pattern.md)**: Key factories jerárquicas, servicios con Zod, queries y mutaciones.
-- **[Estado, Formularios y Soporte Offline](references/state-forms-and-offline.md)**: Zustand en features, React Hook Form y gestión de reconexión.
-- **[Patrones de Componentes con NativeWind](references/nativewind-component-patterns.md)**: Primitivas móviles, modales y testing accesible.
-- **[Plataforma, Rendimiento y Accesibilidad](references/platform-performance-a11y.md)**: Archivos `.ios`/`.android`, FlashList, expo-image y pautas a11y.
-- **[Testing y Tooling (Jest + OXC)](references/testing-and-tooling.md)**: Configuración completa de jest-expo, Oxlint y Oxfmt.
+- **[`SKILL.md`](SKILL.md)**: the full operating spec, the workflow and the critical rules for the agent.
+- **[Screaming Architecture Guide](references/screaming-architecture-guide.md)**: directory structure, layers and naming conventions.
+- **[Thin Routes with Expo Router](references/expo-router-thin-routes.md)**: how to wire screens to `src/app`.
+- **[Navigation and Authentication](references/navigation-and-auth.md)**: `(auth)`/`(app)` route groups, `Stack.Protected` and token storage in SecureStore.
+- **[TanStack Query Pattern](references/tanstack-query-pattern.md)**: hierarchical key factories, services with Zod, queries and mutations.
+- **[State, Forms and Offline Support](references/state-forms-and-offline.md)**: Zustand in features, React Hook Form and reconnection handling.
+- **[NativeWind Component Patterns](references/nativewind-component-patterns.md)**: mobile primitives, modals and accessible testing.
+- **[Platform, Performance and Accessibility](references/platform-performance-a11y.md)**: `.ios`/`.android` files, FlashList, expo-image and a11y guidelines.
+- **[Testing and Tooling (Jest + OXC)](references/testing-and-tooling.md)**: the full jest-expo, Oxlint and Oxfmt setup.

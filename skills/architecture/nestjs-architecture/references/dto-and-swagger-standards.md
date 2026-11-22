@@ -1,51 +1,51 @@
-# Estándares de DTOs, Validación y Swagger OpenAPI
+# DTO, Validation and Swagger OpenAPI Standards
 
-Este documento define los contratos de entrada/salida (DTOs), la configuración obligatoria de `ValidationPipe` / `ClassSerializerInterceptor`, la paginación estándar y la documentación Swagger OpenAPI.
+This document defines the input/output contracts (DTOs), the mandatory `ValidationPipe` / `ClassSerializerInterceptor` configuration, standard pagination and the Swagger OpenAPI documentation.
 
 ---
 
-## 1. Matriz Obligatoria de Uso de DTOs
+## 1. Mandatory DTO Usage Matrix
 
-| Capa / Target | Tipo Permitido | Tipo Prohibido | Propósito |
+| Layer / Target | Allowed Type | Forbidden Type | Purpose |
 | :--- | :--- | :--- | :--- |
-| **Body (`@Body`)** | `Create<Noun>Dto`, `Update<Noun>Dto` | Entidad, Modelo DB, `any`, `Record` | Validación estricta de entrada (`class-validator` o `nestjs-zod`). |
-| **Query (`@Query`)** | `Find<Nouns>QueryDto` | Objeto plano, `any`, entidad | Paginación, ordenamiento y filtros sanitizados. |
-| **Respuesta** | `<Noun>ResponseDto`, `Paginated<Noun>ResponseDto` | Entidad de dominio, registro DB, array plano sin paginar | Previene fuga de campos internos y estabiliza el contrato API. |
+| **Body (`@Body`)** | `Create<Noun>Dto`, `Update<Noun>Dto` | Entity, DB model, `any`, `Record` | Strict input validation (`class-validator` or `nestjs-zod`). |
+| **Query (`@Query`)** | `Find<Nouns>QueryDto` | Plain object, `any`, entity | Pagination, sorting and sanitized filters. |
+| **Response** | `<Noun>ResponseDto`, `Paginated<Noun>ResponseDto` | Domain entity, DB record, plain unpaginated array | Prevents leaking internal fields and stabilizes the API contract. |
 
-### Regla Inquebrantable
-Los controladores **NUNCA** retornan entidades de dominio ni registros crudos de base de datos, y los listados paginados **NUNCA** descartan `total`, `page` y `limit`:
+### Unbreakable Rule
+Controllers **NEVER** return domain entities or raw database records, and paginated listings **NEVER** drop `total`, `page` and `limit`:
 
 ```typescript
-// ✅ CORRECTO: Respuesta individual y paginada con DTOs
+// ✅ CORRECT: single and paginated responses with DTOs
 return CustomerResponseDto.fromEntity(entity);
 return PaginatedCustomerResponseDto.fromPaginatedResult(result);
 
-// ❌ PROHIBIDO: Retornar entidad directa o perder metadatos de paginación
+// ❌ FORBIDDEN: returning the entity directly or losing pagination metadata
 return entity;
 return result.items.map(CustomerResponseDto.fromEntity);
 ```
 
 ---
 
-## 2. `ValidationPipe` Global y Serialización
+## 2. Global `ValidationPipe` and Serialization
 
-Sin `ValidationPipe` con `transform: true`, los valores por defecto (`page = 1`) y `@Type(() => Number)` en `FindQueryDto` **no se ejecutan**. Regístralo globalmente en `src/main.ts` (o vía `APP_PIPE`):
+Without a `ValidationPipe` with `transform: true`, the defaults (`page = 1`) and `@Type(() => Number)` in `FindQueryDto` **do not run**. Register it globally in `src/main.ts` (or through `APP_PIPE`):
 
 ```typescript
 app.useGlobalPipes(
   new ValidationPipe({
-    whitelist: true,            // Elimina propiedades no declaradas en el DTO
-    forbidNonWhitelisted: true, // Responde 400 si llegan campos desconocidos
-    transform: true,            // Convierte query params y params al tipo del DTO
+    whitelist: true,            // Strips properties not declared in the DTO
+    forbidNonWhitelisted: true, // Responds 400 when unknown fields arrive
+    transform: true,            // Converts query params and params to the DTO's types
   }),
 );
 ```
 
-Si usas `ClassSerializerInterceptor` global, anota los `ResponseDto` con `@Exclude()` a nivel de clase y `@Expose()` en cada propiedad pública (o mapea explícitamente en `fromEntity()`).
+If you use a global `ClassSerializerInterceptor`, annotate the `ResponseDto` classes with `@Exclude()` at class level and `@Expose()` on each public property (or map explicitly in `fromEntity()`).
 
 ---
 
-## 3. Definición Estándar de DTOs (`class-validator`)
+## 3. Standard DTO Definition (`class-validator`)
 
 ### 3.1 `create-<noun>.dto.ts`
 ```typescript
@@ -53,17 +53,17 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEmail, IsString, MaxLength, IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateCustomerDto {
-  @ApiProperty({ description: 'Nombre completo del cliente', example: 'Ana María Gómez' })
+  @ApiProperty({ description: 'Customer full name', example: 'Jane Doe' })
   @IsString()
   @IsNotEmpty()
   @MaxLength(100)
   readonly name!: string;
 
-  @ApiProperty({ description: 'Correo electrónico corporativo', example: 'ana.gomez@empresa.com' })
+  @ApiProperty({ description: 'Corporate email address', example: 'jane.doe@company.com' })
   @IsEmail()
   readonly email!: string;
 
-  @ApiPropertyOptional({ description: 'Teléfono internacional', example: '+573001234567' })
+  @ApiPropertyOptional({ description: 'International phone number', example: '+14155550123' })
   @IsOptional()
   @IsString()
   readonly phone?: string;
@@ -88,14 +88,14 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Min, Max, IsInt, IsString, IsOptional } from 'class-validator';
 
 export class FindCustomersQueryDto {
-  @ApiPropertyOptional({ description: 'Página actual', default: 1, minimum: 1, example: 1 })
+  @ApiPropertyOptional({ description: 'Current page', default: 1, minimum: 1, example: 1 })
   @IsOptional()
   @IsInt()
   @Min(1)
   @Type(() => Number)
   page: number = 1;
 
-  @ApiPropertyOptional({ description: 'Registros por página', default: 20, minimum: 1, maximum: 100, example: 20 })
+  @ApiPropertyOptional({ description: 'Records per page', default: 20, minimum: 1, maximum: 100, example: 20 })
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -103,14 +103,14 @@ export class FindCustomersQueryDto {
   @Type(() => Number)
   limit: number = 20;
 
-  @ApiPropertyOptional({ description: 'Término de búsqueda', example: 'Ana' })
+  @ApiPropertyOptional({ description: 'Search term', example: 'Jane' })
   @IsOptional()
   @IsString()
   search?: string;
 }
 ```
 
-### 3.4 `<noun>-response.dto.ts` (Individual + Paginado)
+### 3.4 `<noun>-response.dto.ts` (Single + Paginated)
 ```typescript
 import { Expose } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -118,23 +118,23 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import type { Customer } from '../entities';
 
 export class CustomerResponseDto {
-  @ApiProperty({ description: 'Identificador UUID', example: '3fa85f64-5717-4562-b3fc-2c963f66afa6' })
+  @ApiProperty({ description: 'UUID identifier', example: '3fa85f64-5717-4562-b3fc-2c963f66afa6' })
   @Expose()
   readonly id!: string;
 
-  @ApiProperty({ description: 'Nombre completo', example: 'Ana María Gómez' })
+  @ApiProperty({ description: 'Full name', example: 'Jane Doe' })
   @Expose()
   readonly name!: string;
 
-  @ApiPropertyOptional({ description: 'Descripción', nullable: true })
+  @ApiPropertyOptional({ description: 'Description', nullable: true })
   @Expose()
   readonly description!: string | null;
 
-  @ApiProperty({ description: 'Fecha de creación' })
+  @ApiProperty({ description: 'Creation date' })
   @Expose()
   readonly createdAt!: Date;
 
-  @ApiProperty({ description: 'Fecha de actualización' })
+  @ApiProperty({ description: 'Last update date' })
   @Expose()
   readonly updatedAt!: Date;
 
@@ -192,9 +192,9 @@ export class PaginatedCustomerResponseDto {
 
 ---
 
-## 4. Modo Zod en Monorepos (`nestjs-zod`)
+## 4. Zod Mode in Monorepos (`nestjs-zod`)
 
-Cuando la API convive en un monorepo con modo `zod` (`--contracts zod --scope <scope>`):
+When the API lives in a monorepo in `zod` mode (`--contracts zod --scope <scope>`):
 
 ```typescript
 // dto/create-customer.dto.ts
@@ -205,18 +205,18 @@ import { createCustomerSchema } from '@acme/contracts/customers';
 export class CreateCustomerDto extends createZodDto(createCustomerSchema) {}
 ```
 
-- Registra `ZodValidationPipe` globalmente en lugar del `ValidationPipe` de `class-validator`.
-- Mantén `<Noun>ResponseDto` y `Paginated<Noun>ResponseDto` con `fromEntity()` / `fromPaginatedResult()` y `@ApiProperty` para conservar el aislamiento de respuesta y el esquema OpenAPI.
+- Register `ZodValidationPipe` globally instead of the `class-validator` `ValidationPipe`.
+- Keep `<Noun>ResponseDto` and `Paginated<Noun>ResponseDto` with `fromEntity()` / `fromPaginatedResult()` and `@ApiProperty` to preserve response isolation and the OpenAPI schema.
 
 ---
 
-## 5. Checklist de Swagger en Controladores
+## 5. Swagger Checklist for Controllers
 
-1. **Clase:** `@ApiTags('<Nouns>')`, `@ApiBearerAuth()`, `@Controller('<nouns-kebab>')`.
-2. **Cada endpoint:** `@ApiOperation({ summary, description })`, `@ApiBadRequestResponse()`, `@ApiUnauthorizedResponse()`, `@ApiForbiddenResponse()`.
-3. **Éxito:**
+1. **Class:** `@ApiTags('<Nouns>')`, `@ApiBearerAuth()`, `@Controller('<nouns-kebab>')`.
+2. **Each endpoint:** `@ApiOperation({ summary, description })`, `@ApiBadRequestResponse()`, `@ApiUnauthorizedResponse()`, `@ApiForbiddenResponse()`.
+3. **Success:**
    - `GET /`: `@ApiOkResponse({ type: Paginated<Noun>ResponseDto })`
-   - `GET /:id` y `PATCH /:id`: `@ApiOkResponse({ type: <Noun>ResponseDto })` + `@ApiNotFoundResponse()`
+   - `GET /:id` and `PATCH /:id`: `@ApiOkResponse({ type: <Noun>ResponseDto })` + `@ApiNotFoundResponse()`
    - `POST /`: `@ApiCreatedResponse({ type: <Noun>ResponseDto })` + `@ApiBody({ type: Create<Noun>Dto })`
    - `DELETE /:id`: `@HttpCode(HttpStatus.NO_CONTENT)` + `@ApiNoContentResponse()` + `@ApiNotFoundResponse()`
-4. **Parámetros UUID:** `@ApiParam({ name: 'id', format: 'uuid', ... })` + `new ParseUUIDPipe({ version: '4' })`.
+4. **UUID parameters:** `@ApiParam({ name: 'id', format: 'uuid', ... })` + `new ParseUUIDPipe({ version: '4' })`.

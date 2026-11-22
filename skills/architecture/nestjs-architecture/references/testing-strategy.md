@@ -1,12 +1,12 @@
-# Estrategia de Testing en NestJS (Vitest + SWC + E2E)
+# NestJS Testing Strategy (Vitest + SWC + E2E)
 
-Esta guía estandariza las pruebas unitarias con **Vitest + SWC** (y su alternativa Jest), las pruebas de integración/E2E con **Supertest** y las exclusiones obligatorias de cobertura ($\ge 90\%$).
+This guide standardizes unit tests with **Vitest + SWC** (and the Jest alternative), integration/E2E tests with **Supertest** and the mandatory coverage exclusions ($\ge 90\%$).
 
 ---
 
-## 1. Configuración de `vitest.config.ts` con SWC
+## 1. `vitest.config.ts` Setup with SWC
 
-NestJS depende de `emitDecoratorMetadata` y decoradores experimentales. Vitest requiere `unplugin-swc` para transpilar correctamente las clases decoradas sin perder los metadatos de inyección:
+NestJS depends on `emitDecoratorMetadata` and experimental decorators. Vitest needs `unplugin-swc` to transpile decorated classes correctly without losing the injection metadata:
 
 ```typescript
 // vitest.config.ts
@@ -49,29 +49,29 @@ export default defineConfig({
 
 ---
 
-## 2. Qué Probar por Capa
+## 2. What to Test per Layer
 
-| Capa | Archivo | Qué verificar |
+| Layer | File | What to check |
 | :--- | :--- | :--- |
-| **Repository** | `<noun>.repository.spec.ts` | Mapeo `fromPersistence()`, retorno `null` cuando no existe, filtros (`ownerId`, `search`) y paginación. |
-| **Service** | `<noun>.service.spec.ts` | Happy paths, inyección de `ownerId` en `create`, filtro por rol en `findAll`, `NotFoundException` (404), `ForbiddenException` (403) y `ConflictException` (409). |
-| **Controller** | `<noun>.controller.spec.ts` | Delegación al servicio con `req.user` y retorno de `<Noun>ResponseDto` / `Paginated<Noun>ResponseDto`. |
-| **Guards / Pipes** | `*.guard.spec.ts` | Comportamiento de `@Public()` en `JwtAuthGuard` y validación de roles en `RolesGuard`. |
+| **Repository** | `<noun>.repository.spec.ts` | The `fromPersistence()` mapping, returning `null` when the record does not exist, filters (`ownerId`, `search`) and pagination. |
+| **Service** | `<noun>.service.spec.ts` | Happy paths, `ownerId` injection in `create`, role filtering in `findAll`, `NotFoundException` (404), `ForbiddenException` (403) and `ConflictException` (409). |
+| **Controller** | `<noun>.controller.spec.ts` | Delegation to the service with `req.user` and returning `<Noun>ResponseDto` / `Paginated<Noun>ResponseDto`. |
+| **Guards / Pipes** | `*.guard.spec.ts` | `@Public()` behavior in `JwtAuthGuard` and role validation in `RolesGuard`. |
 
 ---
 
-## 3. Exclusiones de Cobertura
+## 3. Coverage Exclusions
 
-Las siguientes piezas son declarativas o glue de framework y se excluyen de `coverage.exclude` (y de `collectCoverageFrom` en Jest):
-- `src/config/**` (esquemas Zod/Joi de entorno y loaders de `@nestjs/config`).
-- `src/main.ts` y `**/*.module.ts` (wiring de arranque y `@Module`).
-- `**/*.dto.ts` y `**/index.ts` (contratos declarativos y barrels).
+The following pieces are declarative or framework glue and are excluded through `coverage.exclude` (and `collectCoverageFrom` in Jest):
+- `src/config/**` (Zod/Joi environment schemas and `@nestjs/config` loaders).
+- `src/main.ts` y `**/*.module.ts` (bootstrap wiring and `@Module`).
+- `**/*.dto.ts` y `**/index.ts` (declarative contracts and barrels).
 
 ---
 
-## 4. Pruebas E2E con `NodeAdapter` y Supertest
+## 4. E2E Tests with `NodeAdapter` and Supertest
 
-Para validar el pipeline HTTP real (`ValidationPipe`, `ParseUUIDPipe`, `JwtAuthGuard`, `RolesGuard` y serialización):
+To validate the real HTTP pipeline (`ValidationPipe`, `ParseUUIDPipe`, `JwtAuthGuard`, `RolesGuard` and serialization):
 
 ```typescript
 // test/invoices.e2e-spec.ts

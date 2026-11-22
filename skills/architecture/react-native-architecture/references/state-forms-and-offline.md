@@ -1,23 +1,23 @@
-# Estado del Cliente, Formularios y Soporte Offline
+# Client State, Forms and Offline Support
 
-La arquitectura móvil distingue claramente el estado del servidor, el estado de UI global y el estado local de un componente, complementándolo con persistencia y tolerancia a desconexión.
+The mobile architecture clearly distinguishes server state, global UI state and a component's local state, complemented by persistence and tolerance to disconnection.
 
 ---
 
-## 🧭 Matriz de Decisión para Estado
+## 🧭 State Decision Matrix
 
-| Tipo de Estado | Herramienta | Ubicación en el Árbol | Ejemplo |
+| State Type | Tool | Location in the Tree | Example |
 | --- | --- | --- | --- |
-| **Servidor (asíncrono/remoto)** | TanStack Query | `src/features/<feat>/hooks/` | Lista de facturas, perfil de usuario, mutaciones. |
-| **UI Global o de Sesión** | Zustand | `src/features/<feat>/stores/` | Filtros de búsqueda activos, draft en curso, sesión auth. |
-| **Local de Componente** | `useState` / `useReducer` | Dentro de `{component}.tsx` | Dropdown abierto, texto de input transitorio. |
-| **Transversal a toda la app** | Zustand | `src/stores/<store-name>/` | Tema claro/oscuro, preferencias de red, conectividad. |
+| **Server (async/remote)** | TanStack Query | `src/features/<feat>/hooks/` | Invoice list, user profile, mutations. |
+| **Global UI or Session** | Zustand | `src/features/<feat>/stores/` | Active search filters, a draft in progress, auth session. |
+| **Component-local** | `useState` / `useReducer` | Inside `{component}.tsx` | An open dropdown, transient input text. |
+| **App-wide** | Zustand | `src/stores/<store-name>/` | Light/dark theme, network preferences, connectivity. |
 
 ---
 
-## 📦 Zustand Stores en Features (`stores/<name>/`)
+## 📦 Zustand Stores in Features (`stores/<name>/`)
 
-Cuando una feature necesita coordinar estado entre múltiples pantallas sin persistirlo en backend:
+When a feature needs to coordinate state across several screens without persisting it to the backend:
 
 ```ts
 // src/features/billing/stores/billing-filter/billing-filter.store.ts
@@ -38,9 +38,9 @@ export const useBillingFilterStore = create<IBillingFilterState>((set) => ({
 
 ---
 
-## 📝 Formularios Tipados con Zod y React Hook Form
+## 📝 Typed Forms with Zod and React Hook Form
 
-Usa `react-hook-form` con `@hookform/resolvers/zod` vinculando directamente los esquemas de `schemas/`:
+Use `react-hook-form` with `@hookform/resolvers/zod`, binding the schemas from `schemas/` directly:
 
 ```tsx
 // src/features/billing/components/create-invoice-form/create-invoice-form.tsx
@@ -68,7 +68,7 @@ export function CreateInvoiceForm({ onSubmit, isSubmitting }: Readonly<ICreateIn
         name="description"
         render={({ field: { onChange, onBlur, value } }) => (
           <View>
-            <Text className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Descripción</Text>
+            <Text className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Description</Text>
             <TextInput
               onBlur={onBlur}
               onChangeText={onChange}
@@ -85,7 +85,7 @@ export function CreateInvoiceForm({ onSubmit, isSubmitting }: Readonly<ICreateIn
         disabled={isSubmitting}
         className="rounded-md bg-blue-600 p-3 items-center"
       >
-        <Text className="font-semibold text-white">{isSubmitting ? 'Guardando...' : 'Crear Factura'}</Text>
+        <Text className="font-semibold text-white">{isSubmitting ? 'Saving...' : 'Create Invoice'}</Text>
       </Pressable>
     </View>
   );
@@ -94,9 +94,9 @@ export function CreateInvoiceForm({ onSubmit, isSubmitting }: Readonly<ICreateIn
 
 ---
 
-## 📡 Soporte Offline y Gestión de Conexión
+## 📡 Offline Support and Connection Handling
 
-En React Native, el refresco automático de TanStack Query al reenfocar la app requiere suscripción explícita al ciclo de vida nativo (`AppState`) y a la red (`NetInfo`):
+In React Native, TanStack Query's automatic refetch when the app regains focus requires an explicit subscription to the native lifecycle (`AppState`) and to the network (`NetInfo`):
 
 ```ts
 // src/config/query-client.ts
@@ -104,14 +104,14 @@ import { AppState, type AppStateStatus, Platform } from 'react-native';
 import { QueryClient, focusManager, onlineManager } from '@tanstack/react-query';
 import NetInfo from '@react-native-community/netinfo';
 
-// 1. Detección de red en segundo plano
+// 1. Background network detection
 onlineManager.setEventListener((setOnline) => {
   return NetInfo.addEventListener((state) => {
     setOnline(Boolean(state.isConnected));
   });
 });
 
-// 2. Refocus cuando el usuario vuelve a la app
+// 2. Refocus when the user returns to the app
 function onAppStateChange(status: AppStateStatus) {
   if (Platform.OS !== 'web') {
     focusManager.setFocused(status === 'active');
@@ -123,20 +123,20 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 2,
-      staleTime: 1000 * 60 * 5, // 5 minutos de frescura
-      gcTime: 1000 * 60 * 60 * 24, // 24 horas en caché para offline
+      staleTime: 1000 * 60 * 5, // 5 minutes of freshness
+      gcTime: 1000 * 60 * 60 * 24, // 24 hours in cache for offline use
     },
   },
 });
 ```
 
-Para persistencia de caché entre reinicios de la app, usa `@tanstack/react-query-persist-client` con un storage sincrónico como `react-native-mmkv` o asincrónico `AsyncStorage`.
+To persist the cache across app restarts, use `@tanstack/react-query-persist-client` with synchronous storage such as `react-native-mmkv` or asynchronous `AsyncStorage`.
 
 ---
 
-## 🛡️ Validación Estricta de Variables de Entorno (`src/config/env.ts`)
+## 🛡️ Strict Environment Variable Validation (`src/config/env.ts`)
 
-Nunca accedas a `process.env.EXPO_PUBLIC_*` de forma dispersa sin validar tipos:
+Never access `process.env.EXPO_PUBLIC_*` in scattered places without validating the types:
 
 ```ts
 // src/config/env.ts

@@ -406,17 +406,17 @@ export function oxlintrcTemplate() {
         'react-hooks/exhaustive-deps': 'warn',
         'no-restricted-globals': [
           'error',
-          { name: 'window', message: 'No uses window en React Native.' },
-          { name: 'localStorage', message: 'Usa expo-secure-store o AsyncStorage.' },
-          { name: 'document', message: 'No existe DOM en React Native.' },
+          { name: 'window', message: 'Do not use window in React Native.' },
+          { name: 'localStorage', message: 'Use expo-secure-store or AsyncStorage.' },
+          { name: 'document', message: 'There is no DOM in React Native.' },
         ],
         'no-restricted-imports': [
           'error',
           {
-            paths: [{ name: 'react-dom', message: 'No uses react-dom en React Native.' }],
+            paths: [{ name: 'react-dom', message: 'Do not use react-dom in React Native.' }],
             patterns: [
-              { regex: '^@/features/[^/]+$', message: 'Prohibido importar de la raíz de la feature; importa desde la carpeta hoja.' },
-              { regex: '^@/features/[^/]+/(components|hooks|screens|services)$', message: 'Prohibido importar de agrupadores; importa desde la carpeta hoja.' },
+              { regex: '^@/features/[^/]+$', message: 'Do not import from the feature root; import from the leaf folder.' },
+              { regex: '^@/features/[^/]+/(components|hooks|screens|services)$', message: 'Do not import from grouping folders; import from the leaf folder.' },
             ],
           },
         ],
@@ -429,8 +429,8 @@ export function oxlintrcTemplate() {
               'error',
               {
                 patterns: [
-                  { group: ['@tanstack/react-query'], message: 'Rutas delgadas: las queries van en hooks dentro de features.' },
-                  { regex: '^@/features/[^/]+/services/', message: 'Rutas delgadas: la UI consume hooks, nunca servicios directamente.' },
+                  { group: ['@tanstack/react-query'], message: 'Thin routes: queries belong in hooks inside features.' },
+                  { regex: '^@/features/[^/]+/services/', message: 'Thin routes: the UI consumes hooks, never services directly.' },
                 ],
               },
             ],

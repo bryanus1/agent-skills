@@ -1,35 +1,35 @@
 # 🏛️ NestJS Modular Monolith Architecture (`nestjs-architecture`)
 
-> **Estándar de Modular Monolith para NestJS 12 (`NodeAdapter`, SWC, Vitest y OXC). Guía el andamiaje de módulos de dominio, contratos DTO/Zod con paginación, Swagger OpenAPI, repositorios ORM-agnósticos, doble barrera RBAC/ownership y testing $\ge 90\%$.**
+> **Modular Monolith standard for NestJS 12 (`NodeAdapter`, SWC, Vitest and OXC). Guides scaffolding of domain modules, DTO/Zod contracts with pagination, Swagger OpenAPI, ORM-agnostic repositories, a double RBAC/ownership barrier and $\ge 90\%$ test coverage.**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `nestjs-architecture` |
-| **Categoría** | `architecture` |
-| **Versión** | `2.0.0` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
-| **Requisitos** | `node` |
+| **Name** | `nestjs-architecture` |
+| **Category** | `architecture` |
+| **Version** | `2.1.0` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Requirements** | `node` |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
-### Vía `skills.sh` CLI (Recomendado)
+### Via the `skills.sh` CLI (Recommended)
 
 ```bash
-# Instalar en el proyecto actual:
+# Install in the current project:
 npx skills add bryanus1/agent-skills --skill nestjs-architecture
 
-# Instalar globalmente en tu máquina:
+# Install globally on your machine:
 npx skills add bryanus1/agent-skills --skill nestjs-architecture -g
 ```
 
-### Vía Enlace Simbólico Local
+### Via a Local Symlink
 
 ```bash
 # Google Antigravity:
 mkdir -p .agents/skills
-ln -s /ruta/a/agent-skills/skills/architecture/nestjs-architecture .agents/skills/nestjs-architecture
+ln -s /path/to/agent-skills/skills/architecture/nestjs-architecture .agents/skills/nestjs-architecture
 
 # Claude Code:
 mkdir -p .claude/skills
@@ -38,24 +38,24 @@ ln -s ../../.agents/skills/nestjs-architecture .claude/skills/nestjs-architectur
 
 ---
 
-## 💡 Ejemplos de Uso con Agentes de IA
+## 💡 Usage Examples with AI Agents
 
-* **Andamiar un módulo de dominio completo con Prisma y Vitest (18 archivos)**:
-  > *"Crea el módulo de facturas (invoice) con Prisma, Vitest y arquitectura limpia"*
+* **Scaffold a full domain module with Prisma and Vitest (18 files)**:
+  > *"Create the invoice module with Prisma, Vitest and clean architecture"*
   >
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-module.mjs invoice --target-dir src/modules --orm prisma`  
-  > ➔ Genera los **18 archivos** del módulo (`entities`, `dto` con `PaginatedInvoiceResponseDto`, `repositories/repository.ts` con `IInvoiceRepository` e `INVOICE_REPOSITORY_TOKEN`, `repositories/invoice.repository.ts`, `services` con ownership, `controllers` con Swagger completo, specs en Vitest y `invoice.module.ts` exportando solo `InvoiceService`).
+  > 🤖 **The agent will run**: `node <skill-dir>/scripts/scaffold-module.mjs invoice --target-dir src/modules --orm prisma`  
+  > ➔ Generates the module's **18 files** (`entities`, `dto` with `PaginatedInvoiceResponseDto`, `repositories/repository.ts` with `IInvoiceRepository` and `INVOICE_REPOSITORY_TOKEN`, `repositories/invoice.repository.ts`, `services` with ownership, `controllers` with full Swagger, Vitest specs and `invoice.module.ts` exporting only `InvoiceService`).
 
-* **Andamiar dentro de un monorepo con contratos Zod (`apps/api`)**:
-  > *"Crea el módulo de mascotas (pet) conectado a `@acme/contracts/pets` en la API del monorepo"*
+* **Scaffold inside a monorepo with Zod contracts (`apps/api`)**:
+  > *"Create the pet module wired to `@acme/contracts/pets` in the monorepo API"*
   >
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-module.mjs pet --target-dir apps/api/src/modules --contracts zod --scope acme`
+  > 🤖 **The agent will run**: `node <skill-dir>/scripts/scaffold-module.mjs pet --target-dir apps/api/src/modules --contracts zod --scope acme`
 
 ---
 
-## 🛠️ Scripts y Opciones CLI
+## 🛠️ Scripts and CLI Options
 
-> `<skill-dir>` es el directorio donde está instalada esta skill (p. ej. `.agents/skills/nestjs-architecture` o `.claude/skills/nestjs-architecture`).
+> `<skill-dir>` is the directory where this skill is installed (e.g. `.agents/skills/nestjs-architecture` or `.claude/skills/nestjs-architecture`).
 
 ### [`scripts/scaffold-module.mjs`](scripts/scaffold-module.mjs)
 
@@ -63,24 +63,24 @@ ln -s ../../.agents/skills/nestjs-architecture .claude/skills/nestjs-architectur
 node <skill-dir>/scripts/scaffold-module.mjs <noun-singular> [--target-dir <path>] [--plural <name>] [--orm custom|prisma|typeorm|drizzle] [--contracts class-validator|zod] [--scope <scope>] [--test-runner vitest|jest] [--dry-run] [--force]
 ```
 
-* **Opciones**:
-  * `--target-dir <path>`: Directorio destino (por defecto `src/modules`).
-  * `--plural <name>`: Plural explícito en `kebab-case` cuando la pluralización sea irregular.
-  * `--orm <adapter>`: Adaptador de repositorio (`custom`, `prisma`, `typeorm`, `drizzle`; por defecto `custom`).
-  * `--contracts <mode>`: Contratos de entrada (`class-validator` o `zod`; por defecto `class-validator`).
-  * `--scope <scope>`: Scope npm para `--contracts zod` (p. ej. `acme` → `@acme/contracts`).
-  * `--test-runner <runner>`: Runner de specs (`vitest` o `jest`; por defecto `vitest`).
-  * `--dry-run`: Previsualiza los 18 archivos sin escribir en disco.
-  * `--force`: Sobrescribe archivos existentes (solo con confirmación explícita).
+* **Options**:
+  * `--target-dir <path>`: destination directory (default `src/modules`).
+  * `--plural <name>`: explicit plural in `kebab-case` when the pluralization is irregular.
+  * `--orm <adapter>`: repository adapter (`custom`, `prisma`, `typeorm`, `drizzle`; default `custom`).
+  * `--contracts <mode>`: input contracts (`class-validator` or `zod`; default `class-validator`).
+  * `--scope <scope>`: npm scope for `--contracts zod` (e.g. `acme` → `@acme/contracts`).
+  * `--test-runner <runner>`: spec runner (`vitest` or `jest`; default `vitest`).
+  * `--dry-run`: previews the 18 files without writing to disk.
+  * `--force`: overwrites existing files (only with explicit confirmation).
 
 ---
 
-## 📚 Documentación y Referencias
+## 📚 Documentation and References
 
-- **[`SKILL.md`](SKILL.md)**: Especificación operativa completa, stack NestJS 12 (`NodeAdapter`, SWC, Vitest, OXC), secuencia de 18 archivos y reglas críticas.
-- **[Guía del Monolito Modular y Stack](references/modular-monolith-guide.md)**: Bootstrap con `NodeAdapter`, SWC, `oxlint`/`oxfmt`, estructura global `src/` y comunicación inter-módulos.
-- **[Estándares de DTOs, Zod y Swagger OpenAPI](references/dto-and-swagger-standards.md)**: `ValidationPipe`, `PaginatedResponseDto`, `nestjs-zod` y checklist Swagger.
-- **[Patrón de Repositorios y Entidades de Dominio](references/repository-and-entity-pattern.md)**: Adaptadores Prisma/TypeORM/Drizzle, transacciones/Unit of Work y mapeo de errores.
-- **[Estrategia de RBAC y Validación de Ownership](references/rbac-and-ownership.md)**: Orden de `APP_GUARD`, `@CurrentUser()`, ownership en `create`/`findAll`/`findOne` y excepciones HTTP.
-- **[Estrategia de Testing (Vitest + SWC + E2E)](references/testing-strategy.md)**: Configuración `vitest.config.ts` con `unplugin-swc`, unit tests, E2E y exclusiones de cobertura.
-- **[Ejemplos de Flujos y Refactorización](examples/workflows.md)**: Refactor de *Fat Controller* y comunicación inter-módulos.
+- **[`SKILL.md`](SKILL.md)**: full operating spec, the NestJS 12 stack (`NodeAdapter`, SWC, Vitest, OXC), the 18-file sequence and the critical rules.
+- **[Modular Monolith and Stack Guide](references/modular-monolith-guide.md)**: bootstrap with `NodeAdapter`, SWC, `oxlint`/`oxfmt`, the global `src/` structure and inter-module communication.
+- **[DTO, Zod and Swagger OpenAPI Standards](references/dto-and-swagger-standards.md)**: `ValidationPipe`, `PaginatedResponseDto`, `nestjs-zod` and the Swagger checklist.
+- **[Repository and Domain Entity Pattern](references/repository-and-entity-pattern.md)**: Prisma/TypeORM/Drizzle adapters, transactions/Unit of Work and error mapping.
+- **[RBAC and Ownership Validation Strategy](references/rbac-and-ownership.md)**: `APP_GUARD` order, `@CurrentUser()`, ownership in `create`/`findAll`/`findOne` and HTTP exceptions.
+- **[Testing Strategy (Vitest + SWC + E2E)](references/testing-strategy.md)**: `vitest.config.ts` setup with `unplugin-swc`, unit tests, E2E and coverage exclusions.
+- **[Workflow and Refactoring Examples](examples/workflows.md)**: refactoring a *Fat Controller* and inter-module communication.

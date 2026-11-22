@@ -1,62 +1,62 @@
 # ⚡ Astro Architecture
 
-> **Estándar de arquitectura para proyectos Astro (landing pages, *marketing sites* y sitios *content-driven*) con Islands Architecture (*Zero-JS by default*), Tailwind CSS, Content Collections, SEO técnico, linting con OXC y testing E2E con Playwright.**
+> **Architecture standard for Astro projects (landing pages, *marketing sites* and *content-driven* sites) with Islands Architecture (*Zero-JS by default*), Tailwind CSS, Content Collections, technical SEO, OXC linting and Playwright E2E testing.**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `astro-architecture` |
-| **Versión** | `1.0.0` |
-| **Categoría** | `architecture` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
-| **Requisitos** | `node` |
+| **Name** | `astro-architecture` |
+| **Version** | `1.1.0` |
+| **Category** | `architecture` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Requirements** | `node` |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
 ```bash
-# Instalar en el proyecto actual con skills.sh:
+# Install in the current project with skills.sh:
 npx skills add bryanus1/agent-skills --skill astro-architecture
 
-# Instalar globalmente en tu máquina:
+# Install globally on your machine:
 npx skills add bryanus1/agent-skills --skill astro-architecture -g
 ```
 
 ---
 
-## 💡 Ejemplos de Uso con Agentes de IA
+## 💡 Usage Examples with AI Agents
 
-- **Crear la arquitectura de una landing page en Astro:**
-  > *"Estructura una landing page en Astro siguiendo `astro-architecture` con Hero, Features, FAQ sin JS y SEO completo."*
+- **Create the architecture of an Astro landing page:**
+  > *"Structure an Astro landing page following `astro-architecture` with a Hero, Features, a JS-free FAQ and full SEO."*
   >
-  > 🤖 **El agente ejecutará:** `node <skill-dir>/scripts/scaffold-landing.mjs --target-dir . --name "Mi Producto"`
+  > 🤖 **The agent will run:** `node <skill-dir>/scripts/scaffold-landing.mjs --target-dir . --name "My Product"`
 
-- **Auditar un proyecto Astro existente:**
-  > *"Revisa mi proyecto Astro para verificar SEO, uso de `astro:assets` y evitar `client:load` innecesario."*
+- **Audit an existing Astro project:**
+  > *"Check my Astro project for SEO, `astro:assets` usage and unnecessary `client:load`."*
   >
-  > 🤖 **El agente ejecutará:** `node <skill-dir>/scripts/audit-astro.mjs --target-dir .`
+  > 🤖 **The agent will run:** `node <skill-dir>/scripts/audit-astro.mjs --target-dir .`
 
 ---
 
-## 🛠️ Scripts y Opciones CLI
+## 🛠️ Scripts and CLI Options
 
-- **[`scripts/scaffold-landing.mjs`](scripts/scaffold-landing.mjs)**: Genera la estructura base (`BaseLayout.astro`, secciones en `src/components/sections/`, `Navbar`, `Footer`, `src/data/site.ts`, `src/styles/global.css` y `src/pages/index.astro`).
-  - `--target-dir <ruta>`: Directorio raíz del proyecto Astro (por defecto `.`).
-  - `--name "<Nombre>"`: Nombre del sitio/producto para el copy inicial.
-  - `--dry-run`: Previsualiza los archivos a crear sin escribir en disco.
-  - `--force`: Sobrescribe archivos existentes.
-- **[`scripts/audit-astro.mjs`](scripts/audit-astro.mjs)**: Audita `tsconfig.json`, abuso de `client:load`, etiquetas `<img>` sin `astro:assets`, metadatos SEO y `public/robots.txt`.
-  - `--target-dir <ruta>`: Directorio raíz del proyecto Astro (por defecto `.`).
-  - `--strict`: Sale con código `1` si detecta advertencias además de errores.
+- **[`scripts/scaffold-landing.mjs`](scripts/scaffold-landing.mjs)**: generates the base structure (`BaseLayout.astro`, sections in `src/components/sections/`, `Navbar`, `Footer`, `src/data/site.ts`, `src/styles/global.css` and `src/pages/index.astro`) with English placeholder copy.
+  - `--target-dir <path>`: root directory of the Astro project (default `.`).
+  - `--name "<Name>"`: site/product name for the initial copy.
+  - `--dry-run`: previews the files to create without writing to disk.
+  - `--force`: overwrites existing files.
+- **[`scripts/audit-astro.mjs`](scripts/audit-astro.mjs)**: audits `tsconfig.json`, `client:load` overuse, `<img>` tags without `astro:assets`, SEO metadata and `public/robots.txt`.
+  - `--target-dir <path>`: root directory of the Astro project (default `.`).
+  - `--strict`: exits with code `1` if it finds warnings as well as errors.
 
 ---
 
-## 📚 Documentación y Referencias
+## 📚 Documentation and References
 
-- **[`SKILL.md`](SKILL.md)**: Flujo de trabajo paso a paso y reglas críticas para el agente de IA.
-- **[Islas y Renderizado](references/islands-and-rendering.md)**: Criterios *Zero-JS*, directivas `client:*` y modos SSG/SSR.
-- **[Blueprint de Landing Pages](references/landing-blueprint.md)**: Orden de secciones, conversión y accesibilidad WCAG AA.
-- **[Content Collections y Datos](references/content-and-data.md)**: Datos tipados en `src/data/`, Content Collections con Zod y `astro:assets`.
-- **[SEO y Core Web Vitals](references/seo-and-performance.md)**: Checklist de metadatos, Open Graph, JSON-LD, sitemap y rendimiento.
-- **[Toolchain y Testing (OXC + Playwright)](references/testing-and-toolchain.md)**: Configuración de `.oxlintrc.json`, `oxfmt` y suite E2E con Playwright sobre `astro preview`.
-- **[Ejemplo de Estructura](examples/landing-structure.md)**: Árbol de archivos y composición de `index.astro`.
+- **[`SKILL.md`](SKILL.md)**: step-by-step workflow and critical rules for the AI agent.
+- **[Islands and Rendering](references/islands-and-rendering.md)**: *Zero-JS* criteria, `client:*` directives and SSG/SSR modes.
+- **[Landing Page Blueprint](references/landing-blueprint.md)**: section order, conversion and WCAG AA accessibility.
+- **[Content Collections and Data](references/content-and-data.md)**: typed data in `src/data/`, Content Collections with Zod and `astro:assets`.
+- **[SEO and Core Web Vitals](references/seo-and-performance.md)**: checklist of metadata, Open Graph, JSON-LD, sitemap and performance.
+- **[Toolchain and Testing (OXC + Playwright)](references/testing-and-toolchain.md)**: `.oxlintrc.json`, `oxfmt` and an E2E suite with Playwright over `astro preview`.
+- **[Structure Example](examples/landing-structure.md)**: file tree and composition of `index.astro`.

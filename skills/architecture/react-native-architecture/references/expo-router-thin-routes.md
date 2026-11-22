@@ -1,8 +1,8 @@
-# Rutas delgadas con Expo Router
+# Thin Routes with Expo Router
 
-`src/app/` define la navegación por archivos; la UI y la lógica viven en `src/features/`.
+`src/app/` defines file-based navigation; the UI and logic live in `src/features/`.
 
-## Ruta mínima
+## Minimal route
 
 ```tsx
 // src/app/billing/index.tsx
@@ -11,11 +11,11 @@ import { BillingHome } from '@/features/billing/screens/billing-home';
 export default BillingHome;
 ```
 
-`scaffold-feature.mjs billing --with-starter --with-route` genera exactamente esto.
+`scaffold-feature.mjs billing --with-starter --with-route` generates exactly this.
 
-## Rutas dinámicas y parámetros
+## Dynamic routes and parameters
 
-Extrae el parseo a `utils/` de la feature (con test) y deja la ruta como adaptador:
+Extract the parsing to the feature's `utils/` (with a test) and leave the route as an adapter:
 
 ```tsx
 // src/app/billing/[id].tsx
@@ -31,10 +31,10 @@ export default function InvoiceRoute() {
 
 ## Layouts
 
-`_layout.tsx` solo compone providers (`QueryClientProvider`, tema) y `Stack`/`Tabs`. Los providers con lógica propia van en `src/config/` o en una feature, no inline.
+`_layout.tsx` only composes providers (`QueryClientProvider`, theme) and `Stack`/`Tabs`. Providers with their own logic go in `src/config/` or in a feature, not inline.
 
-## Reglas
+## Rules
 
-- Sin lógica de negocio, `useQuery` ni estilos en `src/app/**`.
-- Sin archivos `.test.tsx` dentro de `src/app/` (Expo Router los trataría como rutas).
-- Las screens no importan de `expo-router` salvo que necesiten navegación; prefiere recibir callbacks por props.
+- No business logic, `useQuery` or styles in `src/app/**`.
+- No `.test.tsx` files inside `src/app/` (Expo Router would treat them as routes).
+- Screens do not import from `expo-router` unless they need navigation; prefer receiving callbacks through props.
