@@ -1,8 +1,8 @@
 ---
 name: architecture-map
-version: 1.0.0
+version: 1.1.0
 description: >-
-  Genera o actualiza la página de arquitectura leyendo el repositorio real: stack, diagrama Mermaid, módulos/apps, datos, auth, flujos clave, integraciones y despliegue. Soporta Notion (MCP) y docs/ARCHITECTURE.md local, preservando notas manuales tras confirmar.
+  Generate or update the architecture page by reading the real repository: stack, Mermaid diagram, modules/apps, data, auth, key flows, integrations and deployment. Supports Notion (MCP) and a local docs/ARCHITECTURE.md, preserving manual notes after confirmation.
 tags: [architecture, documentation, diagram, mermaid, notion, onboarding, repo-analysis]
 agents: [antigravity, claude-code, codex, cursor, windsurf]
 triggers:
@@ -12,7 +12,9 @@ triggers:
   - actualizar página de arquitectura
   - documentar arquitectura del repo
   - architecture map
+  - generate architecture page
   - update architecture docs
+  - document the repo architecture
 requirements:
   tools: [view_file, write_to_file, replace_file_content, run_command]
   bins: [git]
@@ -20,74 +22,75 @@ requirements:
 
 # Architecture Map (`mapa-arquitectura`)
 
-## 🎯 Propósito
+## 🎯 Purpose
 
-Generar desde cero o mantener al día la **página de arquitectura viva** de un proyecto leyendo el código real del repositorio (en lugar de documentación desactualizada o suposiciones). Produce una vista clara del sistema —stack verificado, diagrama Mermaid, módulos/apps, datos, seguridad, flujos clave, integraciones y despliegue— en **Notion** o en **`docs/ARCHITECTURE.md`**.
-
----
-
-## ⚡ Cuándo Activar esta Skill
-
-Activa esta skill cuando el usuario:
-- Pida crear, generar o actualizar la página o documento de arquitectura (*"mapa-arquitectura"*, *"actualiza la página de arquitectura"*, *"documenta la arquitectura de este repo"*).
-- Acabe de fusionar cambios estructurales o de incorporar a alguien y necesite sincronizar `docs/ARCHITECTURE.md` o una página de Notion con el estado real del código.
-
-**No la uses** para diseñar desde cero un proyecto nuevo con estándares prescriptivos de framework (para eso usa `monorepo-architecture`, `nestjs-architecture`, `nextjs-architecture`, `astro-architecture` o `react-native-architecture`).
+Generate from scratch, or keep up to date, a project's **living architecture page** by reading the repository's real code (instead of stale documentation or assumptions). It produces a clear view of the system (verified stack, Mermaid diagram, modules/apps, data, security, key flows, integrations and deployment) in **Notion** or in **`docs/ARCHITECTURE.md`**.
 
 ---
 
-## 📋 Flujo de Trabajo Paso a Paso
+## ⚡ When to Trigger
 
-### Paso 1: Determinar Destino y Modo (Crear vs. Actualizar)
-Seguir [references/destinations.md](references/destinations.md):
-1. **Notion (MCP):** si el usuario pasa una URL/ID de Notion o pide escribir en Notion, usar `notion-fetch` si la página ya existe; si es nueva, confirmar en qué página padre o base de datos crearla.
-2. **Archivo local:** si no se indica Notion, buscar en orden `docs/ARCHITECTURE.md`, `ARCHITECTURE.md` y `docs/architecture.md` para **actualizar in situ sin duplicar**. Si ninguno existe, proponer `docs/ARCHITECTURE.md` (o preguntar primero si hay Notion MCP conectado y prefiere Notion).
-3. **Preservación en modo actualización:** leer el documento actual completo e identificar secciones escritas a mano (ADRs, decisiones de negocio, roadmap, responsables, enlaces externos) para conservarlas intactas.
+Trigger this skill when the user:
+- Asks to create, generate or update the architecture page or document (*"mapa-arquitectura"*, *"update the architecture page"*, *"document this repo's architecture"*).
+- Has just merged structural changes or is onboarding someone and needs to sync `docs/ARCHITECTURE.md` or a Notion page with the real state of the code.
 
-### Paso 2: Explorar el Repositorio por Capas (Solo Lectura)
-Seguir el checklist de [references/repo-discovery.md](references/repo-discovery.md), excluyendo carpetas de build, dependencias y archivos con secretos:
-1. **Topología y manifiestos:** monorepo vs. aplicación única, runtimes y gestor de paquetes.
-2. **Apps, módulos y fronteras:** entrypoints, rutas principales, paquetes compartidos y dirección de dependencias.
-3. **Datos y persistencia:** base de datos, ORM/migraciones, almacenamiento de archivos, caché o colas (solo si existen).
-4. **Auth, seguridad y permisos:** proveedores de identidad, middlewares/guards y reglas RLS.
-5. **Integraciones y variables de entorno:** SDKs externos y webhooks; listar **solo nombres** de variables desde `.env.example` o código de configuración (**prohibido** leer `.env` reales).
-6. **Flujos clave:** trazar 1–3 recorridos principales de extremo a extremo citando rutas verificadas.
-7. **Testing, CI/CD y despliegue:** scripts verificados, workflows y artefactos de despliegue.
-
-### Paso 3: Detectar Deriva (Solo en Modo Actualización)
-Comparar lo observado en el Paso 2 contra la página existente y listar de forma breve qué quedó obsoleto o nuevo (módulos añadidos/eliminados, cambios de stack, nuevas integraciones, migración de despliegue o comandos cambiados).
-
-### Paso 4: Redactar el Mapa de Arquitectura
-Seguir [references/architecture-template.md](references/architecture-template.md):
-1. Adaptar las secciones al tamaño real del proyecto (omitir secciones de BD, colas o auth si no existen).
-2. Generar un diagrama Mermaid válido (`flowchart TD` o `flowchart LR`), entrecomillando etiquetas con paréntesis, corchetes o barras.
-3. Marcar cualquier dato que no pueda inferirse con certeza del código como `[por confirmar]` en lugar de adivinar.
-4. Añadir al final el metadato de vigencia (`Última actualización: <YYYY-MM-DD> · Commit: <short-sha>`).
-
-### Paso 5: Puerta de Revisión y Persistencia
-1. Mostrar en el chat:
-   - El **destino exacto** (URL/página de Notion o ruta local).
-   - En creación: el borrador completo.
-   - En actualización: el **resumen de deriva**, las **secciones manuales preservadas** y el contenido actualizado.
-2. **Esperar confirmación explícita del usuario** antes de crear o editar archivos o páginas de Notion.
-3. Si se actualiza en Notion, volver a leer con `notion-fetch` justo antes de `notion-update-page` para no pisar ediciones concurrentes. No editar código fuente ni hacer commits.
+**Do not use it** to design a new project from scratch with prescriptive framework standards (use `monorepo-architecture`, `nestjs-architecture`, `nextjs-architecture`, `astro-architecture` or `react-native-architecture` for that).
 
 ---
 
-## ⚠️ Reglas Críticas
+## 📋 Workflow
 
-1. **Solo hechos verificados en el repo:** cada ruta, comando, módulo o integración documentado debe haber sido comprobado en archivos reales. Lo no verificable se marca `[por confirmar]`.
-2. **Cero secretos:** nunca leer `.env`, `.env.local`, `.env.production`, llaves privadas ni credenciales; solo nombres de variables desde `.env.example` o código.
-3. **Puerta de confirmación obligatoria:** prohibido escribir en `docs/ARCHITECTURE.md` o en Notion sin mostrar primero la propuesta y recibir confirmación.
-4. **Preservación estricta de notas manuales:** nunca borrar ADRs, contexto histórico, enlaces ni notas del equipo que no puedan regenerarse desde el código.
-5. **No duplicar destino:** si ya existe `ARCHITECTURE.md` o una página enlazada, actualizarla en lugar de crear una segunda copia paralela.
-6. **Nivel arquitectónico:** explicar fronteras, responsabilidades y flujos; evitar listas interminables de cada archivo del repo.
-7. **Solo documentación:** no modificar código de la aplicación ni hacer `git commit` o `git push`.
+### Step 1: Determine the Destination and Mode (Create vs. Update)
+Follow [references/destinations.md](references/destinations.md):
+1. **Notion (MCP):** if the user passes a Notion URL/ID or asks to write to Notion, use `notion-fetch` if the page already exists; if it is new, confirm which parent page or database to create it in.
+2. **Local file:** if Notion is not mentioned, look for `docs/ARCHITECTURE.md`, `ARCHITECTURE.md` and `docs/architecture.md`, in that order, to **update in place without duplicating**. If none exists, propose `docs/ARCHITECTURE.md` (or first ask whether a Notion MCP is connected and they prefer Notion).
+3. **Preservation in update mode:** read the whole current document and identify hand-written sections (ADRs, business decisions, roadmap, owners, external links) to keep them intact.
+
+### Step 2: Explore the Repository by Layers (Read-Only)
+Follow the checklist in [references/repo-discovery.md](references/repo-discovery.md), excluding build folders, dependencies and files with secrets:
+1. **Topology and manifests:** monorepo vs. single app, runtimes and package manager.
+2. **Apps, modules and boundaries:** entry points, main routes, shared packages and dependency direction.
+3. **Data and persistence:** database, ORM/migrations, file storage, cache or queues (only if they exist).
+4. **Auth, security and permissions:** identity providers, middleware/guards and RLS rules.
+5. **Integrations and environment variables:** external SDKs and webhooks; list **only the names** of variables from `.env.example` or configuration code (reading real `.env` files is **forbidden**).
+6. **Key flows:** trace 1–3 main end-to-end paths, citing verified paths.
+7. **Testing, CI/CD and deployment:** verified scripts, workflows and deployment artifacts.
+
+### Step 3: Detect Drift (Update Mode Only)
+Compare what you observed in Step 2 against the existing page and briefly list what is stale or new (modules added/removed, stack changes, new integrations, deployment migration or changed commands).
+
+### Step 4: Write the Architecture Map
+Follow [references/architecture-template.md](references/architecture-template.md):
+1. Adapt the sections to the project's real size (omit DB, queue or auth sections if they don't exist).
+2. Generate a valid Mermaid diagram (`flowchart TD` or `flowchart LR`), quoting labels that contain parentheses, brackets or slashes.
+3. Mark anything that cannot be inferred with certainty from the code as `[to confirm]` instead of guessing. Pages written by earlier versions use `[por confirmar]`; treat it the same way and keep it in pages that already use it.
+4. Add the freshness metadata at the end (`Last updated: <YYYY-MM-DD> · Commit: <short-sha>`).
+
+### Step 5: Review Gate and Persistence
+1. Show in the chat:
+   - The **exact destination** (Notion URL/page or local path).
+   - On creation: the full draft.
+   - On update: the **drift summary**, the **preserved manual sections** and the updated content.
+2. **Wait for the user's explicit confirmation** before creating or editing files or Notion pages.
+3. If updating in Notion, read again with `notion-fetch` right before `notion-update-page` so concurrent edits are not overwritten. Do not edit source code or commit.
 
 ---
 
-## 📚 Referencias
+## ⚠️ Critical Rules
 
-- [Checklist de descubrimiento del repo](references/repo-discovery.md): qué leer por capas y qué archivos ignorar.
-- [Plantilla de arquitectura y Mermaid](references/architecture-template.md): estructura canónica, adaptación por tamaño y ejemplo.
-- [Destinos y preservación de notas](references/destinations.md): flujo para Notion MCP, Markdown local y fusión segura.
+1. **Reply in the user's language**, even though this skill is written in English. Write the page in the language of the existing page or, for a new one, the user's language.
+2. **Only facts verified in the repo:** every path, command, module or integration documented must have been checked in real files. Anything unverifiable is marked `[to confirm]`.
+3. **Zero secrets:** never read `.env`, `.env.local`, `.env.production`, private keys or credentials; only variable names from `.env.example` or code.
+4. **Mandatory confirmation gate:** writing to `docs/ARCHITECTURE.md` or Notion without first showing the proposal and receiving confirmation is forbidden.
+5. **Strict preservation of manual notes:** never delete ADRs, historical context, links or team notes that cannot be regenerated from the code.
+6. **No duplicate destination:** if an `ARCHITECTURE.md` or a linked page already exists, update it instead of creating a second parallel copy.
+7. **Architectural level:** explain boundaries, responsibilities and flows; avoid endless lists of every file in the repo.
+8. **Documentation only:** do not modify application code or run `git commit` or `git push`.
+
+---
+
+## 📚 References
+
+- [Repo discovery checklist](references/repo-discovery.md): what to read by layer and which files to ignore.
+- [Architecture template and Mermaid](references/architecture-template.md): canonical structure, size adaptation and an example.
+- [Destinations and note preservation](references/destinations.md): flow for Notion MCP, local Markdown and safe merging.

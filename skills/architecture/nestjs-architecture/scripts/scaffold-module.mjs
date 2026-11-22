@@ -709,12 +709,12 @@ export class Create${NounPascal}Dto extends createZodDto(create${NounPascal}Sche
 import { IsString, IsOptional, IsNotEmpty } from 'class-validator';
 
 export class Create${NounPascal}Dto {
-  @ApiProperty({ description: 'Nombre o título descriptivo', example: 'Ejemplo de ${NounPascal}' })
+  @ApiProperty({ description: 'Descriptive name or title', example: 'Sample ${NounPascal}' })
   @IsString()
   @IsNotEmpty()
   readonly name!: string;
 
-  @ApiPropertyOptional({ description: 'Notas o descripción adicional' })
+  @ApiPropertyOptional({ description: 'Additional notes or description' })
   @IsOptional()
   @IsString()
   readonly description?: string;
@@ -800,14 +800,14 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Min, Max, IsInt, IsString, IsOptional } from 'class-validator';
 
 export class Find${NounsPascal}QueryDto {
-  @ApiPropertyOptional({ description: 'Página actual', default: 1, minimum: 1, example: 1 })
+  @ApiPropertyOptional({ description: 'Current page', default: 1, minimum: 1, example: 1 })
   @IsOptional()
   @IsInt()
   @Min(1)
   @Type(() => Number)
   page: number = 1;
 
-  @ApiPropertyOptional({ description: 'Límite por página', default: 20, minimum: 1, maximum: 100, example: 20 })
+  @ApiPropertyOptional({ description: 'Page size limit', default: 20, minimum: 1, maximum: 100, example: 20 })
   @IsOptional()
   @IsInt()
   @Min(1)
@@ -815,7 +815,7 @@ export class Find${NounsPascal}QueryDto {
   @Type(() => Number)
   limit: number = 20;
 
-  @ApiPropertyOptional({ description: 'Término de búsqueda opcional', example: 'consulta' })
+  @ApiPropertyOptional({ description: 'Optional search term', example: 'query' })
   @IsOptional()
   @IsString()
   search?: string;
@@ -831,23 +831,23 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import type { ${NounPascal} } from '../entities';
 
 export class ${NounPascal}ResponseDto {
-  @ApiProperty({ description: 'Identificador único UUID', example: '3fa85f64-5717-4562-b3fc-2c963f66afa6' })
+  @ApiProperty({ description: 'Unique UUID identifier', example: '3fa85f64-5717-4562-b3fc-2c963f66afa6' })
   @Expose()
   readonly id!: string;
 
-  @ApiProperty({ description: 'Nombre o título descriptivo', example: 'Ejemplo de ${NounPascal}' })
+  @ApiProperty({ description: 'Descriptive name or title', example: 'Sample ${NounPascal}' })
   @Expose()
   readonly name!: string;
 
-  @ApiPropertyOptional({ description: 'Descripción detallada', nullable: true })
+  @ApiPropertyOptional({ description: 'Detailed description', nullable: true })
   @Expose()
   readonly description!: string | null;
 
-  @ApiProperty({ description: 'Fecha de creación (ISO 8601)' })
+  @ApiProperty({ description: 'Creation date (ISO 8601)' })
   @Expose()
   readonly createdAt!: Date;
 
-  @ApiProperty({ description: 'Fecha de última actualización (ISO 8601)' })
+  @ApiProperty({ description: 'Last update date (ISO 8601)' })
   @Expose()
   readonly updatedAt!: Date;
 
@@ -867,19 +867,19 @@ export class ${NounPascal}ResponseDto {
 }
 
 export class Paginated${NounPascal}ResponseDto {
-  @ApiProperty({ type: [${NounPascal}ResponseDto], description: 'Elementos de la página actual' })
+  @ApiProperty({ type: [${NounPascal}ResponseDto], description: 'Items on the current page' })
   @Expose()
   readonly items!: ${NounPascal}ResponseDto[];
 
-  @ApiProperty({ description: 'Total de registros coincidentes', example: 42 })
+  @ApiProperty({ description: 'Total matching records', example: 42 })
   @Expose()
   readonly total!: number;
 
-  @ApiProperty({ description: 'Página actual', example: 1 })
+  @ApiProperty({ description: 'Current page', example: 1 })
   @Expose()
   readonly page!: number;
 
-  @ApiProperty({ description: 'Registros por página', example: 20 })
+  @ApiProperty({ description: 'Records per page', example: 20 })
   @Expose()
   readonly limit!: number;
 
@@ -938,8 +938,8 @@ export interface Find${NounsPascal}Params {
 }
 
 /**
- * Contrato de repositorio abstracto para ${NounPascal}.
- * En cumplimiento de DIP, los servicios consumen esta interfaz y no la implementación concreta.
+ * Abstract repository contract for ${NounPascal}.
+ * Following DIP, services consume this interface, not the concrete implementation.
  */
 export interface I${NounPascal}Repository {
   findById(id: string): Promise<${NounPascal} | null>;
@@ -1019,10 +1019,10 @@ export class ${NounPascal}Service {
   async findOne(id: string, requesterId: string, requesterRole: string): Promise<${NounPascal}> {
     const entity = await this.${nounCamel}Repository.findById(id);
     if (!entity) {
-      throw new NotFoundException('${NounPascal} no encontrado');
+      throw new NotFoundException('${NounPascal} not found');
     }
     if (requesterRole !== 'admin' && entity.ownerId !== requesterId) {
-      throw new ForbiddenException('No tienes permisos suficientes para acceder a este recurso');
+      throw new ForbiddenException('You do not have permission to access this resource');
     }
     return entity;
   }
@@ -1110,11 +1110,11 @@ export class ${NounPascal}Controller {
   constructor(private readonly ${nounCamel}Service: ${NounPascal}Service) {}
 
   @Post()
-  @ApiOperation({ summary: 'Crear ${NounPascal}', description: 'Crea un nuevo registro en el dominio.' })
-  @ApiCreatedResponse({ type: ${NounPascal}ResponseDto, description: 'Creado exitosamente.' })
-  @ApiBadRequestResponse({ description: 'Datos de entrada inválidos.' })
-  @ApiUnauthorizedResponse({ description: 'No autorizado.' })
-  @ApiForbiddenResponse({ description: 'Permisos insuficientes.' })
+  @ApiOperation({ summary: 'Create ${NounPascal}', description: 'Creates a new record in the domain.' })
+  @ApiCreatedResponse({ type: ${NounPascal}ResponseDto, description: 'Created successfully.' })
+  @ApiBadRequestResponse({ description: 'Invalid input data.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({ description: 'Insufficient permissions.' })
   @ApiBody({ type: Create${NounPascal}Dto })
   async create(
     @Body() dto: Create${NounPascal}Dto,
@@ -1125,10 +1125,10 @@ export class ${NounPascal}Controller {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Listar ${NounsPascal}', description: 'Retorna listado paginado con filtros.' })
-  @ApiOkResponse({ type: Paginated${NounPascal}ResponseDto, description: 'Listado paginado obtenido.' })
-  @ApiBadRequestResponse({ description: 'Parámetros de consulta inválidos.' })
-  @ApiUnauthorizedResponse({ description: 'No autorizado.' })
+  @ApiOperation({ summary: 'List ${NounsPascal}', description: 'Returns a paginated, filtered list.' })
+  @ApiOkResponse({ type: Paginated${NounPascal}ResponseDto, description: 'Paginated list returned.' })
+  @ApiBadRequestResponse({ description: 'Invalid query parameters.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   async findAll(
     @Query() query: Find${NounsPascal}QueryDto,
     @Req() req: AuthenticatedRequest,
@@ -1138,13 +1138,13 @@ export class ${NounPascal}Controller {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Consultar ${NounPascal}', description: 'Obtiene detalle por identificador UUID.' })
-  @ApiParam({ name: 'id', format: 'uuid', description: 'UUID del registro' })
-  @ApiOkResponse({ type: ${NounPascal}ResponseDto, description: 'Registro encontrado.' })
-  @ApiBadRequestResponse({ description: 'UUID inválido.' })
-  @ApiUnauthorizedResponse({ description: 'No autorizado.' })
-  @ApiForbiddenResponse({ description: 'Permisos insuficientes.' })
-  @ApiNotFoundResponse({ description: 'Registro no encontrado.' })
+  @ApiOperation({ summary: 'Get ${NounPascal}', description: 'Gets the details by UUID.' })
+  @ApiParam({ name: 'id', format: 'uuid', description: 'Record UUID' })
+  @ApiOkResponse({ type: ${NounPascal}ResponseDto, description: 'Record found.' })
+  @ApiBadRequestResponse({ description: 'Invalid UUID.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({ description: 'Insufficient permissions.' })
+  @ApiNotFoundResponse({ description: 'Record not found.' })
   async findOne(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Req() req: AuthenticatedRequest,
@@ -1154,13 +1154,13 @@ export class ${NounPascal}Controller {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Actualizar ${NounPascal}', description: 'Actualiza campos de un registro.' })
-  @ApiParam({ name: 'id', format: 'uuid', description: 'UUID del registro' })
-  @ApiOkResponse({ type: ${NounPascal}ResponseDto, description: 'Actualizado exitosamente.' })
-  @ApiBadRequestResponse({ description: 'Datos o UUID inválidos.' })
-  @ApiUnauthorizedResponse({ description: 'No autorizado.' })
-  @ApiForbiddenResponse({ description: 'Permisos insuficientes.' })
-  @ApiNotFoundResponse({ description: 'Registro no encontrado.' })
+  @ApiOperation({ summary: 'Update ${NounPascal}', description: 'Updates fields of a record.' })
+  @ApiParam({ name: 'id', format: 'uuid', description: 'Record UUID' })
+  @ApiOkResponse({ type: ${NounPascal}ResponseDto, description: 'Updated successfully.' })
+  @ApiBadRequestResponse({ description: 'Invalid data or UUID.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({ description: 'Insufficient permissions.' })
+  @ApiNotFoundResponse({ description: 'Record not found.' })
   async update(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() dto: Update${NounPascal}Dto,
@@ -1172,13 +1172,13 @@ export class ${NounPascal}Controller {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Eliminar ${NounPascal}', description: 'Elimina un registro del sistema.' })
-  @ApiParam({ name: 'id', format: 'uuid', description: 'UUID del registro' })
-  @ApiNoContentResponse({ description: 'Eliminado exitosamente.' })
-  @ApiBadRequestResponse({ description: 'UUID inválido.' })
-  @ApiUnauthorizedResponse({ description: 'No autorizado.' })
-  @ApiForbiddenResponse({ description: 'Permisos insuficientes.' })
-  @ApiNotFoundResponse({ description: 'Registro no encontrado.' })
+  @ApiOperation({ summary: 'Delete ${NounPascal}', description: 'Deletes a record from the system.' })
+  @ApiParam({ name: 'id', format: 'uuid', description: 'Record UUID' })
+  @ApiNoContentResponse({ description: 'Deleted successfully.' })
+  @ApiBadRequestResponse({ description: 'Invalid UUID.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
+  @ApiForbiddenResponse({ description: 'Insufficient permissions.' })
+  @ApiNotFoundResponse({ description: 'Record not found.' })
   async remove(
     @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Req() req: AuthenticatedRequest,

@@ -4,31 +4,44 @@
     {
       "id": 1,
       "prompt": "Crea un monorepo para la empresa acme con una web en Next.js y una API en NestJS. Somos un solo equipo y queremos compartir las validaciones entre front y back.",
-      "expected_output": "El agente elige el modo zod justificándolo con la matriz, ejecuta scaffold-monorepo.mjs --scope acme --contracts zod primero con --dry-run y después sin él tras confirmación. No ejecuta create-next-app ni nest new sin permiso. Indica cómo conectar las apps con scaffold-app.mjs (extends de @acme/tsconfig, oxc-config, dependencias workspace:*) y termina verificando con pnpm turbo run lint typecheck test build y pnpm check:boundaries.",
-      "files": []
+      "expected_output": "The agent picks zod mode and justifies it with the matrix, runs scaffold-monorepo.mjs --scope acme --contracts zod first with --dry-run and then without it after confirmation. It does not run create-next-app or nest new without permission. It explains how to connect the apps with scaffold-app.mjs (the @acme/tsconfig extends, oxc-config, workspace:* dependencies) and finishes by verifying with pnpm turbo run lint typecheck test build and pnpm check:boundaries. The reply is in Spanish.",
+      "files": [],
+      "assertions": [
+        "Chooses zod mode and justifies it",
+        "Runs scaffold-monorepo.mjs with --dry-run before writing",
+        "Does not run create-next-app or nest new without permission",
+        "Verifies with turbo run and pnpm check:boundaries",
+        "Replies in Spanish"
+      ]
     },
     {
       "id": 2,
-      "prompt": "En mi monorepo (ya tiene packages/contracts, apps/web, apps/api y apps/mobile) añade el dominio de facturas de punta a punta para los tres clientes.",
-      "expected_output": "El agente ejecuta scaffold-fullstack-feature.mjs invoice --targets api,web,mobile con --dry-run y después sin él. Resultado: packages/contracts/src/invoices con el esquema Zod y './invoices' en exports; los 18 archivos de nestjs-architecture en apps/api/src/modules/invoices; la feature de nextjs-architecture en apps/web/src/features/invoices; la feature de react-native-architecture en apps/mobile/src/features/invoices; dependencias workspace:* en las tres apps.",
+      "prompt": "In my monorepo (it already has packages/contracts, apps/web, apps/api and apps/mobile) add the invoices domain end to end for all three clients.",
+      "expected_output": "The agent runs scaffold-fullstack-feature.mjs invoice --targets api,web,mobile with --dry-run and then without it. Result: packages/contracts/src/invoices with the Zod schema and './invoices' in exports; the 18 nestjs-architecture files in apps/api/src/modules/invoices; the nextjs-architecture feature in apps/web/src/features/invoices; the react-native-architecture feature in apps/mobile/src/features/invoices; workspace:* dependencies in all three apps.",
       "files": []
     },
     {
       "id": 3,
       "prompt": "Queremos un monorepo para acme con web Next.js, API NestJS, app móvil Expo y una landing en Astro. ¿Cómo lo estructuramos y qué compartimos?",
-      "expected_output": "El agente recomienda modo openapi (por tener app móvil) y scaffold-monorepo.mjs --scope acme --contracts openapi --apps web,api,mobile,landing, además de design-tokens universal para Tailwind/NativeWind. Explica la regla de aislamiento por plataforma (ui-web nunca se importa en mobile, contracts/design-tokens son universales), cómo configurar metro.config.js y .npmrc para Expo + pnpm, y que apps/landing sigue astro-architecture.",
-      "files": []
+      "expected_output": "The agent recommends openapi mode (because there is a mobile app) and scaffold-monorepo.mjs --scope acme --contracts openapi --apps web,api,mobile,landing, plus a universal design-tokens package for Tailwind/NativeWind. It explains the per-platform isolation rule (ui-web is never imported in mobile; contracts/design-tokens are universal), how to configure metro.config.js and .npmrc for Expo + pnpm, and that apps/landing follows astro-architecture. The reply is in Spanish.",
+      "files": [],
+      "assertions": [
+        "Recommends openapi mode because of the mobile app",
+        "Explains the per-platform isolation rule",
+        "Mentions metro.config.js and .npmrc for Expo + pnpm",
+        "Replies in Spanish"
+      ]
     },
     {
       "id": 4,
-      "prompt": "Para ahorrar tiempo, importé @acme/ui-web dentro de apps/mobile y también importé una entidad de apps/api en apps/landing/src/pages/index.astro. ¿Qué detecta check-boundaries?",
-      "expected_output": "El agente explica que check-boundaries.mjs analiza tanto archivos TS/JS como el frontmatter de .astro y reportará platform-mismatch (native no puede importar web) y relative-escape o app-import (ningún workspace puede importar apps/api). Propone mover tokens agnósticos a packages/design-tokens, usar @acme/api-client o @acme/contracts en landing, y verificar con pnpm check:boundaries.",
+      "prompt": "To save time, I imported @acme/ui-web inside apps/mobile and also imported an entity from apps/api into apps/landing/src/pages/index.astro. What does check-boundaries detect?",
+      "expected_output": "The agent explains that check-boundaries.mjs analyzes both TS/JS files and the frontmatter of .astro files and will report platform-mismatch (native cannot import web) and relative-escape or app-import (no workspace may import apps/api). It proposes moving agnostic tokens to packages/design-tokens, using @acme/api-client or @acme/contracts in landing, and verifying with pnpm check:boundaries.",
       "files": []
     },
     {
       "id": 5,
-      "prompt": "Necesitamos sumar un worker en Node.js y un microservicio en Python FastAPI al monorepo existente. ¿Cómo los integramos?",
-      "expected_output": "El agente usa scaffold-app.mjs con --type worker (en apps/worker, usando @acme/tsconfig/node.json y plataforma node) y --type polyglot (en services/<name> con package.json shim y services/* en pnpm-workspace.yaml, compartiendo contratos vía OpenAPI), ejecutando --dry-run primero.",
+      "prompt": "We need to add a Node.js worker and a Python FastAPI microservice to the existing monorepo. How do we integrate them?",
+      "expected_output": "The agent uses scaffold-app.mjs with --type worker (in apps/worker, using @acme/tsconfig/node.json and the node platform) and --type polyglot (in services/<name> with a shim package.json and services/* in pnpm-workspace.yaml, sharing contracts through OpenAPI), running --dry-run first.",
       "files": []
     }
   ]

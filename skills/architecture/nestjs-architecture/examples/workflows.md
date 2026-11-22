@@ -1,8 +1,8 @@
-# Ejemplos de Flujos y Refactorización — `nestjs-architecture`
+# Workflow and Refactoring Examples — `nestjs-architecture`
 
-## Caso 1: Refactorizar un *Fat Controller* acoplado al ORM
+## Case 1: Refactor a *Fat Controller* coupled to the ORM
 
-**Problema (código acoplado y con fuga de entidad DB):**
+**Problem (coupled code that leaks the DB entity):**
 ```typescript
 @Controller('invoices')
 export class InvoiceController {
@@ -15,27 +15,27 @@ export class InvoiceController {
 }
 ```
 
-**Solución siguiendo `nestjs-architecture`:**
-1. **`repositories/repository.ts`**: definir `IInvoiceRepository` y `INVOICE_REPOSITORY_TOKEN`.
-2. **`repositories/invoice.repository.ts`**: encapsular `this.prisma.invoice.findUnique` y retornar `Invoice.fromPersistence(record)`.
-3. **`services/invoice.service.ts`**: inyectar `@Inject(INVOICE_REPOSITORY_TOKEN) private readonly repo: IInvoiceRepository`, lanzar `NotFoundException` si es `null` y `ForbiddenException` si `requesterRole !== Role.ADMIN && entity.ownerId !== requesterId`.
-4. **`controllers/invoice.controller.ts`**: validar `:id` con `ParseUUIDPipe({ version: '4' })`, documentar con Swagger (`@ApiOperation`, `@ApiParam`, `@ApiOkResponse`, `@ApiNotFoundResponse`, `@ApiForbiddenResponse`, `@ApiUnauthorizedResponse`, `@ApiBadRequestResponse`) y devolver `InvoiceResponseDto.fromEntity(entity)`.
+**Solution following `nestjs-architecture`:**
+1. **`repositories/repository.ts`**: define `IInvoiceRepository` and `INVOICE_REPOSITORY_TOKEN`.
+2. **`repositories/invoice.repository.ts`**: wrap `this.prisma.invoice.findUnique` and return `Invoice.fromPersistence(record)`.
+3. **`services/invoice.service.ts`**: inject `@Inject(INVOICE_REPOSITORY_TOKEN) private readonly repo: IInvoiceRepository`, throw `NotFoundException` on `null` and `ForbiddenException` if `requesterRole !== Role.ADMIN && entity.ownerId !== requesterId`.
+4. **`controllers/invoice.controller.ts`**: validate `:id` with `ParseUUIDPipe({ version: '4' })`, document with Swagger (`@ApiOperation`, `@ApiParam`, `@ApiOkResponse`, `@ApiNotFoundResponse`, `@ApiForbiddenResponse`, `@ApiUnauthorizedResponse`, `@ApiBadRequestResponse`) and return `InvoiceResponseDto.fromEntity(entity)`.
 
 ---
 
-## Caso 2: Comunicación inter-módulos sin cruzar repositorios
+## Case 2: Inter-module communication without crossing repositories
 
-> *"El módulo `Orders` necesita verificar que el usuario exista antes de crear una orden."*
+> *"The `Orders` module needs to check that the user exists before creating an order."*
 
-- **❌ Prohibido:** importar `USER_REPOSITORY_TOKEN` o `UserRepository` dentro de `OrdersModule`.
-- **✅ Correcto:**
-  1. `UsersModule` exporta únicamente `UserService` (`exports: [UserService]`).
-  2. `OrdersModule` importa `UsersModule` (`imports: [UsersModule]`).
-  3. `OrderService` importa `UserService` desde `@/modules/users/services` (carpeta hoja) y lo inyecta en su constructor.
+- **❌ Forbidden:** importing `USER_REPOSITORY_TOKEN` or `UserRepository` inside `OrdersModule`.
+- **✅ Correct:**
+  1. `UsersModule` exports only `UserService` (`exports: [UserService]`).
+  2. `OrdersModule` imports `UsersModule` (`imports: [UsersModule]`).
+  3. `OrderService` imports `UserService` from `@/modules/users/services` (leaf folder) and injects it in its constructor.
 
 ---
 
-## Caso 3: Scaffolding en Monorepo con Contratos Zod
+## Case 3: Monorepo Scaffolding with Zod Contracts
 
 ```bash
 node <skill-dir>/scripts/scaffold-module.mjs invoice \
@@ -46,8 +46,8 @@ node <skill-dir>/scripts/scaffold-module.mjs invoice \
   --dry-run
 ```
 
-Luego ejecuta sin `--dry-run`. El script genera los 18 archivos con:
-- `CreateInvoiceDto` y `UpdateInvoiceDto` extendiendo `createZodDto(...)` de `@acme/contracts/invoices`.
-- `InvoiceResponseDto` y `PaginatedInvoiceResponseDto` listos para Swagger y `fromEntity` / `fromPaginatedResult`.
-- `InvoiceModule` exportando únicamente `InvoiceService`.
-- Specs unitarios listos para ejecutar con `pnpm exec vitest run`.
+Then run it without `--dry-run`. The script generates the 18 files with:
+- `CreateInvoiceDto` and `UpdateInvoiceDto` extending `createZodDto(...)` from `@acme/contracts/invoices`.
+- `InvoiceResponseDto` and `PaginatedInvoiceResponseDto`, ready for Swagger and `fromEntity` / `fromPaginatedResult`.
+- `InvoiceModule` exporting only `InvoiceService`.
+- Unit specs ready to run with `pnpm exec vitest run`.

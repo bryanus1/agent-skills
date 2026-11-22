@@ -1,20 +1,20 @@
-# Patrón de Repositorio, Entidades de Dominio y Transacciones (ORM-Agnostic)
+# Repository Pattern, Domain Entities and Transactions (ORM-Agnostic)
 
-Esta guía detalla cómo desacoplar el motor de persistencia (Prisma, TypeORM, Drizzle, etc.) de los servicios y controladores mediante contratos tipados, entidades inmutables y mapeo de errores.
-
----
-
-## 1. Regla de Oro del Desacoplamiento
-
-- Los servicios y controladores **nunca** importan clientes de ORM (`PrismaClient`, `Repository` de TypeORM, `db` de Drizzle).
-- El repositorio es la única capa que consulta la base de datos y siempre retorna **Entidades de Dominio** inmutables.
-- **El token del repositorio (`<NOUN>_REPOSITORY_TOKEN`) es privado al módulo:** nunca se incluye en `exports` del `@Module`.
+This guide explains how to decouple the persistence engine (Prisma, TypeORM, Drizzle, etc.) from services and controllers through typed contracts, immutable entities and error mapping.
 
 ---
 
-## 2. Entidad de Dominio (`entities/<noun>.entity.ts`)
+## 1. The Golden Rule of Decoupling
 
-Tipado estricto sin `any` en el registro de persistencia:
+- Services and controllers **never** import ORM clients (`PrismaClient`, TypeORM's `Repository`, Drizzle's `db`).
+- The repository is the only layer that queries the database, and it always returns immutable **Domain Entities**.
+- **The repository token (`<NOUN>_REPOSITORY_TOKEN`) is private to the module:** it is never included in the `@Module`'s `exports`.
+
+---
+
+## 2. Domain Entity (`entities/<noun>.entity.ts`)
+
+Strict typing, with no `any` in the persistence record:
 
 ```typescript
 export interface CustomerPersistenceRecord {
@@ -51,7 +51,7 @@ export class Customer {
 
 ---
 
-## 3. Contrato de Repositorio (`repositories/repository.ts`)
+## 3. Repository Contract (`repositories/repository.ts`)
 
 ```typescript
 import type { Customer } from '../entities';
@@ -87,7 +87,7 @@ export interface ICustomerRepository {
 
 ---
 
-## 4. Implementaciones Concretas por ORM
+## 4. Concrete Implementations per ORM
 
 ### 4.1 Prisma (`--orm prisma`)
 ```typescript
@@ -160,14 +160,14 @@ export class CustomerRepository implements ICustomerRepository {
 ```
 
 ### 4.3 Drizzle (`--orm drizzle`)
-Inyecta el cliente Drizzle o un query port tipado (`DrizzleCustomerPort`) sin `any` y transforma cada fila con `(row) => Customer.fromPersistence(row)`.
+Inject the Drizzle client or a typed query port (`DrizzleCustomerPort`) without `any`, and map each row with `(row) => Customer.fromPersistence(row)`.
 
 ---
 
-## 5. Transacciones (Unit of Work ORM-Agnostic) y Mapeo de Errores
+## 5. Transactions (ORM-Agnostic Unit of Work) and Error Mapping
 
-### 5.1 Transacciones sin filtrar el ORM
-Cuando una operación de negocio necesita atomicidad entre múltiples pasos (ej. `Invoice` + `InvoiceItem`), define un puerto abstracto `UnitOfWork`:
+### 5.1 Transactions without leaking the ORM
+When a business operation needs atomicity across several steps (e.g. `Invoice` + `InvoiceItem`), define an abstract `UnitOfWork` port:
 
 ```typescript
 export const UNIT_OF_WORK_TOKEN = 'UNIT_OF_WORK';
@@ -177,14 +177,14 @@ export interface IUnitOfWork {
 }
 ```
 
-En Prisma puede respaldarse con `AsyncLocalStorage` sobre `prisma.$transaction`, y en TypeORM con `QueryRunner`. El servicio permanece 100% agnóstico al ORM.
+In Prisma it can be backed by `AsyncLocalStorage` over `prisma.$transaction`, and in TypeORM by a `QueryRunner`. The service stays 100% ORM-agnostic.
 
-### 5.2 Traducción de errores de persistencia
-El repositorio captura errores nativos del driver (p. ej. Prisma `P2002` o Postgres `23505` para unique constraint) y lanza excepciones semánticas HTTP/de dominio (`ConflictException` `409`), evitando filtrar nombres de tablas o columnas al cliente.
+### 5.2 Translating persistence errors
+The repository catches native driver errors (e.g. Prisma `P2002` or Postgres `23505` for a unique constraint) and throws semantic HTTP/domain exceptions (`ConflictException` `409`), so table or column names never leak to the client.
 
 ---
 
-## 6. Vinculación en el Módulo (`<noun>.module.ts`)
+## 6. Binding in the Module (`<noun>.module.ts`)
 
 ```typescript
 @Module({
@@ -196,7 +196,7 @@ El repositorio captura errores nativos del driver (p. ej. Prisma `P2002` o Postg
       useClass: CustomerRepository,
     },
   ],
-  exports: [CustomerService], // NUNCA exportar CUSTOMER_REPOSITORY_TOKEN
+  exports: [CustomerService], // NEVER export CUSTOMER_REPOSITORY_TOKEN
 })
 export class CustomerModule {}
 ```

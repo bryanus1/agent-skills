@@ -9,7 +9,7 @@ import path from 'node:path';
 function parseArgs(argv) {
   const options = {
     targetDir: '.',
-    name: 'Mi Producto',
+    name: 'My Product',
     dryRun: false,
     force: false,
     help: false,
@@ -38,7 +38,7 @@ function printHelp() {
 
 Options:
   --target-dir <path>  Root directory of the Astro project (default: ".")
-  --name <string>      Site/product name for initial copy (default: "Mi Producto")
+  --name <string>      Site/product name for initial copy (default: "My Product")
   --dry-run            Preview files without writing to disk
   --force              Overwrite existing files
   -h, --help           Show this help message`);
@@ -77,57 +77,57 @@ export interface FaqItem {
 
 export const siteConfig = {
   name: '${siteName.replace(/'/g, "\\'")}',
-  title: '${siteName.replace(/'/g, "\\'")} — Solución rápida y moderna',
+  title: '${siteName.replace(/'/g, "\\'")} — Fast, modern solution',
   description:
-    'Landing page construida con Astro, Tailwind CSS y arquitectura Zero-JS por defecto.',
+    'Landing page built with Astro, Tailwind CSS and a Zero-JS-by-default architecture.',
   nav: [
-    { label: 'Características', href: '#features' },
-    { label: 'Preguntas', href: '#faq' },
+    { label: 'Features', href: '#features' },
+    { label: 'FAQ', href: '#faq' },
   ] satisfies NavItem[],
 };
 
 export const landingContent = {
   hero: {
-    eyebrow: 'Nuevo lanzamiento',
-    headline: 'Construye más rápido con ${siteName.replace(/'/g, "\\'")}',
+    eyebrow: 'New release',
+    headline: 'Build faster with ${siteName.replace(/'/g, "\\'")}',
     subheadline:
-      'Una arquitectura limpia, rápida y optimizada para SEO y conversión desde el primer día.',
-    primaryCta: { label: 'Empezar ahora', href: '#cta' },
-    secondaryCta: { label: 'Ver características', href: '#features' },
+      'A clean, fast architecture optimized for SEO and conversion from day one.',
+    primaryCta: { label: 'Get started', href: '#cta' },
+    secondaryCta: { label: 'See features', href: '#features' },
   },
   features: [
     {
-      title: 'Zero-JS por defecto',
+      title: 'Zero-JS by default',
       description:
-        'HTML estático ultrarrápido que solo hidrata islas cuando es estrictamente necesario.',
+        'Ultra-fast static HTML that only hydrates islands when strictly necessary.',
     },
     {
-      title: 'SEO técnico integrado',
+      title: 'Built-in technical SEO',
       description:
-        'Metadatos Open Graph, canonical, sitemap y estructura semántica lista para indexar.',
+        'Open Graph metadata, canonical, sitemap and a semantic structure ready to index.',
     },
     {
-      title: 'Accesibilidad WCAG AA',
+      title: 'WCAG AA accessibility',
       description:
-        'Contraste verificado, navegación por teclado y controles nativos sin dependencias extra.',
+        'Verified contrast, keyboard navigation and native controls with no extra dependencies.',
     },
   ] satisfies FeatureItem[],
   faqs: [
     {
-      question: '¿Por qué usar Astro para una landing page?',
+      question: 'Why use Astro for a landing page?',
       answer:
-        'Porque entrega HTML estático sin JavaScript innecesario, logrando tiempos de carga mínimos y mejor posicionamiento SEO.',
+        'Because it ships static HTML without unnecessary JavaScript, giving minimal load times and better SEO rankings.',
     },
     {
-      question: '¿Puedo añadir interactividad después?',
+      question: 'Can I add interactivity later?',
       answer:
-        'Sí, mediante Astro Islands usando directivas como client:visible únicamente en los componentes que lo requieran.',
+        'Yes, through Astro Islands, using directives like client:visible only on the components that need it.',
     },
   ] satisfies FaqItem[],
   cta: {
-    title: '¿Listo para lanzar?',
-    description: 'Despliega tu landing page con rendimiento óptimo en minutos.',
-    buttonLabel: 'Contactar',
+    title: 'Ready to launch?',
+    description: 'Deploy your landing page with optimal performance in minutes.',
+    buttonLabel: 'Contact us',
     buttonHref: '#top',
   },
 };
@@ -158,7 +158,7 @@ const canonicalURL = Astro.site
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -183,7 +183,7 @@ const canonicalURL = Astro.site
       href="#main-content"
       class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-slate-900 focus:px-4 focus:py-2 focus:text-white"
     >
-      Saltar al contenido principal
+      Skip to main content
     </a>
     <Navbar />
     <main id="main-content">
@@ -199,7 +199,7 @@ import { siteConfig } from '../../data/site';
 
 <header class="border-b border-slate-200 bg-white/90 backdrop-blur">
   <nav
-    aria-label="Navegación principal"
+    aria-label="Main navigation"
     class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6"
   >
     <a href="/" class="text-lg font-bold tracking-tight text-slate-900">
@@ -234,9 +234,9 @@ const year = new Date().getFullYear();
 
 <footer class="border-t border-slate-200 bg-slate-50 py-10">
   <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 text-sm text-slate-600 sm:flex-row sm:px-6">
-    <p>&copy; {year} {siteConfig.name}. Todos los derechos reservados.</p>
+    <p>&copy; {year} {siteConfig.name}. All rights reserved.</p>
     <div class="flex gap-6">
-      <a href="#features" class="hover:text-slate-900">Características</a>
+      <a href="#features" class="hover:text-slate-900">Features</a>
       <a href="#faq" class="hover:text-slate-900">FAQ</a>
     </div>
   </div>
@@ -302,7 +302,7 @@ const { features } = Astro.props;
   <div class="mx-auto max-w-6xl px-4 sm:px-6">
     <div class="mx-auto max-w-2xl text-center">
       <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-        Diseñado para velocidad y conversión
+        Designed for speed and conversion
       </h2>
     </div>
     <div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
@@ -333,7 +333,7 @@ const { faqs } = Astro.props;
 <section id="faq" class="py-20">
   <div class="mx-auto max-w-3xl px-4 sm:px-6">
     <h2 class="text-center text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-      Preguntas frecuentes
+      Frequently asked questions
     </h2>
     <div class="mt-10 space-y-4">
       {

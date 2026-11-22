@@ -108,7 +108,7 @@ export function ${pascal}({
   return (
     <FormDialog
       title="${entity}"
-      description="Completa el siguiente formulario para continuar."
+      description="Fill in the form below to continue."
       open={open}
       onOpenChange={onOpenChange}
       trigger={trigger}

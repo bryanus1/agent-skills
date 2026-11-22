@@ -1,26 +1,26 @@
-# Límites, Plataformas y Dependencias
+# Boundaries, Platforms and Dependencies
 
-`check-boundaries.mjs` analiza los imports (`import`, `export ... from`, `require()`, `import()`) de todos los archivos `.ts/.tsx/.mts/.cts/.js/.jsx/.mjs/.cjs` y de los bloques frontmatter (`--- ... ---`) y `<script>` de archivos **`.astro`** en cada workspace. Ignora `node_modules`, `dist`, `build`, `.next`, `.astro`, `.expo`, `.turbo`, `coverage` y `out`.
+`check-boundaries.mjs` analyzes the imports (`import`, `export ... from`, `require()`, `import()`) of every `.ts/.tsx/.mts/.cts/.js/.jsx/.mjs/.cjs` file and of the frontmatter blocks (`--- ... ---`) and `<script>` of **`.astro`** files in each workspace. It ignores `node_modules`, `dist`, `build`, `.next`, `.astro`, `.expo`, `.turbo`, `coverage` and `out`.
 
 ---
 
-## 1. Reglas y Cómo Corregirlas
+## 1. Rules and How to Fix Them
 
-| Regla | Ejemplo prohibido | Corrección |
+| Rule | Forbidden example | Fix |
 | :--- | :--- | :--- |
-| `app-import` | `apps/admin` → `import { x } from 'web'` | Mueve el código compartido a `packages/<lib>` e impórtalo desde ambas apps |
-| `package-imports-app` | `packages/ui-web` → `import { theme } from 'web/src/theme'` | Invierte la dependencia: `theme` vive en `packages/design-tokens` |
-| `relative-escape` | `apps/mobile/src/a.ts` → `import '../../../packages/contracts/src/invoices'` | Usa `@acme/contracts/invoices` y decláralo en `package.json` |
-| `undeclared` | `apps/landing/src/pages/index.astro` importa `@acme/design-tokens` sin declararlo | `pnpm --filter landing add @acme/design-tokens@workspace:*` |
-| `deep-import` | `import ... from '@acme/contracts/src/invoices'` | Usa el subpath expuesto (`@acme/contracts/invoices`) o añádelo a `exports` |
-| `cycle` | `@acme/a` depende de `@acme/b` y `@acme/b` de `@acme/a` | Extrae lo común a un tercer paquete del que dependan ambos |
-| `platform-mismatch` | `apps/mobile` (`native`) importa `@acme/ui-web` (`web`), o `packages/contracts` (`universal`) importa `@acme/ui-web` | Respeta la matriz de compatibilidad o mueve la lógica agnóstica a un paquete `universal` |
+| `app-import` | `apps/admin` → `import { x } from 'web'` | Move the shared code to `packages/<lib>` and import it from both apps |
+| `package-imports-app` | `packages/ui-web` → `import { theme } from 'web/src/theme'` | Invert the dependency: `theme` lives in `packages/design-tokens` |
+| `relative-escape` | `apps/mobile/src/a.ts` → `import '../../../packages/contracts/src/invoices'` | Use `@acme/contracts/invoices` and declare it in `package.json` |
+| `undeclared` | `apps/landing/src/pages/index.astro` imports `@acme/design-tokens` without declaring it | `pnpm --filter landing add @acme/design-tokens@workspace:*` |
+| `deep-import` | `import ... from '@acme/contracts/src/invoices'` | Use the exposed subpath (`@acme/contracts/invoices`) or add it to `exports` |
+| `cycle` | `@acme/a` depends on `@acme/b` and `@acme/b` on `@acme/a` | Extract the shared part into a third package both depend on |
+| `platform-mismatch` | `apps/mobile` (`native`) imports `@acme/ui-web` (`web`), or `packages/contracts` (`universal`) imports `@acme/ui-web` | Respect the compatibility matrix or move the agnostic logic to a `universal` package |
 
 ---
 
-## 2. Matriz de Compatibilidad de Plataformas (`platform-mismatch`)
+## 2. Platform Compatibility Matrix (`platform-mismatch`)
 
-Cada workspace declara su plataforma en `package.json`:
+Each workspace declares its platform in `package.json`:
 
 ```json
 {
@@ -29,9 +29,9 @@ Cada workspace declara su plataforma en `package.json`:
 }
 ```
 
-Valores permitidos por defecto:
+Allowed values by default:
 
-| Plataforma origen | Plataformas que puede importar |
+| Source platform | Platforms it may import |
 | :--- | :--- |
 | `universal` | `universal` |
 | `web` | `universal`, `web` |
@@ -39,9 +39,9 @@ Valores permitidos por defecto:
 | `native` | `universal`, `native` |
 | `node` | `universal`, `node` |
 
-### Personalización (`monorepo.boundaries.json`)
+### Customization (`monorepo.boundaries.json`)
 
-Si tienes un repositorio con paquetes heredados sin campo `monorepo` o necesitas ampliar reglas, crea `monorepo.boundaries.json` en la raíz:
+If you have a repository with legacy packages that lack a `monorepo` field, or you need to extend the rules, create `monorepo.boundaries.json` at the root:
 
 ```json
 {
@@ -56,34 +56,34 @@ Si tienes un repositorio con paquetes heredados sin campo `monorepo` o necesitas
 
 ---
 
-## 3. Uso
+## 3. Usage
 
 ```bash
-pnpm check:boundaries                                         # valida apps/*, services/* y packages/*
-node scripts/check-boundaries.mjs --json                      # salida estructurada para CI/agentes
-node scripts/check-boundaries.mjs --apps-dir apps,services    # carpetas tratadas como hojas desplegables
+pnpm check:boundaries                                         # validates apps/*, services/* and packages/*
+node scripts/check-boundaries.mjs --json                      # structured output for CI/agents
+node scripts/check-boundaries.mjs --apps-dir apps,services    # folders treated as deployable leaves
 ```
 
-La salida es `archivo:línea [regla] mensaje` y el script termina con código `1` si encuentra al menos una violación.
+The output is `file:line [rule] message`, and the script exits with code `1` if it finds at least one violation.
 
 ---
 
-## 4. Integración en CI
+## 4. CI Integration
 
 ```yaml
-# .github/workflows/ci.yml (fragmento)
+# .github/workflows/ci.yml (excerpt)
 - run: pnpm install --frozen-lockfile
 - run: pnpm check:boundaries
 - run: pnpm turbo run lint format:check typecheck test build
 ```
 
-Ejecuta `pnpm check:boundaries` antes de `turbo run`: es instantáneo, no requiere builds previos y falla temprano ante cruces ilegales entre plataformas o apps.
+Run `pnpm check:boundaries` before `turbo run`: it is instant, needs no prior builds and fails early on illegal crossings between platforms or apps.
 
 ---
 
-## 5. Límites del Análisis
+## 5. Analysis Limits
 
-- **Specifiers literales:** `import(variable)` y `require` dinámicos no se analizan.
-- **Workspaces declarados:** solo valida paquetes descubiertos por `pnpm-workspace.yaml`.
-- **Servicios políglotas (`services/*`):** sus archivos `.py`/`.go`/`.rs` no se parsean por AST JS; su aislamiento se garantiza por diseño de carpetas y contrato OpenAPI.
-- **Alias `@/`:** los alias internos de cada app no pueden apuntar fuera de su propio `src/`.
+- **Literal specifiers:** dynamic `import(variable)` and `require` are not analyzed.
+- **Declared workspaces:** it only validates packages discovered through `pnpm-workspace.yaml`.
+- **Polyglot services (`services/*`):** their `.py`/`.go`/`.rs` files are not parsed by the JS AST; their isolation is guaranteed by folder design and the OpenAPI contract.
+- **`@/` aliases:** each app's internal aliases cannot point outside its own `src/`.

@@ -1,39 +1,39 @@
-# Patrones de Componentes, FormDialog y Documentación TSDoc
+# Component Patterns, FormDialog and TSDoc Documentation
 
-Este documento define el ciclo de vida, descubrimiento, modularización y documentación de componentes de UI en Next.js.
+This document defines the lifecycle, discovery, modularization and documentation of UI components in Next.js.
 
 ---
 
-## 1. Protocolo de Descubrimiento de Componentes (3-Tier Sequence)
+## 1. Component Discovery Protocol (3-Tier Sequence)
 
-Antes de crear cualquier componente visual (sea compartido o específico de una feature), el desarrollador o agente debe seguir rigurosamente esta secuencia de validación en 3 niveles:
+Before creating any visual component (shared or feature-specific), the developer or agent must strictly follow this 3-level validation sequence:
 
 ```mermaid
 flowchart TD
-    A["¿Necesitas un Componente UI?"] --> B{"Nivel 1: ¿Existe en src/components/*\no en la feature actual?"}
-    B -- "Sí" --> C["Reutilizar o Extender\nel Componente Existente"]
-    B -- "No" --> D{"Nivel 2: ¿Existe en la\nlibrería base (shadcn/ui)?"}
-    D -- "Sí" --> E["Instalar vía CLI:\npnpm dlx shadcn@latest add <name>\ny adaptar estilos de tokens"]
-    D -- "No" --> F["Nivel 3: Crear Componente Custom\ncon subcarpeta encapsulada,\nTSDoc y test con Vitest"]
+    A["Do you need a UI Component?"] --> B{"Level 1: does it exist in src/components/*\nor in the current feature?"}
+    B -- "Yes" --> C["Reuse or Extend\nthe Existing Component"]
+    B -- "No" --> D{"Level 2: does it exist in the\nbase library (shadcn/ui)?"}
+    D -- "Yes" --> E["Install via CLI:\npnpm dlx shadcn@latest add <name>\nand adapt token styles"]
+    D -- "No" --> F["Level 3: Create a Custom Component\nwith an encapsulated subfolder,\nTSDoc and a Vitest test"]
 ```
 
-1. **Nivel 1 — Comprobar componentes existentes**:
-   - Revisar `src/components/ui/` (primitivas base), `src/components/common/` (compuestos reutilizables) o los componentes dentro de la feature actual (`src/features/<feature>/components/`).
-   - Si existe, se reutiliza o parametriza con props opcionales.
-2. **Nivel 2 — Instalar desde el registro base (`shadcn/ui`)**:
-   - Si no existe en el proyecto, validar si está disponible en `shadcn/ui` (ej. `dialog`, `badge`, `table`, `sheet`, `popover`).
-   - Instalar mediante `pnpm dlx shadcn@latest add <component>` y adaptar variantes y tokens de color al diseño de la aplicación.
-3. **Nivel 3 — Construir Componente Custom**:
-   - Solo si no existe ni localmente ni en el registro base, se genera un nuevo componente respetando el estándar de subcarpeta (`<name>/<name>.tsx`, `<name>/<name>.test.tsx`, `<name>/index.ts`), interfaces documentadas y estilos semánticos.
+1. **Level 1 — Check existing components**:
+   - Review `src/components/ui/` (base primitives), `src/components/common/` (reusable composites) or the components inside the current feature (`src/features/<feature>/components/`).
+   - If it exists, reuse it or parameterize it with optional props.
+2. **Level 2 — Install from the base registry (`shadcn/ui`)**:
+   - If it does not exist in the project, check whether it is available in `shadcn/ui` (e.g. `dialog`, `badge`, `table`, `sheet`, `popover`).
+   - Install it with `pnpm dlx shadcn@latest add <component>` and adapt the variants and color tokens to the app's design.
+3. **Level 3 — Build a Custom Component**:
+   - Only if it exists neither locally nor in the base registry, generate a new component following the subfolder standard (`<name>/<name>.tsx`, `<name>/<name>.test.tsx`, `<name>/index.ts`), with documented interfaces and semantic styles.
 
 ---
 
-## 2. Arquitectura de Diálogos Modales: Estándar `FormDialog`
+## 2. Modal Dialog Architecture: the `FormDialog` Standard
 
-Todos los formularios modales de creación, edición, confirmación o envío de entidades deben estructurarse bajo el patrón **FormDialog**.
+Every modal form for creating, editing, confirming or submitting entities must follow the **FormDialog** pattern.
 
-### 2.1 Contenedor Base Reutilizable (`src/components/common/form-dialog/form-dialog.tsx`)
-El contenedor `FormDialog` envuelve la primitiva `Dialog` de `shadcn/ui`:
+### 2.1 Reusable Base Container (`src/components/common/form-dialog/form-dialog.tsx`)
+The `FormDialog` container wraps the `shadcn/ui` `Dialog` primitive:
 
 ```tsx
 'use client';
@@ -49,27 +49,27 @@ import {
 } from '@/components/ui/dialog';
 
 /**
- * Propiedades para {@link FormDialog}.
+ * Props for {@link FormDialog}.
  */
 export interface IFormDialogProps {
-  /** Título principal del encabezado modal. */
+  /** Main title of the modal header. */
   readonly title: string;
-  /** Subtítulo o instrucciones opcionales del modal. */
+  /** Optional subtitle or instructions for the modal. */
   readonly description?: string;
-  /** Icono decorativo opcional en el encabezado. */
+  /** Optional decorative icon in the header. */
   readonly icon?: React.ReactNode;
-  /** Estado de apertura en modo controlado. */
+  /** Open state in controlled mode. */
   readonly open?: boolean;
-  /** Callback al cambiar el estado de apertura. */
+  /** Callback when the open state changes. */
   readonly onOpenChange?: (open: boolean) => void;
-  /** Elemento disparador opcional; pasar null cuando se controla desde el padre. */
+  /** Optional trigger element; pass null when the parent controls it. */
   readonly trigger?: React.ReactNode | null;
-  /** Contenido del formulario dentro del modal. */
+  /** Form content inside the modal. */
   readonly children: React.ReactNode;
 }
 
 /**
- * Contenedor modal estandarizado para formularios de creación y edición.
+ * Standardized modal container for create and edit forms.
  */
 export function FormDialog({
   title,
@@ -98,8 +98,8 @@ export function FormDialog({
 }
 ```
 
-### 2.2 Subcarpeta de Entidad `*-form-dialog`
-Cada formulario modal de entidad reside en su subcarpeta dedicada terminada en `-form-dialog` dentro de la feature:
+### 2.2 The `*-form-dialog` Entity Subfolder
+Each entity modal form lives in its own dedicated subfolder ending in `-form-dialog` inside the feature:
 
 ```text
 src/features/billing/components/invoice-form-dialog/
@@ -108,8 +108,8 @@ src/features/billing/components/invoice-form-dialog/
 └── invoice-form-dialog.tsx
 ```
 
-### 2.3 Conexión Completa: `FormDialog` + Esquema Zod + Hook
-1. **Interface de Props (`I<Entity>FormDialogProps`)**:
+### 2.3 Full Wiring: `FormDialog` + Zod Schema + Hook
+1. **Props Interface (`I<Entity>FormDialogProps`)**:
    ```tsx
    'use client';
 
@@ -120,15 +120,15 @@ src/features/billing/components/invoice-form-dialog/
    import { createInvoiceSchema } from '@/features/billing/schemas';
 
    export interface IInvoiceFormDialogProps {
-     /** Controla la visibilidad del modal en modo controlado. */
+     /** Controls the modal's visibility in controlled mode. */
      readonly open?: boolean;
-     /** Callback ejecutado al cambiar el estado de apertura. */
+     /** Callback run when the open state changes. */
      readonly onOpenChange?: (open: boolean) => void;
-     /** Disparador opcional; null cuando se abre desde una tabla o estado padre. */
+     /** Optional trigger; null when opened from a table or parent state. */
      readonly trigger?: React.ReactNode | null;
-     /** Entidad opcional para modo edición. Si es null/undefined, opera en modo creación. */
+     /** Optional entity for edit mode. If null/undefined, it works in create mode. */
      readonly initialData?: IInvoice | null;
-     /** Callback al completar exitosamente la operación. */
+     /** Callback when the operation completes successfully. */
      readonly onSuccess?: () => void;
    }
 
@@ -152,7 +152,7 @@ src/features/billing/components/invoice-form-dialog/
        });
 
        if (!parsed.success) {
-         setError(parsed.error.issues[0]?.message ?? 'Datos inválidos');
+         setError(parsed.error.issues[0]?.message ?? 'Invalid data');
          return;
        }
 
@@ -165,21 +165,21 @@ src/features/billing/components/invoice-form-dialog/
 
      return (
        <FormDialog
-         title={initialData ? 'Editar Factura' : 'Nueva Factura'}
-         description="Completa los datos fiscales de la factura."
+         title={initialData ? 'Edit Invoice' : 'New Invoice'}
+         description="Fill in the invoice's billing details."
          open={open}
          onOpenChange={onOpenChange}
          trigger={trigger}
        >
          <form onSubmit={handleSubmit} className="space-y-4 py-2">
            {error ? <p role="alert" className="text-sm text-destructive">{error}</p> : null}
-           {/* Campos del formulario o subcomponente presentacional */}
+           {/* Form fields or a presentational subcomponent */}
            <div className="flex justify-end gap-2 pt-4">
              <button type="button" onClick={() => onOpenChange?.(false)} className="px-4 py-2 text-sm border rounded-md">
-               Cancelar
+               Cancel
              </button>
              <button type="submit" disabled={isPending} className="px-4 py-2 text-sm bg-primary text-primary-foreground rounded-md">
-               Guardar
+               Save
              </button>
            </div>
          </form>
@@ -187,40 +187,40 @@ src/features/billing/components/invoice-form-dialog/
      );
    }
    ```
-2. **Subformularios Presentacionales**: Si el formulario es extenso o tiene múltiples pasos, el diálogo delega los campos a un componente presentacional puro (`invoice-form.tsx`), manteniendo el diálogo enfocado en el ciclo de vida del modal.
+2. **Presentational Subforms**: if the form is long or has several steps, the dialog delegates the fields to a pure presentational component (`invoice-form.tsx`), keeping the dialog focused on the modal's lifecycle.
 
 ---
 
-## 3. Estándar de Documentación TSDoc
+## 3. TSDoc Documentation Standard
 
-Todos los componentes exportados en `src/components/common/` y `src/features/**/components/` (incluidas pantallas y secciones) deben incluir bloques **TSDoc** rigurosos.
+Every component exported from `src/components/common/` and `src/features/**/components/` (including screens and sections) must include thorough **TSDoc** blocks.
 
-### Plantilla de Documentación:
+### Documentation Template:
 
 ```tsx
 import React from 'react';
 
 /**
- * Propiedades para {@link MetricCard}.
+ * Props for {@link MetricCard}.
  */
 export interface IMetricCardProps {
-  /** Título principal de la tarjeta de métricas. */
+  /** Main title of the metric card. */
   readonly title: string;
-  /** Valor numérico o texto representativo de la métrica. */
+  /** Numeric value or text representing the metric. */
   readonly value: string | number;
-  /** Porcentaje de cambio respecto al período anterior. */
+  /** Percentage change from the previous period. */
   readonly trendPercentage?: number;
-  /** Icono visual representativo. */
+  /** Representative visual icon. */
   readonly icon?: React.ReactNode;
-  /** Callback opcional al interactuar con la tarjeta. */
+  /** Optional callback when interacting with the card. */
   readonly onClick?: () => void;
 }
 
 /**
- * Renderiza una tarjeta de resumen métrico con indicador de tendencia e icono.
+ * Renders a metric summary card with a trend indicator and an icon.
  *
- * @param props - Opciones de configuración descritas en {@link IMetricCardProps}.
- * @returns Elemento JSX renderizado.
+ * @param props - Configuration options described in {@link IMetricCardProps}.
+ * @returns The rendered JSX element.
  *
  * @example
  * ```tsx
@@ -229,7 +229,7 @@ export interface IMetricCardProps {
  * export function Example() {
  *   return (
  *     <MetricCard
- *       title="Facturación Mensual"
+ *       title="Monthly Revenue"
  *       value="$12,450"
  *       trendPercentage={8.4}
  *     />
@@ -258,7 +258,7 @@ export function MetricCard({
       <div className="mt-2 text-2xl font-bold">{value}</div>
       {trendPercentage !== undefined && (
         <p className="mt-1 text-xs text-muted-foreground">
-          {trendPercentage >= 0 ? `+${trendPercentage}%` : `${trendPercentage}%`} vs mes anterior
+          {trendPercentage >= 0 ? `+${trendPercentage}%` : `${trendPercentage}%`} vs last month
         </p>
       )}
     </div>

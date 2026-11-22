@@ -3,8 +3,8 @@
   "skills": [
     {
       "name": "architecture-map",
-      "version": "1.0.0",
-      "description": "Genera o actualiza la página de arquitectura leyendo el repositorio real: stack, diagrama Mermaid, módulos/apps, datos, auth, flujos clave, integraciones y despliegue. Soporta Notion (MCP) y docs/ARCHITECTURE.md local, preservando notas manuales tras confirmar.",
+      "version": "1.1.0",
+      "description": "Generate or update the architecture page by reading the real repository: stack, Mermaid diagram, modules/apps, data, auth, key flows, integrations and deployment. Supports Notion (MCP) and a local docs/ARCHITECTURE.md, preserving manual notes after confirmation.",
       "category": "architecture",
       "path": "skills/architecture/architecture-map/SKILL.md",
       "readme": "skills/architecture/architecture-map/README.md",
@@ -31,14 +31,16 @@
         "actualizar página de arquitectura",
         "documentar arquitectura del repo",
         "architecture map",
-        "update architecture docs"
+        "generate architecture page",
+        "update architecture docs",
+        "document the repo architecture"
       ],
       "requires": []
     },
     {
       "name": "astro-architecture",
-      "version": "1.0.0",
-      "description": "Estándar de arquitectura para proyectos Astro (landing pages, marketing sites y sitios content-driven). Guía estructura modular, Islands Architecture (Zero-JS), Tailwind CSS, Content Collections con Zod, SEO técnico, astro:assets, linting con OXC y testing E2E con Playwright.",
+      "version": "1.1.0",
+      "description": "Architecture standard for Astro projects (landing pages, marketing sites and content-driven sites). Covers modular structure, Islands Architecture (Zero-JS), Tailwind CSS, Content Collections with Zod, technical SEO, astro:assets, OXC linting and Playwright E2E testing.",
       "category": "architecture",
       "path": "skills/architecture/astro-architecture/SKILL.md",
       "readme": "skills/architecture/astro-architecture/README.md",
@@ -66,8 +68,10 @@
         "astro architecture",
         "astro landing page",
         "crear landing page en astro",
+        "create an astro landing page",
         "arquitectura astro",
         "estructurar proyecto astro",
+        "structure an astro project",
         "astro islands",
         "astro oxlint playwright"
       ],
@@ -75,8 +79,8 @@
     },
     {
       "name": "monorepo-architecture",
-      "version": "2.0.0",
-      "description": "Estándar de monorepo con pnpm workspaces, Turborepo y OXC para apps web (Next.js), API (NestJS), mobile (Expo), landing (Astro), workers y servicios políglotas: paquetes compilados, design tokens, contratos Zod/OpenAPI, límites por plataforma y scaffolding multi-app.",
+      "version": "2.1.0",
+      "description": "Monorepo standard with pnpm workspaces, Turborepo and OXC for web (Next.js), API (NestJS), mobile (Expo), landing (Astro), workers and polyglot services: compiled packages, design tokens, Zod/OpenAPI contracts, per-platform boundaries and multi-app scaffolding.",
       "category": "architecture",
       "path": "skills/architecture/monorepo-architecture/SKILL.md",
       "readme": "skills/architecture/monorepo-architecture/README.md",
@@ -106,14 +110,17 @@
         "turborepo",
         "pnpm workspaces",
         "crear monorepo",
+        "create a monorepo",
         "estructurar monorepo",
+        "structure a monorepo",
         "paquete compartido",
         "shared package",
         "feature full-stack",
         "límites de módulos",
         "module boundaries",
         "monorepo mobile web api landing",
-        "agregar app al monorepo"
+        "agregar app al monorepo",
+        "add an app to the monorepo"
       ],
       "requires": [
         "astro-architecture",
@@ -124,8 +131,8 @@
     },
     {
       "name": "nestjs-architecture",
-      "version": "2.0.0",
-      "description": "Estándar de Modular Monolith para NestJS 12 (NodeAdapter, SWC, Vitest y OXC). Guía el andamiaje de módulos de dominio, contratos DTO/Zod, Swagger OpenAPI, repositorios ORM-agnósticos, doble barrera RBAC/ownership y testing >= 90%.",
+      "version": "2.1.0",
+      "description": "Modular Monolith standard for NestJS 12 (NodeAdapter, SWC, Vitest and OXC). Guides scaffolding of domain modules, DTO/Zod contracts, Swagger OpenAPI, ORM-agnostic repositories, a double RBAC/ownership barrier and >= 90% test coverage.",
       "category": "architecture",
       "path": "skills/architecture/nestjs-architecture/SKILL.md",
       "readme": "skills/architecture/nestjs-architecture/README.md",
@@ -167,14 +174,17 @@
         "arquitectura nestjs",
         "crear modulo nestjs",
         "estructurar nestjs",
-        "revisar modulo nestjs"
+        "revisar modulo nestjs",
+        "create a nestjs module",
+        "structure a nestjs api",
+        "review a nestjs module"
       ],
       "requires": []
     },
     {
       "name": "nextjs-architecture",
-      "version": "1.2.1",
-      "description": "Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions con Zod, hooks con TanStack Query, FormDialog, linting con OXC y testing con Vitest + SWC (>= 90%) y Playwright E2E.",
+      "version": "1.3.0",
+      "description": "Screaming Architecture standard for the Next.js App Router. Guides feature-based structure, encapsulated subfolders, Server Actions with Zod, TanStack Query hooks, FormDialog, OXC linting and testing with Vitest + SWC (>= 90%) and Playwright E2E.",
       "category": "architecture",
       "path": "skills/architecture/nextjs-architecture/SKILL.md",
       "readme": "skills/architecture/nextjs-architecture/README.md",
@@ -206,15 +216,17 @@
         "nextjs form dialog",
         "arquitectura nextjs",
         "crear feature nextjs",
+        "create a nextjs feature",
         "estructurar nextjs",
+        "structure a nextjs app",
         "nextjs vitest playwright"
       ],
       "requires": []
     },
     {
       "name": "react-native-architecture",
-      "version": "1.1.0",
-      "description": "Estándar Screaming Architecture para React Native y Expo Router. Guía estructuración por features, rutas delgadas en src/app, TanStack Query, NativeWind, tests Jest >= 90%, análisis estático con Oxlint y formato Oxfmt. Incluye validador y scaffolds de feature, componente, hook y servicio.",
+      "version": "1.2.0",
+      "description": "Screaming Architecture standard for React Native and Expo Router. Guides feature-based structure, thin routes in src/app, TanStack Query, NativeWind, Jest tests >= 90%, Oxlint static analysis and Oxfmt formatting. Includes a validator and feature, component, hook and service scaffolds.",
       "category": "architecture",
       "path": "skills/architecture/react-native-architecture/SKILL.md",
       "readme": "skills/architecture/react-native-architecture/README.md",
@@ -245,14 +257,18 @@
         "screaming architecture react native",
         "arquitectura react native",
         "crear feature react native",
+        "create a react native feature",
         "estructurar expo",
         "expo app structure",
         "expo router tabs",
         "proteger rutas expo",
+        "protect expo routes",
         "crear pantalla react native",
+        "create a react native screen",
         "react native tanstack hook",
         "oxlint expo",
-        "configurar lint react native"
+        "configurar lint react native",
+        "set up react native lint"
       ],
       "requires": []
     },

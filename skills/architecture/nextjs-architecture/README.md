@@ -1,35 +1,35 @@
 # ⚡ Next.js Screaming Architecture (`nextjs-architecture`)
 
-> **Estándar de Screaming Architecture para Next.js App Router. Guía la estructuración por features, subcarpetas encapsuladas, Server Actions con Zod, hooks con TanStack Query, `FormDialog`, linting con OXC y testing con Vitest + SWC ($\ge 90\%$) y Playwright E2E.**
+> **Screaming Architecture standard for the Next.js App Router. Guides feature-based structure, encapsulated subfolders, Server Actions with Zod, TanStack Query hooks, `FormDialog`, OXC linting and testing with Vitest + SWC ($\ge 90\%$) and Playwright E2E.**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `nextjs-architecture` |
-| **Categoría** | `architecture` |
-| **Versión** | `1.2.1` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
-| **Requisitos** | `node` |
+| **Name** | `nextjs-architecture` |
+| **Category** | `architecture` |
+| **Version** | `1.3.0` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Requirements** | `node` |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
-### Vía `skills.sh` CLI (Recomendado)
+### Via the `skills.sh` CLI (Recommended)
 
 ```bash
-# Instalar en el proyecto actual:
+# Install in the current project:
 npx skills add bryanus1/agent-skills --skill nextjs-architecture
 
-# Instalar globalmente en tu máquina:
+# Install globally on your machine:
 npx skills add bryanus1/agent-skills --skill nextjs-architecture -g
 ```
 
-### Vía Enlace Simbólico Local
+### Via a Local Symlink
 
 ```bash
 # Google Antigravity:
 mkdir -p .agents/skills
-ln -s /ruta/a/agent-skills/skills/architecture/nextjs-architecture .agents/skills/nextjs-architecture
+ln -s /path/to/agent-skills/skills/architecture/nextjs-architecture .agents/skills/nextjs-architecture
 
 # Claude Code:
 mkdir -p .claude/skills
@@ -38,25 +38,25 @@ ln -s ../../.agents/skills/nextjs-architecture .claude/skills/nextjs-architectur
 
 ---
 
-## 💡 Ejemplos de Uso con Agentes de IA
+## 💡 Usage Examples with AI Agents
 
-* **Andamiar una feature completa con su ruta en App Router**:
-  > *"Estructura la feature de facturación (billing) con Screaming Architecture, archivos iniciales y su ruta en App Router"*
+* **Scaffold a full feature with its App Router route**:
+  > *"Structure the billing feature with Screaming Architecture, starter files and its App Router route"*
   >
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-feature.mjs billing --with-starter --with-route`  
-  > ➔ Genera las 7 subcarpetas (`components`, `hooks`, `models`, `schemas`, `screens`, `services`, `utils`), modelo plano `.ts` sin tests, screen encapsulada con test en **Vitest**, barrel de hoja terminal y ruta delgada `src/app/billing/page.tsx`.
+  > 🤖 **The agent will run**: `node <skill-dir>/scripts/scaffold-feature.mjs billing --with-starter --with-route`  
+  > ➔ Generates the 7 subfolders (`components`, `hooks`, `models`, `schemas`, `screens`, `services`, `utils`), a flat `.ts` model without tests, an encapsulated screen with a **Vitest** test, leaf-folder barrels and the thin route `src/app/billing/page.tsx`.
 
-* **Crear componente modal desacoplado (`FormDialog`)**:
-  > *"Crea un diálogo modal para crear facturas en billing con shadcn Dialog"*
+* **Create a decoupled modal component (`FormDialog`)**:
+  > *"Create a modal dialog to create invoices in billing with the shadcn Dialog"*
   >
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-component.mjs invoice-form-dialog --target-dir src/features/billing/components --type dialog`  
-  > ➔ Genera el patrón `FormDialog` (`'use client'`) con TSDoc, test unitario con Vitest (`vi.fn()`) e `index.ts`.
+  > 🤖 **The agent will run**: `node <skill-dir>/scripts/scaffold-component.mjs invoice-form-dialog --target-dir src/features/billing/components --type dialog`  
+  > ➔ Generates the `FormDialog` pattern (`'use client'`) with TSDoc, a Vitest unit test (`vi.fn()`) and an `index.ts`.
 
 ---
 
-## 🛠️ Scripts y Opciones CLI
+## 🛠️ Scripts and CLI Options
 
-> `<skill-dir>` es el directorio donde está instalada esta skill (p. ej. `.agents/skills/nextjs-architecture` o `.claude/skills/nextjs-architecture`).
+> `<skill-dir>` is the directory where this skill is installed (e.g. `.agents/skills/nextjs-architecture` or `.claude/skills/nextjs-architecture`).
 
 - **[`scripts/scaffold-feature.mjs`](scripts/scaffold-feature.mjs)**:
   ```bash
@@ -69,10 +69,10 @@ ln -s ../../.agents/skills/nextjs-architecture .claude/skills/nextjs-architectur
 
 ---
 
-## 📚 Documentación y Referencias
+## 📚 Documentation and References
 
-- **[`SKILL.md`](SKILL.md)**: Especificación operativa completa, regla de hoja terminal para barrels y reglas críticas para el agente.
-- **[Guía Detallada de Screaming Architecture](references/screaming-architecture-guide.md)**: Estructura de directorios, frontera Server vs Client Components, capas, sufijos y convenciones de nombres.
-- **[Patrones de Componentes y FormDialog](references/component-and-dialog-patterns.md)**: Protocolo de descubrimiento en 3 niveles, contenedor `FormDialog` conectado con Zod y TSDoc.
-- **[Patrones de Datos: Server Actions & TanStack Query](references/tanstack-and-actions-pattern.md)**: Validación Zod en servidor, servicios encapsulados y key factories en hooks hoja.
-- **[Testing y Toolchain: Vitest, Playwright, OXC y SWC](references/testing-and-toolchain.md)**: Configuración de Vitest + SWC ($\ge 90\%$ coverage), Playwright E2E (`e2e/`) y `.oxlintrc.json`.
+- **[`SKILL.md`](SKILL.md)**: the full operating spec, the leaf-folder barrel policy and the critical rules for the agent.
+- **[Detailed Screaming Architecture Guide](references/screaming-architecture-guide.md)**: directory structure, the Server vs Client Components boundary, layers, suffixes and naming conventions.
+- **[Component and FormDialog Patterns](references/component-and-dialog-patterns.md)**: the 3-level discovery protocol, the `FormDialog` container wired to Zod, and TSDoc.
+- **[Data Patterns: Server Actions & TanStack Query](references/tanstack-and-actions-pattern.md)**: server-side Zod validation, encapsulated services and key factories in leaf hooks.
+- **[Testing and Toolchain: Vitest, Playwright, OXC and SWC](references/testing-and-toolchain.md)**: Vitest + SWC setup ($\ge 90\%$ coverage), Playwright E2E (`e2e/`) and `.oxlintrc.json`.

@@ -1,44 +1,44 @@
-# 🔍 Checklist de SEO Técnico y Core Web Vitals
+# 🔍 Technical SEO and Core Web Vitals Checklist
 
-## 1. Metadatos Esenciales en `BaseLayout.astro`
+## 1. Essential Metadata in `BaseLayout.astro`
 
-Todo `BaseLayout.astro` debe aceptar `title`, `description`, `image` (opcional) y `noindex` (opcional), generando:
+Every `BaseLayout.astro` must accept `title`, `description`, `image` (optional) and `noindex` (optional), and generate:
 
-- `<meta charset="utf-8" />` y `<meta name="viewport" content="width=device-width, initial-scale=1" />`
-- `<title>{title}</title>` (idealmente 50–60 caracteres)
-- `<meta name="description" content={description} />` (140–160 caracteres)
-- `<link rel="canonical" href={canonicalURL} />` construyendo la URL con `new URL(Astro.url.pathname, Astro.site)`
+- `<meta charset="utf-8" />` and `<meta name="viewport" content="width=device-width, initial-scale=1" />`
+- `<title>{title}</title>` (ideally 50–60 characters)
+- `<meta name="description" content={description} />` (140–160 characters)
+- `<link rel="canonical" href={canonicalURL} />`, building the URL with `new URL(Astro.url.pathname, Astro.site)`
 - **Open Graph:** `og:type`, `og:url`, `og:title`, `og:description`, `og:image`, `og:locale`
 - **Twitter Cards:** `twitter:card` (`summary_large_image`), `twitter:title`, `twitter:description`, `twitter:image`
 
-> **Importante:** Configurar `site: 'https://tudominio.com'` en `astro.config.mjs` para que `Astro.site` y `@astrojs/sitemap` generen URLs absolutas válidas.
+> **Important:** set `site: 'https://yourdomain.com'` in `astro.config.mjs` so `Astro.site` and `@astrojs/sitemap` generate valid absolute URLs.
 
 ---
 
-## 2. Datos Estructurados (JSON-LD)
+## 2. Structured Data (JSON-LD)
 
-Inyectar JSON-LD en el `<head>` mediante `<script type="application/ld+json" set:html={JSON.stringify(schema)} />`:
+Inject JSON-LD into the `<head>` with `<script type="application/ld+json" set:html={JSON.stringify(schema)} />`:
 
-- **Landing de producto/SaaS:** `Organization` + `SoftwareApplication` (o `Product`).
-- **Sección FAQ:** `FAQPage` con las preguntas y respuestas reales visibles en la página.
+- **Product/SaaS landing:** `Organization` + `SoftwareApplication` (or `Product`).
+- **FAQ section:** `FAQPage` with the real questions and answers visible on the page.
 
 ---
 
-## 3. Rastreo e Indexación
+## 3. Crawling and Indexing
 
-- Instalar `@astrojs/sitemap` en `astro.config.mjs`.
-- Crear `public/robots.txt` apuntando al sitemap:
+- Install `@astrojs/sitemap` in `astro.config.mjs`.
+- Create `public/robots.txt` pointing to the sitemap:
   ```txt
   User-agent: *
   Allow: /
 
-  Sitemap: https://tudominio.com/sitemap-index.xml
+  Sitemap: https://yourdomain.com/sitemap-index.xml
   ```
 
 ---
 
 ## 4. Core Web Vitals
 
-- **LCP (< 2.5s):** Preload o `fetchpriority="high"` en la imagen del Hero; fuentes auto-hospedadas (`@fontsource/*`) o con `font-display: swap`.
-- **CLS (< 0.1):** Dimensiones explícitas en todas las imágenes (`<Image />`) y reserva de espacio en embeds o banners.
-- **INP (< 200ms):** Mantener el bundle de JS cercano a `0 KB` en la carga inicial evitando `client:load` innecesario.
+- **LCP (< 2.5s):** preload or `fetchpriority="high"` on the Hero image; self-hosted fonts (`@fontsource/*`) or `font-display: swap`.
+- **CLS (< 0.1):** explicit dimensions on every image (`<Image />`) and reserved space for embeds or banners.
+- **INP (< 200ms):** keep the JS bundle close to `0 KB` on initial load by avoiding unnecessary `client:load`.

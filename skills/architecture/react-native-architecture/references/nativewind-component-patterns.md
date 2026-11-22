@@ -1,25 +1,25 @@
-# Patrones de componentes con NativeWind
+# NativeWind Component Patterns
 
-## Descubrimiento en 3 niveles
+## 3-level discovery
 
-1. Reutilizar de `src/components/common/`.
-2. Si hay una librería UI ya adoptada por el proyecto, usarla antes de crear una nueva.
-3. Crear un componente custom con `scaffold-component.mjs`.
+1. Reuse from `src/components/common/`.
+2. If the project has already adopted a UI library, use it before creating a new component.
+3. Create a custom component with `scaffold-component.mjs`.
 
-## Primitivas Móviles y Equivalencias Web
+## Mobile Primitives and Web Equivalents
 
-| Web / DOM | React Native / Expo | Notas de uso móvil |
+| Web / DOM | React Native / Expo | Mobile usage notes |
 | --- | --- | --- |
-| `div`, `section`, `article` | `View` | Contenedor flex por defecto (`flex-col`). |
-| `span`, `p`, `h1`-`h6` | `Text` | Todo texto DEBE estar dentro de `<Text>`. |
-| `button` | `Pressable` | Siempre añadir `accessibilityRole="button"`. |
-| `input` | `TextInput` | Envolver en `KeyboardAvoidingView` para formularios. |
-| `img` | `Image` (`expo-image`) | Rendimiento óptimo, caché nativa y placeholders blurhash. |
-| `ul` / listas cortas | `ScrollView` | Para vistas con scroll continuo de tamaño finito. |
-| `ul` / listas medias | `FlatList` | Virtualización estándar de React Native. |
-| `ul` / listas largas / feeds | `FlashList` (`@shopify/flash-list`) | 5x a 10x más eficiente que FlatList reciclando celdas. |
+| `div`, `section`, `article` | `View` | A flex container by default (`flex-col`). |
+| `span`, `p`, `h1`-`h6` | `Text` | All text MUST be inside `<Text>`. |
+| `button` | `Pressable` | Always add `accessibilityRole="button"`. |
+| `input` | `TextInput` | Wrap in `KeyboardAvoidingView` for forms. |
+| `img` | `Image` (`expo-image`) | Optimal performance, native caching and blurhash placeholders. |
+| `ul` / short lists | `ScrollView` | For continuously scrolling views of finite size. |
+| `ul` / medium lists | `FlatList` | Standard React Native virtualization. |
+| `ul` / long lists / feeds | `FlashList` (`@shopify/flash-list`) | 5x to 10x more efficient than FlatList by recycling cells. |
 
-## Configuración estándar: NativeWind v4
+## Standard setup: NativeWind v4
 
 1. **`metro.config.js`:**
    ```js
@@ -56,11 +56,11 @@
    };
    ```
 
-Acepta siempre `className` como prop para permitir overrides desde componentes padres. Soporta modo oscuro usando prefijos `dark:`.
+Always accept `className` as a prop so parent components can override styles. Support dark mode with `dark:` prefixes.
 
-## Modales
+## Modals
 
-El arquetipo `--type modal` genera un modal accesible con animación y soporte `dark:`.
+The `--type modal` archetype generates an accessible modal with animation and `dark:` support.
 
 ```tsx
 export interface IModalProps {
@@ -73,16 +73,16 @@ export interface IModalProps {
 }
 ```
 
-Para flujos de pantalla completa complejos (como checkout o wizards), prefiere una ruta modal de Expo Router (`presentation: 'modal'`) en `src/app/` que reexporta una screen de la feature.
+For complex full-screen flows (such as checkout or wizards), prefer an Expo Router modal route (`presentation: 'modal'`) in `src/app/` that re-exports a feature screen.
 
-## Testing de UI
+## UI Testing
 
 ```tsx
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { CreateInvoiceModal } from './create-invoice-modal';
 
 describe('CreateInvoiceModal', () => {
-  it('dispara onConfirm al pulsar Guardar', () => {
+  it('calls onConfirm when Save is pressed', () => {
     const onConfirm = jest.fn();
     const onClose = jest.fn();
 
@@ -91,14 +91,14 @@ describe('CreateInvoiceModal', () => {
         visible
         onClose={onClose}
         onConfirm={onConfirm}
-        confirmLabel="Guardar"
+        confirmLabel="Save"
       />
     );
 
-    fireEvent.press(screen.getByRole('button', { name: 'Guardar' }));
+    fireEvent.press(screen.getByRole('button', { name: 'Save' }));
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 });
 ```
 
-Consulta siempre por rol de accesibilidad (`getByRole`), label (`getByLabelText`) o texto visible (`getByText`), **nunca por selector CSS o className**.
+Always query by accessibility role (`getByRole`), label (`getByLabelText`) or visible text (`getByText`), **never by CSS selector or className**.

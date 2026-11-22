@@ -1,23 +1,23 @@
 # 🗂️ Monorepo Architecture (`monorepo-architecture`)
 
-> **Estándar de monorepo con pnpm workspaces, Turborepo y OXC para apps web (Next.js), API (NestJS), mobile (Expo), landing (Astro), workers y servicios políglotas: paquetes compilados, design tokens, contratos Zod/OpenAPI, límites por plataforma y scaffolding multi-app.**
+> **Monorepo standard with pnpm workspaces, Turborepo and OXC for web (Next.js), API (NestJS), mobile (Expo), landing (Astro), workers and polyglot services: compiled packages, design tokens, Zod/OpenAPI contracts, per-platform boundaries and multi-app scaffolding.**
 
-| Propiedad | Valor |
+| Property | Value |
 | :--- | :--- |
-| **Nombre** | `monorepo-architecture` |
-| **Categoría** | `architecture` |
-| **Versión** | `2.0.0` |
-| **Agentes Compatibles** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
-| **Requisitos** | `node`, `pnpm` |
-| **Skills Hermanas** | [`astro-architecture`](../astro-architecture/README.md), [`nestjs-architecture`](../nestjs-architecture/README.md), [`nextjs-architecture`](../nextjs-architecture/README.md), [`react-native-architecture`](../react-native-architecture/README.md) |
+| **Name** | `monorepo-architecture` |
+| **Category** | `architecture` |
+| **Version** | `2.1.0` |
+| **Compatible Agents** | Antigravity, Claude Code, OpenAI Codex, Cursor, Windsurf |
+| **Requirements** | `node`, `pnpm` |
+| **Sibling Skills** | [`astro-architecture`](../astro-architecture/README.md), [`nestjs-architecture`](../nestjs-architecture/README.md), [`nextjs-architecture`](../nextjs-architecture/README.md), [`react-native-architecture`](../react-native-architecture/README.md) |
 
 ---
 
-## 📦 Instalación
+## 📦 Installation
 
-> **Importante:** Para el scaffolding completo entre aplicaciones, instala las skills hermanas que utilice tu monorepo junto a esta skill.
+> **Important:** for full scaffolding across applications, install the sibling skills your monorepo uses alongside this skill.
 
-### Vía `skills.sh` CLI (Recomendado)
+### Via the `skills.sh` CLI (Recommended)
 
 ```bash
 npx skills add bryanus1/agent-skills --skill monorepo-architecture
@@ -27,50 +27,50 @@ npx skills add bryanus1/agent-skills --skill react-native-architecture
 npx skills add bryanus1/agent-skills --skill astro-architecture
 ```
 
-### Vía Enlace Simbólico Local
+### Via a Local Symlink
 
 ```bash
 mkdir -p .agents/skills
-ln -s /ruta/a/agent-skills/skills/architecture/monorepo-architecture .agents/skills/monorepo-architecture
-ln -s /ruta/a/agent-skills/skills/architecture/nestjs-architecture .agents/skills/nestjs-architecture
-ln -s /ruta/a/agent-skills/skills/architecture/nextjs-architecture .agents/skills/nextjs-architecture
-ln -s /ruta/a/agent-skills/skills/architecture/react-native-architecture .agents/skills/react-native-architecture
-ln -s /ruta/a/agent-skills/skills/architecture/astro-architecture .agents/skills/astro-architecture
+ln -s /path/to/agent-skills/skills/architecture/monorepo-architecture .agents/skills/monorepo-architecture
+ln -s /path/to/agent-skills/skills/architecture/nestjs-architecture .agents/skills/nestjs-architecture
+ln -s /path/to/agent-skills/skills/architecture/nextjs-architecture .agents/skills/nextjs-architecture
+ln -s /path/to/agent-skills/skills/architecture/react-native-architecture .agents/skills/react-native-architecture
+ln -s /path/to/agent-skills/skills/architecture/astro-architecture .agents/skills/astro-architecture
 ```
 
 ---
 
-## 💡 Ejemplos de Uso con Agentes de IA
+## 💡 Usage Examples with AI Agents
 
-* **Crear un monorepo multi-plataforma (Web + API + Mobile + Landing)**:
-  > *"Crea un monorepo para acme con web Next.js, API NestJS, app móvil Expo y landing Astro usando OpenAPI"*
+* **Create a multi-platform monorepo (Web + API + Mobile + Landing)**:
+  > *"Create a monorepo for acme with a Next.js web app, a NestJS API, an Expo mobile app and an Astro landing using OpenAPI"*
   >
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-monorepo.mjs --scope acme --contracts openapi --apps web,api,mobile,landing --dry-run`  
-  > ➔ Genera raíz con `pnpm-workspace.yaml`, `turbo.json`, `.npmrc` (con hoisting para Expo), `packages/tsconfig` (8 presets), `packages/oxc-config`, `packages/api-client` y `pnpm check:boundaries`.
+  > 🤖 **The agent will run**: `node <skill-dir>/scripts/scaffold-monorepo.mjs --scope acme --contracts openapi --apps web,api,mobile,landing --dry-run`  
+  > ➔ Generates the root with `pnpm-workspace.yaml`, `turbo.json`, `.npmrc` (with hoisting for Expo), `packages/tsconfig` (8 presets), `packages/oxc-config`, `packages/api-client` and `pnpm check:boundaries`.
 
-* **Añadir una app o servicio a un monorepo existente**:
-  > *"Agrega una app móvil Expo y un worker Node al monorepo"*
+* **Add an app or service to an existing monorepo**:
+  > *"Add an Expo mobile app and a Node worker to the monorepo"*
   >
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-app.mjs mobile --type mobile` y `node <skill-dir>/scripts/scaffold-app.mjs worker --type worker`  
-  > ➔ Conecta `package.json` (`monorepo.platform`), `tsconfig.json`, `.oxlintrc.json` y `metro.config.js` en `apps/mobile`.
+  > 🤖 **The agent will run**: `node <skill-dir>/scripts/scaffold-app.mjs mobile --type mobile` and `node <skill-dir>/scripts/scaffold-app.mjs worker --type worker`  
+  > ➔ Wires up `package.json` (`monorepo.platform`), `tsconfig.json`, `.oxlintrc.json` and `metro.config.js` in `apps/mobile`.
 
-* **Andamiar un dominio de punta a punta (API + Web + Mobile)**:
-  > *"Añade facturas en api, web y mobile"*
+* **Scaffold an end-to-end domain (API + Web + Mobile)**:
+  > *"Add invoices to api, web and mobile"*
   >
-  > 🤖 **El agente ejecutará**: `node <skill-dir>/scripts/scaffold-fullstack-feature.mjs invoice --targets api,web,mobile`  
-  > ➔ Crea el contrato Zod en `packages/contracts/src/invoices`, el módulo NestJS de 18 archivos, la feature Next.js y la feature Expo/React Native de forma atómica.
+  > 🤖 **The agent will run**: `node <skill-dir>/scripts/scaffold-fullstack-feature.mjs invoice --targets api,web,mobile`  
+  > ➔ Atomically creates the Zod contract in `packages/contracts/src/invoices`, the 18-file NestJS module, the Next.js feature and the Expo/React Native feature.
 
-* **Revisar límites entre workspaces y plataformas**:
-  > *"¿Hay imports prohibidos entre apps, archivos .astro o paquetes web/móvil?"*
+* **Review boundaries between workspaces and platforms**:
+  > *"Are there forbidden imports between apps, .astro files or web/mobile packages?"*
   >
-  > 🤖 **El agente ejecutará**: `pnpm check:boundaries` (o `node <skill-dir>/scripts/check-boundaries.mjs`)  
-  > ➔ Detecta `app-import`, `package-imports-app`, `relative-escape`, `undeclared`, `deep-import`, `cycle` y `platform-mismatch` (también dentro de `.astro`).
+  > 🤖 **The agent will run**: `pnpm check:boundaries` (or `node <skill-dir>/scripts/check-boundaries.mjs`)  
+  > ➔ Detects `app-import`, `package-imports-app`, `relative-escape`, `undeclared`, `deep-import`, `cycle` and `platform-mismatch` (also inside `.astro` files).
 
 ---
 
-## 🛠️ Scripts y Opciones CLI
+## 🛠️ Scripts and CLI Options
 
-> `<skill-dir>` es el directorio donde está instalada esta skill (p. ej. `.agents/skills/monorepo-architecture` o `.claude/skills/monorepo-architecture`).
+> `<skill-dir>` is the directory where this skill is installed (e.g. `.agents/skills/monorepo-architecture` or `.claude/skills/monorepo-architecture`).
 
 - **[`scripts/scaffold-monorepo.mjs`](scripts/scaffold-monorepo.mjs)**:
   ```bash
@@ -95,11 +95,11 @@ ln -s /ruta/a/agent-skills/skills/architecture/astro-architecture .agents/skills
 
 ---
 
-## 📚 Documentación y Referencias
+## 📚 Documentation and References
 
-- **[`SKILL.md`](SKILL.md)**: Especificación operativa completa, matriz de arquetipos y reglas críticas.
-- **[Guía de Estructura del Monorepo](references/monorepo-structure-guide.md)**: Árbol multi-app (`web + api + mobile + landing`), conexión de apps y registro de nuevos stacks.
-- **[Turborepo y pnpm Workspaces](references/turborepo-and-pnpm.md)**: Metro + pnpm para Expo, Astro, `turbo.json`, caché y variables de entorno.
-- **[Paquetes Compartidos y Contratos](references/shared-packages-and-contracts.md)**: Compilación, ESM/CJS, `design-tokens`, `ui-web` vs `ui-native`, Zod y OpenAPI.
-- **[Límites y Dependencias](references/boundaries-and-dependencies.md)**: Reglas del validador (`platform-mismatch`, `.astro`) y CI.
-- **[Ejemplos de Flujos](examples/workflows.md)**: Monorepo 4-apps, añadir `mobile`/`worker`/`polyglot`, feature cross-platform y corrección de violaciones.
+- **[`SKILL.md`](SKILL.md)**: the full operating spec, the archetype matrix and the critical rules.
+- **[Monorepo Structure Guide](references/monorepo-structure-guide.md)**: the multi-app tree (`web + api + mobile + landing`), connecting apps and registering new stacks.
+- **[Turborepo and pnpm Workspaces](references/turborepo-and-pnpm.md)**: Metro + pnpm for Expo, Astro, `turbo.json`, caching and environment variables.
+- **[Shared Packages and Contracts](references/shared-packages-and-contracts.md)**: compilation, ESM/CJS, `design-tokens`, `ui-web` vs `ui-native`, Zod and OpenAPI.
+- **[Boundaries and Dependencies](references/boundaries-and-dependencies.md)**: validator rules (`platform-mismatch`, `.astro`) and CI.
+- **[Workflow Examples](examples/workflows.md)**: a 4-app monorepo, adding `mobile`/`worker`/`polyglot`, a cross-platform feature and fixing violations.

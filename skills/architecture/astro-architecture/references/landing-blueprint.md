@@ -1,45 +1,45 @@
-# 🧩 Blueprint de Secciones para Landing Pages
+# 🧩 Landing Page Section Blueprint
 
-Una landing page efectiva sigue una narrativa progresiva de conversión. Cada sección debe vivir en `src/components/sections/` como un componente `.astro` independiente y recibir sus datos tipados desde `src/data/`.
+An effective landing page follows a progressive conversion narrative. Each section lives in `src/components/sections/` as an independent `.astro` component and receives its typed data from `src/data/`.
 
 ---
 
-## 1. Orden Recomendado de Secciones
+## 1. Recommended Section Order
 
 1. **Navbar (`src/components/ui/Navbar.astro`)**
-   - Logo + máximo 3–5 enlaces de anclaje (`#features`, `#pricing`, `#faq`) + 1 CTA principal destacado.
-   - Sin menús mega-desplegables que distraigan del objetivo de conversión.
+   - Logo + at most 3–5 anchor links (`#features`, `#pricing`, `#faq`) + 1 highlighted primary CTA.
+   - No mega dropdown menus that distract from the conversion goal.
 
 2. **Hero (`HeroSection.astro`)**
-   - **Un único `<h1>` por página**, claro y orientado a beneficio (no solo el nombre de la marca).
-   - Subtítulo conciso (1–2 líneas) explicando *qué hace* y *para quién*.
-   - **CTA primario** (acción principal) + **CTA secundario** opcional (ej. "Ver demo").
-   - Visual principal (*product shot*, ilustración o código) optimizado con `<Image loading="eager" fetchpriority="high" />` para proteger el LCP.
+   - **A single `<h1>` per page**, clear and benefit-oriented (not just the brand name).
+   - A concise subtitle (1–2 lines) explaining *what it does* and *for whom*.
+   - **Primary CTA** (main action) + optional **secondary CTA** (e.g. "Watch demo").
+   - Main visual (*product shot*, illustration or code) optimized with `<Image loading="eager" fetchpriority="high" />` to protect LCP.
 
 3. **Social Proof (`SocialProofSection.astro`)**
-   - Logos de clientes, métricas verificables o testimonios breves inmediatamente debajo del Hero.
+   - Customer logos, verifiable metrics or short testimonials right below the Hero.
 
-4. **Propuesta de Valor / Features (`FeaturesSection.astro`)**
-   - Grid responsive (`grid-cols-1 md:grid-cols-3`) con 3–6 beneficios concretos.
-   - Iconos SVG inline ligeros o de un set optimizado; evitar librerías pesadas de iconos en cliente.
+4. **Value Proposition / Features (`FeaturesSection.astro`)**
+   - Responsive grid (`grid-cols-1 md:grid-cols-3`) with 3–6 concrete benefits.
+   - Light inline SVG icons or icons from an optimized set; avoid heavy client-side icon libraries.
 
-5. **Cómo Funciona (`HowItWorksSection.astro`)**
-   - 3 pasos numerados que reducen la fricción percibida.
+5. **How It Works (`HowItWorksSection.astro`)**
+   - 3 numbered steps that reduce perceived friction.
 
-6. **Pricing / Planes (`PricingSection.astro`)** *(si aplica)*
-   - Máximo 3 columnas, destacando visualmente el plan recomendado (`aria-label` o badge claro).
+6. **Pricing / Plans (`PricingSection.astro`)** *(if applicable)*
+   - At most 3 columns, visually highlighting the recommended plan (`aria-label` or a clear badge).
 
 7. **FAQ (`FaqSection.astro`)**
-   - Usar `<details>` y `<summary>` nativos estilizados con Tailwind (`group`, `group-open:rotate-180`) para lograr acordeones accesibles sin JavaScript.
+   - Use native `<details>` and `<summary>` styled with Tailwind (`group`, `group-open:rotate-180`) to get accessible accordions without JavaScript.
 
-8. **CTA Final + Footer (`CtaSection.astro`, `Footer.astro`)**
-   - Cierre con llamada a la acción directa y footer con enlaces legales, contacto y redes.
+8. **Final CTA + Footer (`CtaSection.astro`, `Footer.astro`)**
+   - Close with a direct call to action and a footer with legal links, contact and social networks.
 
 ---
 
-## 2. Accesibilidad (WCAG AA) y Tailwind CSS
+## 2. Accessibility (WCAG AA) and Tailwind CSS
 
-- **Skip link:** Incluir `<a href="#main-content" class="sr-only focus:not-sr-only ...">Saltar al contenido</a>` al inicio de `BaseLayout.astro`.
-- **Contraste:** Mínimo `4.5:1` en texto normal y `3:1` en texto grande o elementos UI.
-- **Estados de foco:** Nunca eliminar `outline` sin reemplazarlo por `focus-visible:ring-2 focus-visible:ring-offset-2`.
-- **Movimiento reducido:** Respetar `motion-reduce:transition-none` y `motion-reduce:animate-none` en animaciones.
+- **Skip link:** include `<a href="#main-content" class="sr-only focus:not-sr-only ...">Skip to main content</a>` at the start of `BaseLayout.astro`.
+- **Contrast:** at least `4.5:1` for normal text and `3:1` for large text or UI elements.
+- **Focus states:** never remove `outline` without replacing it with `focus-visible:ring-2 focus-visible:ring-offset-2`.
+- **Reduced motion:** respect `motion-reduce:transition-none` and `motion-reduce:animate-none` in animations.
