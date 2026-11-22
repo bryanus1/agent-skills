@@ -44,7 +44,7 @@ test('table cells escape pipes and angle brackets and link to skill README.md', 
   });
   assert.match(table, /\*\*\[`x`\]\(skills\/c\/x\/README\.md\)\*\*/);
   assert.match(table, /a \\\| b &lt;feature&gt; next \|$/m);
-  assert.match(table, /\| Todos \|/);
+  assert.match(table, /\| All \|/);
 });
 
 test('replaceBlock swaps only the marked region and is idempotent', () => {

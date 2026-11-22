@@ -41,7 +41,7 @@ export function buildCatalog() {
 }
 
 function formatAgents(agents) {
-  if (agents.includes('all') || ALL_AGENTS.every((agent) => agents.includes(agent))) return 'Todos';
+  if (agents.includes('all') || ALL_AGENTS.every((agent) => agents.includes(agent))) return 'All';
   return agents.length > 0 ? agents.join(', ') : '—';
 }
 
@@ -52,7 +52,7 @@ export function renderTable(catalog) {
   const rows = catalog.skills.map((skill) =>
     `| **[\`${skill.name}\`](${skill.readme})** | ${skill.category ? `\`${skill.category}\`` : '—'} | \`${skill.version}\` | ${formatAgents(skill.agents)} | ${escapeCell(skill.description)} |`,
   );
-  return ['| Skill | Categoría | Versión | Agentes | Descripción |', '| :--- | :--- | :--- | :--- | :--- |', ...rows].join('\n');
+  return ['| Skill | Category | Version | Agents | Description |', '| :--- | :--- | :--- | :--- | :--- |', ...rows].join('\n');
 }
 
 export function replaceBlock(content, marker, replacement) {
